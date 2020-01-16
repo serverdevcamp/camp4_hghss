@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rest.user.mapper.UserMapper">
+    <select id = "getUserByEmail" resultType="com.rest.user.model.User">
+        SELECT * FROM user WHERE email = #{email};
+    </select>
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.rest.user.model.User">
+        INSERT INTO user(email,hashed_password,salt) VALUE (#{email},#{hashedPassword},#{salt});
+    </insert>
+</mapper>
