@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HghssPage from '../views/HghssPage.vue'
-
+import RecruitPage from '../views/RecruitPage'
 // import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
@@ -11,6 +11,11 @@ const routes = [
     path: '/',
     name: 'HghssPage',
     component: HghssPage
+  },
+  {
+    path: '/recruit',
+    name: 'RecruitPage',
+    component: RecruitPage
   },
   // {
   //   path: '/about',
