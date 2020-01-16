@@ -1,11 +1,11 @@
-package com.rest.user.service;
+package com.rest.recruit.service;
 
-import com.rest.user.dto.ResultResponse;
-import com.rest.user.dto.SimpleResponse;
-import com.rest.user.dto.request.GetRecruitCalendarRequestDTO;
-import com.rest.user.dto.response.GetCalendarResponse;
-import com.rest.user.dto.response.GetRecruitCalendarSimpleResponseDTO;
-import com.rest.user.mapper.RecruitMapper;
+import com.rest.recruit.dto.ResultResponse;
+import com.rest.recruit.dto.SimpleResponse;
+import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
+import com.rest.recruit.dto.response.GetCalendarResponse;
+import com.rest.recruit.dto.response.GetRecruitCalendarSimpleResponseDTO;
+import com.rest.recruit.mapper.RecruitMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

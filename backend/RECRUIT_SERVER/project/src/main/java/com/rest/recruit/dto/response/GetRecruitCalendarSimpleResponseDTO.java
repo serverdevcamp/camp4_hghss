@@ -1,9 +1,7 @@
-package com.rest.user.dto.response;
+package com.rest.recruit.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter
