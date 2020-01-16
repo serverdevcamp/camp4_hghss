@@ -1,12 +1,9 @@
-package com.rest.user.controller;
+package com.rest.recruit.controller;
 
-import com.rest.user.dto.request.GetRecruitCalendarRequestDTO;
-import com.rest.user.dto.response.GetRecruitCalendarSimpleResponseDTO;
-import com.rest.user.service.RecruitService;
+import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
+import com.rest.recruit.service.RecruitService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 
 @RestController

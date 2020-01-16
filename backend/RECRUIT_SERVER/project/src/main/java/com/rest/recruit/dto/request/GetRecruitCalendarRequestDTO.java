@@ -1,4 +1,4 @@
-package com.rest.user.dto.request;
+package com.rest.recruit.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;

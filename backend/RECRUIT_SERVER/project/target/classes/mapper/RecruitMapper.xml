@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.rest.user.mapper.RecruitMapper">
+<mapper namespace="com.rest.recruit.mapper.RecruitMapper">
 
     <sql id = "field">
         recruit.id AS recruitId,
@@ -13,7 +13,7 @@
         recruit.start_time AS startTime,
         recruit.end_time AS endTime
     </sql>
-    <select id = "getRecruitCalendarByDate" parameterType="String" resultType="com.rest.user.dto.response.GetRecruitCalendarSimpleResponseDTO">
+    <select id = "getRecruitCalendarByDate" parameterType="String" resultType="com.rest.recruit.dto.response.GetRecruitCalendarSimpleResponseDTO">
 
         SELECT
         <include refid="field"/>
