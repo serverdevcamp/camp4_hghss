@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rest.user.mapper.RecruitMapper">
+
+    <sql id = "field">
+        recruit.id AS recruitId,
+        company.id AS companyId,
+        company.name AS companyName,
+        recruit.recruit_type AS recruitType,
+        company.logo_url AS imageFileName,
+        position.division AS employType,
+        recruit.start_time AS startTime,
+        recruit.end_time AS endTime
+    </sql>
+    <select id = "getRecruitCalendarByDate" parameterType="String" resultType="com.rest.user.dto.response.GetRecruitCalendarSimpleResponseDTO">
+
+        SELECT
+        <include refid="field"/>
+        FROM company
+        INNER JOIN recruit ON company.id= recruit.company_id
+        INNER JOIN position ON recruit.id = position.recruit_id
+        WHERE recruit.end_time<![CDATA[>=]]>DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i') OR recruit.start_time<![CDATA[>=]]>DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i')
+        OR (recruit.start_time<![CDATA[>=]]>DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i') AND recruit.end_time<![CDATA[<=]]>DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
+        ORDER BY recruit.id ASC;
+    </select>
+
+
+
+
+</mapper>
