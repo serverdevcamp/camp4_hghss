@@ -28,6 +28,9 @@ dependencies {
     runtime 'io.jsonwebtoken:jjwt-impl:0.10.7'
     runtime 'io.jsonwebtoken:jjwt-jackson:0.10.7'
 
+    compile 'javax.mail:1.4.7'
+    compile 'org.springframework.session:2.1.4.RELEASE'
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'mysql:mysql-connector-java'
     annotationProcessor 'org.projectlombok:lombok'

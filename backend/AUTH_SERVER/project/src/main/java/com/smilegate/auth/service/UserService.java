@@ -1,15 +1,21 @@
 package com.smilegate.auth.service;
 
-import com.smilegate.auth.config.security.JwtTokenProvider;
+import com.smilegate.auth.exceptions.ExistEmailException;
+import com.smilegate.auth.utils.JwtUtil;
 import com.smilegate.auth.domain.User;
 import com.smilegate.auth.dto.SigninRequestDto;
 import com.smilegate.auth.dto.SigninResponseDto;
+import com.smilegate.auth.dto.SignupRequestDto;
 import com.smilegate.auth.exceptions.EmailNotExistException;
 import com.smilegate.auth.exceptions.PasswordWrongException;
 import com.smilegate.auth.repository.UserRepository;
+import com.smilegate.auth.utils.MailUtil;
+import com.smilegate.auth.utils.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -17,7 +23,9 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtUtil jwtUtil;
+    private final MailUtil mailUtil;
+    private final RedisUtil redisUtil;
 
     public SigninResponseDto signin(SigninRequestDto signinRequestDto) {
         String email = signinRequestDto.getEmail();
@@ -33,9 +41,37 @@ public class UserService {
         }
 
         // token 발급
-        String accessToken = jwtTokenProvider.createToken(user.getEmail(), user.getGrade(), 30);
-        String refreshToken = jwtTokenProvider.createToken(user.getEmail(), user.getGrade(), 60*24*14);
+        String accessToken = jwtUtil.createToken(user.getEmail(), user.getGrade(), 30);
+        String refreshToken = jwtUtil.createToken(user.getEmail(), user.getGrade(), 60*24*14);
 
         return new SigninResponseDto(accessToken, refreshToken);
+    }
+
+    public void sendSignupMail(SignupRequestDto signupRequestDto) {
+        String email = signupRequestDto.getEmail();
+        String hashedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
+
+        if(userRepository.countUser(email) > 0) {
+            throw new ExistEmailException(email);
+        }
+
+        String key = UUID.randomUUID().toString();
+        User user = User.builder()
+                        .email(email)
+                        .hashedPassword(hashedPassword)
+                        .grade("USER")
+                        .build();
+
+        if(mailUtil.sendSignupMail(key, user)) {
+            redisUtil.set(key, user, 10);
+        }
+    }
+
+    public void registerUser(String key) {
+        User user = (User)redisUtil.get(key);
+        // TODO : Random Nickname
+        user.setNickname("test");
+        userRepository.registerUser(user);
+        redisUtil.delete(key);
     }
 }

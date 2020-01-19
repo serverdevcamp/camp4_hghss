@@ -1,4 +1,4 @@
-package com.smilegate.auth.config.security;
+package com.smilegate.auth.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -18,10 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
 
-import static org.apache.tomcat.jni.Time.now;
-
 @Component
-public class JwtTokenProvider {
+public class JwtUtil {
 
     @Value("${jwt.secret}")
     private String secret;
@@ -31,7 +29,7 @@ public class JwtTokenProvider {
 
     private final UserDetailsService userDetailsService;
 
-    public JwtTokenProvider(@Qualifier("customUserDetailsService") UserDetailsService userDetailsService) {
+    public JwtUtil(@Qualifier("customUserDetailsService") UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 

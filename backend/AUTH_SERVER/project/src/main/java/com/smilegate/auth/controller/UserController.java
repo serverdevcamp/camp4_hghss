@@ -2,10 +2,13 @@ package com.smilegate.auth.controller;
 
 import com.smilegate.auth.dto.SigninRequestDto;
 import com.smilegate.auth.dto.SigninResponseDto;
+import com.smilegate.auth.dto.SignupRequestDto;
 import com.smilegate.auth.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -20,15 +23,29 @@ public class UserController {
         return ResponseEntity.ok().body(signinResponseDto);
     }
 
-    @GetMapping("/signup")
-    public String signup() {
-        return "singup";
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody SignupRequestDto signupRequestDto) {
+        userService.sendSignupMail(signupRequestDto);
+        return ResponseEntity.ok().body("인증 메일 전송");
     }
 
     @GetMapping("/signup/confirm")
-    public String signupConfirm() {
-        return "singup confirm";
+    public ResponseEntity<?> signupConfirm(@RequestParam("key")String key) {
+        userService.registerUser(key);
+        return ResponseEntity.ok().body("가입 완료");
     }
 
+//    @PostMapping("/findPassword")
+//    public ResponseEntity<?> findPassword(@RequestBody Map<String, String> map) {
+//        userService.sendPasswordMail(map.get("email"));
+//        return ResponseEntity.ok().body("비밀번호 변경 메일 전송");
+//    }
+//
+//    @GetMapping("/findPassword/confirm")
+//    public ResponseEntity<?> findPasswordConfirm(@RequestParam("key")String key) {
+//        String token = userService.getUpdatePasswordToken(key);
+//        return ResponseEntity.ok().body(token);
+////        return ResponseEntity.ok().body(new FindPasswordConfirmResponseDto(token));
+//    }
 
 }
