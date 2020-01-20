@@ -5,13 +5,13 @@ import com.rest.recruit.model.RecruitDetail;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 @Getter
 @Setter
 public class GetRecruitDetailResponseDTO {
-
 
     private int recruitId;
     private String companyName;
@@ -46,4 +46,5 @@ public class GetRecruitDetailResponseDTO {
         this.favoriteCount = tmp.getFavoriteCount();
         this.employments = getRecruitPositionResponseDTO;
     }
+
 }
