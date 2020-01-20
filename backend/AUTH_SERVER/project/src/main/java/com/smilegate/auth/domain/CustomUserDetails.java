@@ -20,7 +20,7 @@ public class CustomUserDetails implements UserDetails {
 
     private String email;
     private String hashedPassword;
-    private  String grade;
+    private String grade;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -5,6 +5,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
@@ -32,6 +34,16 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public int registerUser(User user) {
         return session.insert("user.signup", user);
+    }
+
+    @Override
+    public void updatePassword(User user) {
+        session.update("user.updatePassword", user);
+    }
+
+    @Override
+    public List<User> findUsers() {
+        return session.selectList("user.findUsers");
     }
 
 }

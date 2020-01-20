@@ -17,6 +17,7 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtUtil {
@@ -38,9 +39,9 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public String createToken(String email, String grade, int minutes) {
+    public String createToken(String email, List<String> roles, int minutes) {
         Claims claims = Jwts.claims().setSubject(email);
-        claims.put("roles", grade);
+        claims.put("roles", roles);
 
         Date now = new Date();
         return Jwts.builder()

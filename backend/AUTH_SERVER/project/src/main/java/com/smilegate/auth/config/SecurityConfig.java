@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtUtil jwtUtil;
@@ -38,8 +36,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                    .antMatchers("/*/signin/**", "/*/signup/**").permitAll()
-                    .anyRequest().hasRole("USER")
+                    .antMatchers("/users/updatePassword").permitAll()
+                    .antMatchers("/*/signin/**", "/*/signup/**", "/*/findPassword/**").hasAnyAuthority("USER", "ADMIN")
+                    .antMatchers("/admin/**").hasAuthority("ADMIN")
+                    .anyRequest().hasAnyAuthority("USER", "ADMIN")
                 .and()
                     .addFilterBefore(
                             new JwtAuthenticationFilter(jwtUtil),

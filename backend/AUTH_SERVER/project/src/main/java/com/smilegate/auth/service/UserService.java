@@ -1,6 +1,7 @@
 package com.smilegate.auth.service;
 
 import com.smilegate.auth.exceptions.ExistEmailException;
+import com.smilegate.auth.exceptions.NonExistEmailException;
 import com.smilegate.auth.utils.JwtUtil;
 import com.smilegate.auth.domain.User;
 import com.smilegate.auth.dto.SigninRequestDto;
@@ -15,6 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -41,8 +45,8 @@ public class UserService {
         }
 
         // token 발급
-        String accessToken = jwtUtil.createToken(user.getEmail(), user.getGrade(), 30);
-        String refreshToken = jwtUtil.createToken(user.getEmail(), user.getGrade(), 60*24*14);
+        String accessToken = jwtUtil.createToken(user.getEmail(), new ArrayList<>(Collections.singleton(user.getGrade())), 30);
+        String refreshToken = jwtUtil.createToken(user.getEmail(), new ArrayList<>(Collections.singleton(user.getGrade())), 60*24*14);
 
         return new SigninResponseDto(accessToken, refreshToken);
     }
@@ -71,7 +75,52 @@ public class UserService {
         User user = (User)redisUtil.get(key);
         // TODO : Random Nickname
         user.setNickname("test");
-        userRepository.registerUser(user);
+        if(userRepository.registerUser(user) > 0) {
+            redisUtil.delete(key);
+        }
+    }
+
+    public void sendPasswordMail(String email) {
+        if(userRepository.countUser(email) == 0) {
+            throw new NonExistEmailException(email);
+        }
+
+        String key = UUID.randomUUID().toString();
+
+        if(mailUtil.sendPasswordMail(key, email)) {
+            redisUtil.set(key, email, 10);
+        }
+    }
+
+    public String getUpdatePasswordToken(String key) {
+        String email = (String) redisUtil.get(key);
+        List<String> roles = new ArrayList<>();
+        String grade = "UPDATE_PASSWORD";
+        roles.add(grade);
+
+        String token = jwtUtil.createToken(email, roles, 10);
+
         redisUtil.delete(key);
+
+        return token;
+    }
+
+    public void updatePassword(String email, String password) {
+        if(userRepository.countUser(email) == 0) {
+            throw new NonExistEmailException(email);
+        }
+
+        String hashedPassword = passwordEncoder.encode(password);
+
+        userRepository.updatePassword(
+                User.builder()
+                    .email(email)
+                    .hashedPassword(hashedPassword)
+                    .build()
+        );
+    }
+
+    public List<User> getUserList() {
+        return userRepository.findUsers();
     }
 }
