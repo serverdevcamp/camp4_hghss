@@ -1,6 +1,17 @@
 <template>
   <section id="calendar">
-    <v-row class="header"> 
+    <v-row class="month-header">
+      <v-col></v-col>
+      <v-col>
+        <p class="point-font">
+          {{ year }}년 {{ month+1 }}월
+        </p>
+      </v-col>
+      <v-col>
+        <input v-model="search" class="search-company" type="text" placeholder="회사명을 입력하세요.">
+      </v-col>
+    </v-row>
+    <v-row class="weeks-header">
        <v-col v-for="day in days" :key="day">
          <p class="point-font">{{ day }}</p>
        </v-col>
@@ -12,14 +23,14 @@
             <p class="title point-font">{{ getCalendarDate(7*(week-1)+day-1).substring(8,10)}}</p>
           </v-row>
           <div class="company-wrapper">
-            <v-row class="company" v-for="company in recruit[getCalendarDate(7*(week-1)+day-1)].start" :key="company.recruitId" >
+            <v-row v-if="company.companyName.indexOf(search) >= 0" class="company" v-for="company in recruit[getCalendarDate(7*(week-1)+day-1)].start" :key="company.recruitId" >
               <span class="info-start-icon point-font">시</span>
               <span class="company-name">{{ company.companyName}}</span>
               <span class="star-btn">
                 <font-awesome-icon icon="star"/>
               </span>
             </v-row>
-            <v-row class="company" v-for="company in recruit[getCalendarDate(7*(week-1)+day-1)].end" :key="company.recruitId" >
+            <v-row v-if="company.companyName.indexOf(search) >= 0" class="company" v-for="company in recruit[getCalendarDate(7*(week-1)+day-1)].end" :key="company.recruitId" >
               <span class="info-end-icon point-font">끝</span>
               <span class="company-name">{{ company.companyName}}</span>
               <div class="star-btn">
@@ -52,15 +63,14 @@ export default {
     ],
     days: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
     weeks: "",
-
     today: new Date(),
     year: "",
     month: "",
     date: "",
-
     startDate: "",
     endtDate: "",
-    recruit: {}
+    recruit: {},
+    search:'',
   }),
   computed: {
     ...mapGetters(["getCalendarRecruit"])
@@ -122,7 +132,7 @@ export default {
     this.month = this.today.getMonth();
     this.date = this.today.getDate();
     this.createCalendar(this.year, this.month);
-  }
+  },
 };
 </script>
 <style lang="scss">
@@ -145,7 +155,25 @@ $end: #3f4b5e;
     margin: 0;
     padding: 0;
   }
-  .header{
+  .month-header{
+    background: $calendar-border;
+    p{ 
+      padding: 20px 0 15px;
+      text-align: center;
+      font-size: 1.5rem;
+      letter-spacing: 0.05rem;
+    }
+    .search-company{
+      float:right;
+      width: 60%;
+      margin:20px 15px;
+      padding: 5px 10px;
+      background: #ffffff;
+      border-radius: 5px;
+      font-size: 0.85rem;
+    }
+  }
+  .weeks-header{
     background: $calendar-day;
     p {
       width:100%;
@@ -156,7 +184,7 @@ $end: #3f4b5e;
     }
   }
   .calendar-scroll{
-    height:calc(100vh - 50px);
+    height:100%;
     overflow: scroll;
   }
   .row.week-wrapper {
