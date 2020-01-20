@@ -17,4 +17,6 @@ public interface RecruitMapper {
     public RecruitDetail GetDetailRecruitPage(int recruitIdx);
 
     List<Position> getPosition(int recruitIdx);
+
+    public int updateViewCount(int recruitIdx);
 }

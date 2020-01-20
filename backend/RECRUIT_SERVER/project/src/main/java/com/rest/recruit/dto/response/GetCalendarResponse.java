@@ -1,12 +1,17 @@
 package com.rest.recruit.dto.response;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@Builder
 public class GetCalendarResponse {
     private int companyId;
     private int recruitId;
@@ -17,18 +22,41 @@ public class GetCalendarResponse {
     private String imageFileName;//EMPLOYEE TYPE, USER_LIKE
     private List<Integer> employType;
 
+    public static GetCalendarResponse of(GetRecruitCalendarSimpleResponseDTO getRecruitCalendarSimpleResponseDTO,
+                                         List<Integer> employTypeTmp) {
+     return GetCalendarResponse.builder()
+         .companyId(getRecruitCalendarSimpleResponseDTO.getCompanyId())
+         .recruitId(getRecruitCalendarSimpleResponseDTO.getRecruitId())
+        .companyName(getRecruitCalendarSimpleResponseDTO.getCompanyName())
+        .recruitType(getRecruitCalendarSimpleResponseDTO.getRecruitType())
+        .imageFileName(getRecruitCalendarSimpleResponseDTO.getImageFileName())
+        .startTime(getRecruitCalendarSimpleResponseDTO.getStartTime())
+        .endTime(getRecruitCalendarSimpleResponseDTO.getEndTime())
+        .employType(employTypeTmp).build();
+    }
 
-    public GetCalendarResponse(int recruitId, int companyId, String companyName, String imageFileName,
-                               int recruitType,String startTime,String endTime,List<Integer> employTypeTmp) {
+    public static GetCalendarResponse of(GetRecruitCalendarSimpleResponseDTO getRecruitCalendarSimpleResponseDTO) {
+        //convert string to array
 
-        this.companyId = companyId;
-        this.recruitId = recruitId;
-        this.companyName = companyName;
-        this.recruitType = recruitType;
-        this.imageFileName = imageFileName;
-        this.employType = employTypeTmp;
-        this.startTime = startTime;
-        this.endTime = endTime;
+
+        return GetCalendarResponse.builder()
+                .companyId(getRecruitCalendarSimpleResponseDTO.getCompanyId())
+                .recruitId(getRecruitCalendarSimpleResponseDTO.getRecruitId())
+                .companyName(getRecruitCalendarSimpleResponseDTO.getCompanyName())
+                .recruitType(getRecruitCalendarSimpleResponseDTO.getRecruitType())
+                .imageFileName(getRecruitCalendarSimpleResponseDTO.getImageFileName())
+                .startTime(getRecruitCalendarSimpleResponseDTO.getStartTime())
+                .endTime(getRecruitCalendarSimpleResponseDTO.getEndTime())
+                .employType(convertToArray(getRecruitCalendarSimpleResponseDTO.getEmployType())).build();
+    }
+
+    private static List<Integer> convertToArray(String employType) {
+        List<String> tmpString = Arrays.asList(employType.split(","));
+
+        return tmpString.stream()
+                .map(s-> Integer.valueOf(s))
+                .collect(Collectors.toList());
 
     }
+
 }

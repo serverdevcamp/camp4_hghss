@@ -9,7 +9,7 @@
         company.name AS companyName,
         recruit.recruit_type AS recruitType,
         company.logo_url AS imageFileName,
-        position.division AS employType,
+        GROUP_CONCAT(position.division) AS employType,
         recruit.start_time AS startTime,
         recruit.end_time AS endTime
     </sql>
@@ -26,6 +26,8 @@
         recruit.view_count,
         COUNT(recruit_like.user_id) AS 'favorite_count'
     </sql>
+
+
     <select id = "getRecruitCalendarByDate" parameterType="String" resultType="com.rest.recruit.dto.response.GetRecruitCalendarSimpleResponseDTO">
 
         SELECT
@@ -33,16 +35,16 @@
         FROM company
         INNER JOIN recruit ON company.id= recruit.company_id
         INNER JOIN position ON recruit.id = position.recruit_id
-        WHERE recruit.end_time<![CDATA[>=]]>DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i') OR recruit.start_time<![CDATA[>=]]>DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i')
-        OR (recruit.start_time<![CDATA[>=]]>DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i') AND recruit.end_time<![CDATA[<=]]>DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
+        WHERE (DATE(recruit.start_time) <![CDATA[>=]]> DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i')
+        AND DATE(recruit.start_time) <![CDATA[<=]]>  DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
+        OR (DATE(recruit.end_time) <![CDATA[>=]]>  DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i')
+        AND DATE(recruit.end_time)  <![CDATA[<=]]> DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
+        GROUP BY recruit.id
         ORDER BY recruit.start_time ASC;
     </select>
 
 
-
-
     <select id = "GetDetailRecruitPage" resultType="com.rest.recruit.model.RecruitDetail">
-
         SELECT
         <include refid = "detail"/>
         FROM recruit
@@ -60,6 +62,11 @@
         INNER JOIN question ON question.position_id = position.id
         WHERE recruit.id = #{recruitIdx};
     </select>
+
+    <update id="updateViewCount" useGeneratedKeys="true" parameterType="com.rest.recruit.model.RecruitDetail">
+        UPDATE recruit SET  recruit.view_count = recruit.view_count + 1 
+        WHERE recruit.id = #{recruitIdx};
+    </update>
 
 
 </mapper>

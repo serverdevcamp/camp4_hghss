@@ -16,6 +16,12 @@ public class Position {
 
 
     private String questionContent;
+    private List<Question> quesitons;
+
+    public void setEmployments(List<Question> tmpQuestion) {
+        this.quesitons = tmpQuestion;
+
+    }
 
 
     //employMentResume
