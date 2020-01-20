@@ -27,7 +27,7 @@ public class AppConfig {
         SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriverClass(com.mysql.cj.jdbc.Driver.class);
         dataSource.setUsername("root");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/hghssdb?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/hghssdb?allowMultiQueries=true&useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC");
         dataSource.setPassword("welcome1");
 
         return dataSource;

@@ -13,6 +13,19 @@
         recruit.start_time AS startTime,
         recruit.end_time AS endTime
     </sql>
+
+    <sql id = "detail">
+        recruit.id AS 'recruit_id',
+        company.name AS 'company_name',
+        company.logo_url AS 'image_file_name',
+        recruit.employment_page_url,
+        DATE_FORMAT(recruit.start_time,'%Y-%m-%d %h:%i') AS 'start_time',
+        DATE_FORMAT(recruit.end_time,'%Y-%m-%d %h:%i') AS 'end_time',
+        recruit.content,
+        recruit.recruit_type AS 'recruit_type',
+        recruit.view_count,
+        COUNT(recruit_like.user_id) AS 'favorite_count'
+    </sql>
     <select id = "getRecruitCalendarByDate" parameterType="String" resultType="com.rest.recruit.dto.response.GetRecruitCalendarSimpleResponseDTO">
 
         SELECT
@@ -22,10 +35,31 @@
         INNER JOIN position ON recruit.id = position.recruit_id
         WHERE recruit.end_time<![CDATA[>=]]>DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i') OR recruit.start_time<![CDATA[>=]]>DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i')
         OR (recruit.start_time<![CDATA[>=]]>DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i') AND recruit.end_time<![CDATA[<=]]>DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
-        ORDER BY recruit.id ASC;
+        ORDER BY recruit.start_time ASC;
     </select>
 
 
+
+
+    <select id = "GetDetailRecruitPage" resultType="com.rest.recruit.model.RecruitDetail">
+
+        SELECT
+        <include refid = "detail"/>
+        FROM recruit
+        INNER JOIN company ON company.id = recruit.company_id
+        INNER JOIN recruit_like ON recruit_like.recruit_id = recruit.id
+        WHERE recruit.id = #{recruitIdx};
+    </select>
+
+    <select id = "getPosition" resultType="com.rest.recruit.model.Position">
+        SELECT
+        position.id AS 'position_id', position.field , position.division,
+        question.id AS 'question_id',question.question_content
+        FROM recruit
+        INNER JOIN position ON position.recruit_id = recruit.id
+        INNER JOIN question ON question.position_id = position.id
+        WHERE recruit.id = #{recruitIdx};
+    </select>
 
 
 </mapper>
