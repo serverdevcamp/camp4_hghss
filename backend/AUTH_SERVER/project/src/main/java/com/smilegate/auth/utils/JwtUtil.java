@@ -52,16 +52,16 @@ public class JwtUtil {
     }
 
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserEmail(token));
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(getClaims(token).getSubject());
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
-    private String getUserEmail(String token) {
+    public Claims getClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(key)
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
 
     public String getToken(HttpServletRequest request) {

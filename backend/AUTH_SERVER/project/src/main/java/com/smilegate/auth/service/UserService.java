@@ -1,17 +1,16 @@
 package com.smilegate.auth.service;
 
-import com.smilegate.auth.exceptions.ExistEmailException;
-import com.smilegate.auth.exceptions.NonExistEmailException;
+import com.smilegate.auth.exceptions.*;
 import com.smilegate.auth.utils.JwtUtil;
 import com.smilegate.auth.domain.User;
-import com.smilegate.auth.dto.SigninRequestDto;
-import com.smilegate.auth.dto.SigninResponseDto;
-import com.smilegate.auth.dto.SignupRequestDto;
-import com.smilegate.auth.exceptions.EmailNotExistException;
-import com.smilegate.auth.exceptions.PasswordWrongException;
+import com.smilegate.auth.dto.request.SigninRequestDto;
+import com.smilegate.auth.dto.response.TokenResponseDto;
+import com.smilegate.auth.dto.request.SignupRequestDto;
 import com.smilegate.auth.repository.UserRepository;
 import com.smilegate.auth.utils.MailUtil;
 import com.smilegate.auth.utils.RedisUtil;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,7 @@ public class UserService {
     private final MailUtil mailUtil;
     private final RedisUtil redisUtil;
 
-    public SigninResponseDto signin(SigninRequestDto signinRequestDto) {
+    public TokenResponseDto signin(SigninRequestDto signinRequestDto) {
         String email = signinRequestDto.getEmail();
         String password = signinRequestDto.getPassword();
 
@@ -45,10 +44,13 @@ public class UserService {
         }
 
         // token 발급
-        String accessToken = jwtUtil.createToken(user.getEmail(), new ArrayList<>(Collections.singleton(user.getGrade())), 30);
-        String refreshToken = jwtUtil.createToken(user.getEmail(), new ArrayList<>(Collections.singleton(user.getGrade())), 60*24*14);
+        String accessToken = jwtUtil.createToken(user.getEmail(), Collections.singletonList(user.getGrade()), 30);
+        String refreshToken = jwtUtil.createToken(user.getEmail(), Collections.singletonList(user.getGrade()), 60*24*14);
 
-        return new SigninResponseDto(accessToken, refreshToken);
+        return TokenResponseDto.builder()
+                                .accessToken(accessToken)
+                                .refreshToken(refreshToken)
+                                .build();
     }
 
     public void sendSignupMail(SignupRequestDto signupRequestDto) {
@@ -82,7 +84,7 @@ public class UserService {
 
     public void sendPasswordMail(String email) {
         if(userRepository.countUser(email) == 0) {
-            throw new NonExistEmailException(email);
+            throw new EmailNotExistException(email);
         }
 
         String key = UUID.randomUUID().toString();
@@ -95,7 +97,7 @@ public class UserService {
     public String getUpdatePasswordToken(String key) {
         String email = (String) redisUtil.get(key);
         List<String> roles = new ArrayList<>();
-        String grade = "UPDATE_PASSWORD";
+        String grade = "USER";
         roles.add(grade);
 
         String token = jwtUtil.createToken(email, roles, 10);
@@ -107,20 +109,30 @@ public class UserService {
 
     public void updatePassword(String email, String password) {
         if(userRepository.countUser(email) == 0) {
-            throw new NonExistEmailException(email);
+            throw new EmailNotExistException(email);
         }
 
         String hashedPassword = passwordEncoder.encode(password);
 
-        userRepository.updatePassword(
-                User.builder()
-                    .email(email)
-                    .hashedPassword(hashedPassword)
-                    .build()
-        );
+        userRepository.updatePassword(User.builder().email(email).hashedPassword(hashedPassword).build());
     }
 
-    public List<User> getUserList() {
-        return userRepository.findUsers();
+    public TokenResponseDto refreshToken(String refreshToken) throws ExpiredJwtException {
+        Claims claims = jwtUtil.getClaims(refreshToken);
+        String email = claims.getSubject();
+
+        if(redisUtil.get(email) != null) {
+            // logout한 상태에서 refreshToken이 날아옴...
+            throw new BlackListTokenException();
+        }
+
+        if(!jwtUtil.isValidToken(refreshToken)) {
+            throw new ExpiredRefreshTokenException();
+        }
+
+        String grade = (String) claims.get("roles", List.class).get(0);
+        String token = jwtUtil.createToken(email, Collections.singletonList(grade), 30);
+
+        return TokenResponseDto.builder().accessToken(token).refreshToken(refreshToken).build();
     }
 }
