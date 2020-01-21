@@ -2,13 +2,19 @@
   <section id="calendar">
     <v-row class="month-header">
       <v-col></v-col>
-      <v-col>
+      <v-col cols="5">
         <p class="point-font">
+          <span class="before-month-btn" @click="beforeMonth()">
+            <font-awesome-icon icon="chevron-left"/>
+          </span>
           {{ year }}년 {{ month+1 }}월
+          <span class="after-month-btn" @click="afterMonth()">
+            <font-awesome-icon icon="chevron-right"/>
+          </span>
         </p>
       </v-col>
       <v-col>
-        <input v-model="search" class="search-company" type="text" placeholder="회사명을 입력하세요.">
+        <input v-model="search" class="search-company" type="text" placeholder="기업명을 입력하세요.">
       </v-col>
     </v-row>
     <v-row class="weeks-header">
@@ -125,6 +131,24 @@ export default {
       var calendarDate = new Date(this.startDate.valueOf());
       calendarDate.setDate(calendarDate.getDate() + days);
       return calendarDate.toISOString().substring(0,10);
+    },
+    beforeMonth(){
+      if(this.month == 0) { 
+        this.year -= 1
+        this.month = 11
+      }else{
+        this.month -= 1
+      }
+      this.createCalendar(this.year, this.month);
+    },
+    afterMonth(){
+      if(this.month == 11){
+        this.year +=1
+        this.month = 0
+      }else{
+        this.month +=1
+      }
+      this.createCalendar(this.year, this.month);
     }
   },
   created() {
@@ -145,13 +169,14 @@ $star2: #f4d569;
 $end: #3f4b5e;
 
 #calendar {
+  width:100%;
   height:calc(100vh - 50px);
   margin: 0;
   padding: 0;
-  padding-left: 1px;
   overflow: hidden;
   .row,
   .col {
+    width:100%;
     margin: 0;
     padding: 0;
   }
@@ -163,13 +188,26 @@ $end: #3f4b5e;
       font-size: 1.5rem;
       letter-spacing: 0.05rem;
     }
+    .before-month-btn, .after-month-btn{
+      cursor: pointer;
+      display: inline-block;
+      padding: 5px 10px;
+      margin: 0 15px;
+      border-radius: 50%;
+      text-align: center;
+      &:hover{
+        background: rgba(1,1,1,0.1);
+      }
+    }
     .search-company{
       float:right;
       width: 60%;
-      margin:20px 15px;
+      max-width: 250px;
+      margin:20px 10%;
       padding: 5px 10px;
       background: #ffffff;
-      border-radius: 5px;
+      border: 1px solid $calendar-day;
+      border-radius: 50px;
       font-size: 0.85rem;
     }
   }
@@ -184,19 +222,17 @@ $end: #3f4b5e;
     }
   }
   .calendar-scroll{
-    height:100%;
+    height: calc(100vh - 145px);
     overflow: scroll;
   }
   .row.week-wrapper {
+    min-height: 25%;
     border-bottom: 1px solid $calendar-border;
     &:nth-child(1) {
       border-top: 1px solid $calendar-border;
     }
     .day-wrapper {
-      border-right: 1px solid $calendar-border;
-      &:nth-child(1) {
-        border-left: 1px solid $calendar-border;
-      }
+      border-left: 1px solid $calendar-border;
       .title-wrapper {
         padding: 5px 0;
         background: $calendar-title;

@@ -2,6 +2,7 @@ export default {
   user :{
     email : "",
   },
+  ChatState: false, // 채팅방 열림 여부
   starRank: {
     1: {
       company: "스마일게이트",
