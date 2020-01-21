@@ -59,7 +59,6 @@ public class MailUtil {
             return true;
 
         } catch (Exception e) {
-            // TODO: Auto-generated catch block
             e.printStackTrace();
             return false;
         }
@@ -84,7 +83,6 @@ public class MailUtil {
             return true;
 
         } catch (Exception e) {
-            // TODO: Auto-generated catch block
             e.printStackTrace();
             return false;
         }

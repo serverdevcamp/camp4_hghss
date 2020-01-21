@@ -1,9 +1,6 @@
 package com.smilegate.auth.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -20,12 +18,12 @@ public class CustomUserDetails implements UserDetails {
 
     private String email;
     private String hashedPassword;
-    private String grade;
+    private String role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        GrantedAuthority role = new SimpleGrantedAuthority(grade);
+        GrantedAuthority role = new SimpleGrantedAuthority(this.role);
         authorities.add(role);
         return authorities;
     }

@@ -20,7 +20,9 @@ public class RedisUtil {
         return redisTemplate.opsForValue().get(key);
     }
 
-    public void delete(String key) {
-        redisTemplate.delete(key);
+    public boolean delete(String key) {
+        return redisTemplate.delete(key);
     }
+
+    public boolean hasKey(String key) { return redisTemplate.hasKey(key); }
 }

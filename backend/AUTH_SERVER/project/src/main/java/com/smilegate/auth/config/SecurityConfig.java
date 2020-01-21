@@ -4,6 +4,7 @@ import com.smilegate.auth.filters.JwtAuthenticationFilter;
 import com.smilegate.auth.utils.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -36,9 +37,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                    .antMatchers("/*/signin/**", "/*/signup/**", "/*/findPassword/**").permitAll()
+                    .antMatchers("/*/signin/**", "/*/signup/**", "/*/findPassword/**", "/*/hello").permitAll()
+                    .antMatchers(HttpMethod.GET, "/exception/**").permitAll()
                     .antMatchers("/admin/**").hasAuthority("ADMIN")
-                    .anyRequest().authenticated()
+                    .anyRequest().hasAnyAuthority("USER", "ADMIN")
+                .and()
+                    .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
+                .and()
+                    .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                 .and()
                     .addFilterBefore(
                             new JwtAuthenticationFilter(jwtUtil),

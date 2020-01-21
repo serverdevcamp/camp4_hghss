@@ -19,6 +19,6 @@ public class User {
 
     private String nickname;
 
-    private String grade;
+    private String role;
 
 }

@@ -1,16 +1,20 @@
 package com.smilegate.auth.controller;
 
 import com.smilegate.auth.dto.ResultResponse;
-import com.smilegate.auth.dto.request.*;
+import com.smilegate.auth.dto.request.FindPasswordRequestDto;
+import com.smilegate.auth.dto.request.SigninRequestDto;
+import com.smilegate.auth.dto.request.SignupRequestDto;
+import com.smilegate.auth.dto.request.UpdatePasswordRequestDto;
 import com.smilegate.auth.dto.response.TokenResponseDto;
+import com.smilegate.auth.exceptions.UnauthorizedException;
 import com.smilegate.auth.service.UserService;
+import com.smilegate.auth.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -20,15 +24,18 @@ import java.io.IOException;
 public class UserController {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @GetMapping("/hello")
     public String hello() {
-        return "Hello!!!";
+        return "Hello";
     }
 
     @PostMapping("/signin")
     public ResponseEntity<ResultResponse> signin(@RequestBody SigninRequestDto signinRequestDto) {
+
         TokenResponseDto tokenResponseDto = userService.signin(signinRequestDto);
+
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
                         .success("true")
@@ -39,9 +46,28 @@ public class UserController {
         );
     }
 
+    @GetMapping("/signout")
+    public ResponseEntity<ResultResponse> signout(HttpServletRequest request) {
+
+        String refreshToken = jwtUtil.getToken(request);
+        if(!jwtUtil.isRefreshToken(refreshToken)) throw new UnauthorizedException();
+
+        userService.signout(refreshToken);
+
+        return ResponseEntity.ok().body(
+                ResultResponse.builder()
+                        .success("true")
+                        .status(HttpStatus.OK.value())
+                        .message("로그아웃 되었습니다.")
+                        .build()
+        );
+    }
+
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignupRequestDto signupRequestDto) {
+    public ResponseEntity<ResultResponse> signup(@RequestBody SignupRequestDto signupRequestDto) {
+
         userService.sendSignupMail(signupRequestDto);
+
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
                         .success("true")
@@ -53,13 +79,18 @@ public class UserController {
 
     @GetMapping("/signup/confirm")
     public void signupConfirm(@RequestParam("key")String key, HttpServletResponse response) throws IOException {
+
         userService.registerUser(key);
-        response.sendRedirect("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
+        // TODO: 인증 완료 후 로그인 페이지로
+        response.sendRedirect("http://google.com");
     }
 
     @PostMapping("/findPassword")
-    public ResponseEntity<?> findPassword(@RequestBody FindPasswordRequestDto findPasswordRequestDto) {
+    public ResponseEntity<ResultResponse> findPassword(@RequestBody FindPasswordRequestDto findPasswordRequestDto) {
+
         userService.sendPasswordMail(findPasswordRequestDto.getEmail());
+
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
                         .success("true")
@@ -71,21 +102,25 @@ public class UserController {
 
     @GetMapping("/findPassword/confirm")
     public void findPasswordConfirm(@RequestParam("key")String key, HttpServletResponse response) throws IOException {
+
         String token = userService.getUpdatePasswordToken(key);
-        response.setHeader("token", token);
-        response.sendRedirect("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+
+        // TODO: 토큰전달 어떻게?
+        // TODO: 비밀번호 변경 페이지로
+        response.sendRedirect("http://naver.com?token=" + token);
     }
 
     @PostMapping("/updatePassword")
-    public ResponseEntity<?> update(
-            @RequestBody UpdatePasswordRequestDto updatePasswordRequestDto,
-            Authentication authentication
+    public ResponseEntity<ResultResponse> update(
+            HttpServletRequest request,
+            @RequestBody UpdatePasswordRequestDto updatePasswordRequestDto
     ) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        String email = userDetails.getUsername();
+        String accessToken = jwtUtil.getToken(request);
+        if(!jwtUtil.isAccessToken(accessToken)) throw new UnauthorizedException();
+
+        String email = jwtUtil.getClaims(accessToken).getSubject();
         String password = updatePasswordRequestDto.getPassword();
-
         userService.updatePassword(email, password);
 
         return ResponseEntity.ok().body(
@@ -97,12 +132,13 @@ public class UserController {
         );
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<ResultResponse> refreshToken(
-            @RequestBody RefreshTokenRequestDto refreshTokenRequestDto
-    ) {
-        TokenResponseDto tokenResponseDto = userService.refreshToken(refreshTokenRequestDto.getRefreshToken());
+    @GetMapping("/refresh")
+    public ResponseEntity<ResultResponse> refreshToken(HttpServletRequest request) {
 
+        String refreshToken = jwtUtil.getToken(request);
+        if(!jwtUtil.isRefreshToken(refreshToken)) throw new UnauthorizedException();
+
+        TokenResponseDto tokenResponseDto = userService.refreshToken(refreshToken);
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
                         .success("true")
