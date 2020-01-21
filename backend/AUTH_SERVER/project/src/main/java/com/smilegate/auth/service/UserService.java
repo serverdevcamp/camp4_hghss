@@ -54,7 +54,7 @@ public class UserService {
     }
 
     public void signout(String refreshToken) {
-        if(!redisUtil.delete(refreshToken)) throw new NonSigninUserException();
+        if(!redisUtil.delete(refreshToken)) throw new SignoutException();
     }
 
     public TokenResponseDto refreshToken(String refreshToken) throws ExpiredJwtException {

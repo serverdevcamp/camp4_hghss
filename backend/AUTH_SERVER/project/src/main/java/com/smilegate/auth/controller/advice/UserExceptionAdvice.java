@@ -123,17 +123,4 @@ public class UserExceptionAdvice {
                 .build();
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NonSigninUserException.class)
-    public ResultResponse handleNonSigninUser(Exception e) {
-        return ResultResponse.builder()
-                .success("false")
-                .status(HttpStatus.UNAUTHORIZED.value())
-                .message(e.getMessage())
-                .build();
-    }
-
-
-
 }
