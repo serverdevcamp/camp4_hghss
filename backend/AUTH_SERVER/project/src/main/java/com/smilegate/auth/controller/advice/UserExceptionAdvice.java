@@ -36,7 +36,7 @@ public class UserExceptionAdvice {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(EmailNotExistException.class)
     public ResultResponse handleEmailNotExist(Exception e) {
         return ResultResponse.builder()

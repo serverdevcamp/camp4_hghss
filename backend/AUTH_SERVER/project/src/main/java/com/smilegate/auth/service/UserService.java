@@ -50,6 +50,8 @@ public class UserService {
         return TokenResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .email(email)
+                .nickname(user.getNickname())
                 .build();
     }
 

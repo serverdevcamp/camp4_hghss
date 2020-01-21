@@ -50,7 +50,7 @@ public class MailUtil {
             message.setSubject("[합격하소서] 인증코드 전송"); //메일 제목을 입력
 
             message.setContent("<h1>[이메일 인증]</h1> <p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p> " +
-                    "<a href='http://localhost:8080/users/signup/confirm?key="
+                    "<a href='http://localhost:8000/users/signup/confirm?key="
                     +key +"' target='_blenk'>이메일 인증 확인</a>","text/html;charset=euc-kr");
 
             // send the message
@@ -74,7 +74,7 @@ public class MailUtil {
             message.setSubject("[합격하소서] 비밀번호 찾기 전송"); //메일 제목을 입력
 
             message.setContent("<h1>[비밀번호 변경]</h1> <p>아래 링크를 클릭하시면 비밀번호를 변경하실 수 있습니다.</p> " +
-                    "<a href='http://localhost:8080/users/findPassword/confirm?key="
+                    "<a href='http://localhost:8000/users/findPassword/confirm?key="
                     +key +"' target='_blenk'>비밀번호 변경하기</a>","text/html;charset=euc-kr");
 
             // send the message

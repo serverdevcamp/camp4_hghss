@@ -47,9 +47,9 @@ public class UserController {
     }
 
     @GetMapping("/signout")
-    public ResponseEntity<ResultResponse> signout(HttpServletRequest request) {
-
-        String refreshToken = jwtUtil.getToken(request);
+    public ResponseEntity<ResultResponse> signout(@RequestHeader("Authorization")String token) {
+        String refreshToken = token.substring("Bearer ".length());
+//        String refreshToken = jwtUtil.getToken(request);
         if(!jwtUtil.isRefreshToken(refreshToken)) throw new UnauthorizedException();
 
         userService.signout(refreshToken);
@@ -83,7 +83,7 @@ public class UserController {
         userService.registerUser(key);
 
         // TODO: 인증 완료 후 로그인 페이지로
-        response.sendRedirect("http://google.com");
+        response.sendRedirect("http://localhost:8080/");
     }
 
     @PostMapping("/findPassword")
@@ -107,7 +107,7 @@ public class UserController {
 
         // TODO: 토큰전달 어떻게?
         // TODO: 비밀번호 변경 페이지로
-        response.sendRedirect("http://naver.com?token=" + token);
+        response.sendRedirect("http://localhost:8080/" + token);
     }
 
     @PostMapping("/updatePassword")
