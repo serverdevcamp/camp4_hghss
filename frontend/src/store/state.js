@@ -1,6 +1,7 @@
 export default {
   user :{
     email : "",
+    nickname : ""
   },
   ChatState: false, // 채팅방 열림 여부
   starRank: {

@@ -38,6 +38,7 @@
 </template>
 <script>
 const MODAL_WIDTH = 656
+
 export default {
   name: 'DemoLoginModal',
   data () {

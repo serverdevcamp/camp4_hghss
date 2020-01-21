@@ -1,4 +1,7 @@
 export default {
+    getUser(state) {
+        return state.user;
+    },
     getChatState(state){
         return state.ChatState
     },
