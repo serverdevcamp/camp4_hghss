@@ -3,7 +3,7 @@
     <div class="nav-section">
       <div class="point-font nav-home" @click="$router.push('/')">합격하소서 🙏</div>
       <div class="nav-btn" @click="$router.push('recruit')">채용 공고</div>
-      <div class="nav-btn" @click="$router.push('/')">자기소개서</div>
+      <div class="nav-btn" @click="$router.push('resume')">자기소개서</div>
     </div>
     <div class="nav-section">
       <div class="user-section">
@@ -18,6 +18,11 @@
           <div class="accounts btn">{{ $store.state.user.email }}</div>
           <div class="sign-out-btn btn">LOGOUT</div>
         </div>
+      </div>
+      <div class="chat-section" v-if="$route.name != 'HghssPage'">
+        <p class="nav-btn icon-btn" @click="$store.state.ChatState = !$store.state.ChatState">
+          <font-awesome-icon :icon="['far', 'comment-dots']" />
+        </p>
       </div>
     </div>
     <Authentication/>
@@ -38,7 +43,7 @@ export default {
     showModal(target) {
       this.$modal.show('account-modal', { target: target });
     }
-  }
+  },
 };
 </script>
 <style lang="scss">
@@ -72,11 +77,15 @@ export default {
   }
   .icon-btn {
     padding: 10px;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     &:hover {
       background: rgba(1, 1, 1, 0.1);
       border-radius: 3px;
     }
+  }
+  .user-section, .chat-section{
+    display: inline-block;
+    margin-left: 5px;
   }
   .user-section {
     position: relative;

@@ -17,6 +17,11 @@ const routes = [
     name: 'RecruitPage',
     component: RecruitPage
   },
+  {
+    path: '/resume',
+    name: 'ResumePage',
+    component: RecruitPage
+  },
   // {
   //   path: '/about',
   //   name: 'about',
