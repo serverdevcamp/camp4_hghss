@@ -4,8 +4,11 @@ import com.rest.recruit.dto.ResultResponse;
 import com.rest.recruit.dto.ResultResponseWithoutData;
 import com.rest.recruit.dto.SimpleResponse;
 import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
+import com.rest.recruit.service.RankingService;
 import com.rest.recruit.service.RecruitService;
+import com.rest.recruit.util.DateValidation;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.annotations.Api;
@@ -22,7 +25,10 @@ public class RecruitController {
 
     private final RecruitService recruitService;
 
-    public RecruitController(RecruitService recruitService) {
+    private final RankingService rankingService;
+
+    public RecruitController(RecruitService recruitService,RankingService rankingService) {
+        this.rankingService = rankingService;
         this.recruitService = recruitService;
     }
 
@@ -33,14 +39,15 @@ public class RecruitController {
     public ResponseEntity calendar(@ApiParam(value = "start_date , end_date", required = true) 
         @RequestBody GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO){
 
+
 /*    !validationDate(getRecruitCalendarRequestDTO.getStartTime()) ||
                 !validationDate(getRecruitCalendarRequestDTO.getEndTime())*/
         if ( getRecruitCalendarRequestDTO.getEndTime() == null ||
                 getRecruitCalendarRequestDTO.getStartTime() == null ||
                 getRecruitCalendarRequestDTO.getEndTime().isEmpty() ||
                 getRecruitCalendarRequestDTO.getStartTime().isEmpty() ||
-                !validationDate(getRecruitCalendarRequestDTO.getStartTime()) ||
-                !validationDate(getRecruitCalendarRequestDTO.getEndTime())) {
+                !DateValidation.validationDate(getRecruitCalendarRequestDTO.getStartTime()) ||
+                !DateValidation.validationDate(getRecruitCalendarRequestDTO.getEndTime())) {
 
             return SimpleResponse.badRequest(ResultResponseWithoutData.builder()
                     .message("필요한 값이 잘못되었습니다")
@@ -61,21 +68,30 @@ public class RecruitController {
         return recruitService.GetDetailRecruitPage(recruitIdx);
     }
 
-
-    private boolean validationDate(String checkDate) {
-
-        try{
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-            dateFormat.setLenient(false);
-            dateFormat.parse(checkDate);
-            return  true;
-
-        }catch (ParseException e){
-            return  false;
-        }
-
+    //스케쥴링@Scheduled(cron="0 0 0 * * ?")
+    @ApiOperation(value = "채용공고 db to redis", httpMethod = "POST", notes ="채용공고 DB를 REDIS에 업로드")
+    @PostMapping("/ranking/updateRedis")
+    public ResponseEntity DbToRedis(){
+        return rankingService.DbToRedis();
     }
+
+
+    //스케쥴링
+    @Scheduled(cron="0 0 0 * * ?")
+    @ApiOperation(value = "redis to 채용공고 db", httpMethod = "PUT", notes ="REDIS를 채용공고 DB에 업로드")
+    @PostMapping("/ranking/updateDB")
+    public ResponseEntity RedisToDb(){
+        return rankingService.RedisToDb();
+    }
+
+
+    @ApiOperation(value = "7일내 마감하는 조회수 랭킹", httpMethod = "GET", notes ="7일내 마감하는 조회수 랭킹")
+    @PostMapping("/ranking/visit")
+    public ResponseEntity getRankingByVisitCnt(){
+        return rankingService.getRankingByVisitCnt();
+    }
+
+
 
 
 }

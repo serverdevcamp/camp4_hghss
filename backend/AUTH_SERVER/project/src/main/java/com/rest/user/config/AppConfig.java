@@ -18,6 +18,8 @@ import javax.sql.DataSource;
  * MYSQL을 위한 CONFIG 파일
  * 모든 Config 파일은 보안에 취약하므로 gitignore를 꼭 합시다.
  * 본 프로젝트에서는 코드를 보여주기위해 gitignore에 추가하지 않음.
+ *  iptables -I INPUT 1 -p tcp --dport 3306 -j ACCEPT
+ * 
  */
 @Configuration
 @MapperScan(value = "com.rest.user.mapper")
