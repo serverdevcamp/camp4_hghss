@@ -7,14 +7,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 
 @ControllerAdvice
 public class UserExceptionAdvice {
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(UnauthorizedException.class)
     public ResultResponse handleAdminAuthNeeded(Exception e) {
         return ResultResponse.builder()
@@ -25,9 +22,8 @@ public class UserExceptionAdvice {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(SignoutException.class)
-    public ResultResponse handelBlackListToken(Exception e) {
+    public ResultResponse handelSignoutException(Exception e) {
         return ResultResponse.builder()
                 .success("false")
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -36,7 +32,6 @@ public class UserExceptionAdvice {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(EmailNotExistException.class)
     public ResultResponse handleEmailNotExist(Exception e) {
         return ResultResponse.builder()
@@ -47,7 +42,6 @@ public class UserExceptionAdvice {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ExistEmailException.class)
     public ResultResponse handleExistEmail(Exception e) {
         return ResultResponse.builder()
@@ -58,7 +52,6 @@ public class UserExceptionAdvice {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(ExpiredRefreshTokenException.class)
     public ResultResponse handleExpiredRefreshToken(Exception e) {
         return ResultResponse.builder()
@@ -69,7 +62,6 @@ public class UserExceptionAdvice {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(InvalidTokenException.class)
     public ResultResponse handleInvalidToken(Exception e) {
         return ResultResponse.builder()
@@ -80,7 +72,6 @@ public class UserExceptionAdvice {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(LoginNeededException.class)
     public ResultResponse handleLoginNeeded(Exception e) {
         return ResultResponse.builder()
@@ -91,7 +82,6 @@ public class UserExceptionAdvice {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(PasswordWrongException.class)
     public ResultResponse handlePasswordWrong(Exception e) {
         return ResultResponse.builder()
@@ -102,7 +92,6 @@ public class UserExceptionAdvice {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AuthenticationEntryPointException.class)
     public ResultResponse handleAuthenticationEntryPoint(Exception e) {
         return ResultResponse.builder()
@@ -113,7 +102,6 @@ public class UserExceptionAdvice {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AccessDeniedException.class)
     public ResultResponse handleAccessDenied(Exception e) {
         return ResultResponse.builder()

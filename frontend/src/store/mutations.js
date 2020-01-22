@@ -1,5 +1,5 @@
 export default {
-    signin(state, payload) {
+    setUserInfo(state, payload) {
         state.user.email = payload.email;
         state.user.nickname = payload.nickname;
     },

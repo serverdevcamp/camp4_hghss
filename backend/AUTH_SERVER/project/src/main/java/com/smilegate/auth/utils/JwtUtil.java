@@ -38,9 +38,11 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public String createToken(Integer userId, String email, List<String> roles, String tokenType, int minutes) {
+    public String createToken(Integer userId, String email, String nickname, List<String> roles, String tokenType, int minutes) {
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("userId", userId);
+        claims.put("email", email);
+        claims.put("nickname", nickname);
         claims.put("roles", roles);
         claims.put("tokenType", tokenType);
 

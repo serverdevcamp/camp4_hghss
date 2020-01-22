@@ -42,16 +42,16 @@ public class UserService {
         if(!passwordEncoder.matches(password, user.getHashedPassword())) throw new PasswordWrongException();
 
         // token 발급
-        String accessToken = jwtUtil.createToken(user.getId(), user.getEmail(), Collections.singletonList(user.getRole()), "ACCESS_TOKEN", 30);
-        String refreshToken = jwtUtil.createToken(user.getId(), user.getEmail(), Collections.singletonList(user.getRole()), "REFRESH_TOKEN", 60*24*14);
+        String accessToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), Collections.singletonList(user.getRole()), "ACCESS_TOKEN", 30);
+        String refreshToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), Collections.singletonList(user.getRole()), "REFRESH_TOKEN", 60*24*14);
 
         redisUtil.set(refreshToken, user.getRole(), 60*24*14);
 
         return TokenResponseDto.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
                 .email(email)
                 .nickname(user.getNickname())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -62,17 +62,20 @@ public class UserService {
     public TokenResponseDto refreshToken(String refreshToken) throws ExpiredJwtException {
 
         // 로그아웃 상태에서 refresh 요청
-        if(redisUtil.hasKey(refreshToken)) throw new SignoutException();
+        if(!redisUtil.hasKey(refreshToken)) throw new SignoutException();
 
         Claims claims = jwtUtil.getClaims(refreshToken);
 
         int userId = (int) claims.get("userId");
         String email = claims.getSubject();
+        String nickname  = (String) claims.get("nickname");
         String grade = (String) ((List) claims.get("roles")).get(0);
 
-        String accessToken = jwtUtil.createToken(userId, email, Collections.singletonList(grade), "ACCESS_TOKEN", 30);
+        String accessToken = jwtUtil.createToken(userId, email, nickname, Collections.singletonList(grade), "ACCESS_TOKEN", 30);
 
         return TokenResponseDto.builder()
+                .email(email)
+                .nickname(nickname)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
@@ -117,7 +120,9 @@ public class UserService {
     public String getUpdatePasswordToken(String key) {
 
         String email = (String) redisUtil.get(key);
-        String token = jwtUtil.createToken(null, email, Collections.singletonList("USER"), "ACCESS_TOKEN", 10);
+
+        // 비밀번호 찾기 후 이메일 링크를 통해 토큰 요청 시, 10분안에 비밀번호를 변경
+        String token = jwtUtil.createToken(null, email, null, Collections.singletonList("USER"), "ACCESS_TOKEN", 10);
 
         redisUtil.delete(key);
 
@@ -130,6 +135,11 @@ public class UserService {
 
         String hashedPassword = passwordEncoder.encode(password);
 
-        userRepository.updatePassword(User.builder().email(email).hashedPassword(hashedPassword).build());
+        userRepository.updatePassword(
+                User.builder()
+                .email(email)
+                .hashedPassword(hashedPassword)
+                .build()
+        );
     }
 }
