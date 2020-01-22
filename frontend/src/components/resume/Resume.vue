@@ -297,8 +297,14 @@ export default {
     },
     drop(e) {
       e.preventDefault();
-      var data = e.dataTransfer.getData("text");
-      e.target.appendChild(document.getElementById(data));
+      for(var i in e.path){
+        if(e.path[i].classList.contains('drop-box')){
+          var data = e.dataTransfer.getData("text");
+          e.path[i].appendChild(document.getElementById(data));
+          break
+        }
+      }
+      
     },
     allowDrop(e) {
       e.preventDefault();
@@ -422,11 +428,11 @@ $drop-box: #dddee0;
           .date-alert{
             margin-top: 8px;
             padding: 2px 0;
-            color: rgb(211,98,50);
+            color: rgb(255, 104, 19);;
             font-size: 0.7rem;
             font-weight: 600;
             path{
-              color:rgb(211,98,50);
+              color:rgb(255, 104, 19);;
             }
           }
         }

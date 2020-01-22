@@ -17,6 +17,7 @@
       </div>
       <div class="modal-btns">
           <button class="large-btn hghss-btn point-font">{{ action[target] }}</button>
+          <button class="large-btn hghss-btn point-font" v-if="target == 0" @click="moveToPath('password/reset')">비밀번호 찾기</button>
           <!-- social -->
           <button class="large-btn naver-btn">connect with <span class="point-font">naver</span></button>
           <button class="large-btn facebook-btn">connect with <span class="point-font">facebook</span></button>
@@ -37,9 +38,18 @@ export default {
   },
   methods: {
     beforeOpen(event) {
+      // 데이터 초기화
+      this.email = ''
+      this.passwd = ''
+      this.passwd2 = ''
+    
       this.target = event.params.target;
+    },
+    moveToPath(path){
+      this.$router.push(path)
+      this.$modal.hide('account-modal')
     }
-  }
+  },
 };
 </script>
 <style lang="scss">

@@ -41,7 +41,8 @@ export default {
   },
   methods: {
     showModal(target) {
-      this.$modal.show('account-modal', { target: target });
+      this.user_menu = false
+      this.$modal.show('account-modal', { target: target })
     }
   },
 };
