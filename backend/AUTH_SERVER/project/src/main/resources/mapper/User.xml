@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="user">
+    <select id="findUserDetailsByEmail" parameterType="String" resultType="CustomUserDetails">
+        SELECT email, role FROM user WHERE email = #{email}
+    </select>
+
+    <select id="findByEmail" parameterType="String" resultType="User">
+        SELECT * FROM user WHERE email = #{email}
+    </select>
+
+    <select id="countUser" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM user WHERE email = #{email}
+    </select>
+
+    <select id="findUsers" resultType="User">
+        SELECT * FROM user
+    </select>
+
+    <update id="signup" parameterType="User">
+        INSERT INTO user(email, hashed_password, nickname)
+        VALUES(#{email}, #{hashedPassword}, #{nickname})
+    </update>
+
+    <update id="updatePassword" parameterType="User" >
+        UPDATE user
+        SET hashed_password = #{hashedPassword}
+        WHERE email = #{email}
+    </update>
+</mapper>
