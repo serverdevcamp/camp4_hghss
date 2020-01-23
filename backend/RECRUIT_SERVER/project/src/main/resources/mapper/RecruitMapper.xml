@@ -89,9 +89,10 @@
         WHERE recruit.id = #{recruitIdx};
     </select>
 
-
-
-
+    <update id="updateViewCountWithDB" useGeneratedKeys="true" parameterType="int">
+        UPDATE recruit SET  recruit.view_count = recruit.view_count+1
+        WHERE recruit.id = #{recruitIdx};
+    </update>
 
     <update id="updateViewCount" useGeneratedKeys="true" parameterType="int">
         UPDATE recruit SET  recruit.view_count = #{viewCount}

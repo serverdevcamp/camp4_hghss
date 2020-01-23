@@ -14,13 +14,14 @@ public class GetRankingByVisitCntResponseDTO {
     private String companyName;
 
 
-//String tmpString = "ranking:" + tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
-//                    tmp.getCompanyId() + ":" + tmp.getCompanyName();
+    //String tmpString = tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
+    //                    tmp.getCompanyId() + ":" + tmp.getCompanyName();
+
     public GetRankingByVisitCntResponseDTO(String[] array,double viewCount,int rank) {
 
-        this.recruitId = Integer.parseInt(array[2]);
-        this.companyId = Integer.parseInt(array[3]);
-        this.companyName = array[4];
+        this.recruitId = Integer.parseInt(array[1]);
+        this.companyId = Integer.parseInt(array[2]);
+        this.companyName = array[3];
         this.viewCount = viewCount;
         this.rank  = rank;
     }

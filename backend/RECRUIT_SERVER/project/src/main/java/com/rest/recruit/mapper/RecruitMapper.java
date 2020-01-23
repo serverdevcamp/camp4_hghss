@@ -25,5 +25,7 @@ public interface RecruitMapper {
 
     public SimpleRecruit getSimpleRecruitById(int recruitIdx);
 
+    public int updateViewCountWithDB(int recruitIdx);
+
 //    public boolean updateRecruitCnt();
 }

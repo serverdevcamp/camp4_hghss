@@ -32,42 +32,23 @@ public class RankingService {
     RedisTemplate<String, String> redisTemplate;
 
     public ResponseEntity DbToRedis() {
-        
+
         List<SimpleRecruit> recruitDetail = recruitMapper.getSimpleRecruit();
 
         ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
-        Set<ZSetOperations.TypedTuple<String>> rankingSet =
-                zsetOperations.reverseRangeWithScores("redis-visit", 0, -1);
 
-        if(rankingSet.size() == 0){
-                for(SimpleRecruit tmp : recruitDetail){
-                    System.out.print("tmp!\n");
-                    System.out.print("Inter\n");
-                    System.out.print(tmp.getRecruitId());
-                        String tmpString = "ranking:" + tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
-                                tmp.getCompanyId() + ":" + tmp.getCompanyName();
-                        zsetOperations.add("redis-visit", tmpString, tmp.getViewCount());
-                        zsetOperations.add("redis-like", tmpString, tmp.getFavoriteCount());
-                }
+        for(SimpleRecruit tmp : recruitDetail){
+            String tmpString =  tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
+                    tmp.getCompanyId() + ":" + tmp.getCompanyName();
 
-            return SimpleResponse.ok(rankingSet);
-        }
+           Long rank = zsetOperations.reverseRank("ranking-visit",tmpString); //몇위인지
+           if(rank != null){
+               //이미 존재한다면
+               continue;
+           }
 
-            for (ZSetOperations.TypedTuple<String> rank : rankingSet) {
-                for(SimpleRecruit tmp : recruitDetail){
-                System.out.print("tmp!\n");
-                String[] array = rank.getValue().split(":");
-
-                System.out.print("Inter\n");
-                System.out.print(tmp.getRecruitId());
-                if(tmp.getRecruitId() != Integer.parseInt(array[2])){
-
-                    String tmpString = "ranking:" + tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
-                            tmp.getCompanyId() + ":" + tmp.getCompanyName();
-                    zsetOperations.add("redis-visit", tmpString, tmp.getViewCount());
-                    zsetOperations.add("redis-like", tmpString, tmp.getFavoriteCount());
-                }
-            }
+            zsetOperations.add("ranking-visit", tmpString, tmp.getViewCount());
+            zsetOperations.add("ranking-like", tmpString, tmp.getFavoriteCount());
         }
 
 
@@ -77,25 +58,22 @@ public class RankingService {
 
     public ResponseEntity RedisToDb() throws ParseException {
 
-
         ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
         Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations
-                .reverseRangeWithScores("redis-visit", 0, -1);
+                .reverseRangeWithScores("ranking-visit", 0, -1);
         SimpleDateFormat format1 = new SimpleDateFormat( "yyyy-MM-dd-HH-mm");
+
         Date time = new Date();
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+
 
         for (ZSetOperations.TypedTuple<String> rank : rankingSet) {
             String[] array = rank.getValue().split(":");
-            //String tmpString = "ranking:" + tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
-            //                    tmp.getCompanyId() + ":" + tmp.getCompanyName();
-            String from = array[1];
-            //ss????
-            SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+            String from = array[0];
             Date date = transFormat.parse(from);
-//Integer.parseInt(String.valueOf(Math.round(rank.getScore())))
 
             //db업데이트
-            int tmp = recruitMapper.updateViewCount(Integer.parseInt(array[2]),
+            int tmp = recruitMapper.updateViewCount(Integer.parseInt(array[1]),
                     Integer.parseInt(String.valueOf(Math.round(rank.getScore()))));
 
             if(tmp < 0){
@@ -103,7 +81,8 @@ public class RankingService {
             }
 
             if(date.compareTo(time)  < 0){
-                zsetOperations.remove("redis-visit",rank.getValue());
+                //이미지난채용이면 캐시에서 지우기
+                zsetOperations.remove("ranking-visit",rank.getValue());
             }
 
 
@@ -115,22 +94,32 @@ public class RankingService {
 
     public ResponseEntity getRankingByVisitCnt() throws ParseException {
         ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
-        Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations.reverseRangeWithScores("redis-visit", 0, 4);
+        Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations.reverseRangeWithScores("ranking-visit", 0, 9);
 
         List<GetRankingByVisitCntResponseDTO> getRankingByVisitCntResponseDTOList = new ArrayList<>();
         int i = 1;
 
+        Date time = new Date();
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
         for (ZSetOperations.TypedTuple<String> rank : rankingSet) {
-
 
             System.out.print("\nrank\n");
             System.out.print(rank.getValue());
             String[] array = rank.getValue().split(":");
-//Integer.parseInt(String.valueOf(Math.round(score))))
 
-                getRankingByVisitCntResponseDTOList
+            String endTime = array[0];
+            Date endDate = transFormat.parse(endTime);
+
+            if(endDate.compareTo(time) <0 ) {
+                continue;
+            }
+
+            getRankingByVisitCntResponseDTOList
                         .add(new GetRankingByVisitCntResponseDTO(array,rank.getScore(),i++));
 
+            if(i > 5){
+                break;
+            }
         }
 
         return SimpleResponse.ok(ResultResponse.builder()

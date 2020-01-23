@@ -19,6 +19,10 @@ import io.swagger.annotations.ApiParam;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+//또한, 특정 도메인만 접속을 허용할 수도 있습니다.
+  //      - @CrossOrigin(origins = "허용주소:포트")
+
+@CrossOrigin("*")
 @Api(tags={"채용공고"})
 @RestController
 @RequestMapping("/recruits")

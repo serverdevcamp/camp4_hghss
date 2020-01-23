@@ -67,28 +67,46 @@ public class RecruitService {
 
             SimpleRecruit tmp = recruitMapper.getSimpleRecruitById(recruitIdx);
 
-            System.out.print("\ntmp1\n");
-            System.out.print(tmp.getRecruitId());
-            System.out.print("\ntmp2\n");
-            System.out.print(tmp.getCompanyId());
-            System.out.print("\ntmp3\n");
-            System.out.print(tmp.getCompanyName());
-            System.out.print("\ntmp4\n");
-            System.out.print(tmp.getEndTime());
-
-            String tmpString = "ranking:" + tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
+            String tmpString = tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
                     tmp.getCompanyId() + ":" + tmp.getCompanyName();
 
             ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
-            double score = zsetOperations.incrementScore("redis-visit",tmpString,1);//+1 하기.
+//db vs redis!!
+/*
+*
 
-
+         Long rank = zsetOperations.reverseRank("ranking-visit",tmpString); //몇위인지
+           if(rank != null){
+               //이미 존재한다면
+               continue;
+           }
+*
+*
+*
+*
+* */
 
             RecruitDetail tmpdetail = recruitMapper.GetDetailRecruitPage(recruitIdx);
             List<Position> tmpPosition = recruitMapper.getPosition(recruitIdx);
             List<Question> tmpQuestion = new ArrayList<>();
 
-            tmpdetail.setViewCount( Integer.parseInt(String.valueOf(Math.round(score))));
+
+            if(zsetOperations.reverseRank("ranking-visit",tmpString) != null){
+
+                System.out.print("tmpString\n");
+                System.out.print(tmpString);
+
+                double score = zsetOperations.incrementScore("ranking-visit",tmpString,1);
+                tmpdetail.setViewCount( Integer.parseInt(String.valueOf(Math.round(score))));
+            }else{
+
+                tmpdetail.setViewCount(tmpdetail.getViewCount()+1);
+                int updateCheck = recruitMapper.updateViewCountWithDB(recruitIdx);
+            //레디스에없다면 update +1
+                if(updateCheck < 0){
+                    return SimpleResponse.badRequest();
+                }
+            }
 
             for (int i = 0;i<tmpPosition.size();i++) {
                 tmpQuestion.add(new Question(tmpPosition.get(i).getQuestionId(),tmpPosition.get(i).getQuestionContent()));
