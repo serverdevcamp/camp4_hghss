@@ -63,11 +63,6 @@
         WHERE recruit.id = #{recruitIdx};
     </select>
 
-    <update id="updateViewCount" useGeneratedKeys="true" parameterType="com.rest.recruit.model.RecruitDetail">
-        UPDATE recruit SET  recruit.view_count = recruit.view_count + 1 
-        WHERE recruit.id = #{recruitIdx};
-    </update>
-
     <select id="getSimpleRecruit" resultType="com.rest.recruit.model.SimpleRecruit">
         SELECT
         recruit.id AS recruitId,
@@ -83,5 +78,23 @@
         GROUP BY recruit.id;
     </select>
 
+    <select id="getSimpleRecruitById" resultType="com.rest.recruit.model.SimpleRecruit">
+        SELECT
+        recruit.id AS recruitId,
+        recruit.company_id AS companyId,
+        DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS endTime,
+        company.name AS companyName
+        FROM recruit
+        INNER JOIN company ON company.id = recruit.company_id
+        WHERE recruit.id = #{recruitIdx};
+    </select>
 
+
+
+
+
+    <update id="updateViewCount" useGeneratedKeys="true" parameterType="int">
+        UPDATE recruit SET  recruit.view_count = #{viewCount}
+        WHERE recruit.id = #{recruitIdx};
+    </update>
 </mapper>

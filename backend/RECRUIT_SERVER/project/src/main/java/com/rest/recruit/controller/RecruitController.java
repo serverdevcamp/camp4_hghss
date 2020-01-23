@@ -7,6 +7,7 @@ import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
 import com.rest.recruit.service.RankingService;
 import com.rest.recruit.service.RecruitService;
 import com.rest.recruit.util.DateValidation;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
@@ -33,15 +34,11 @@ public class RecruitController {
     }
 
 
-    //email confirm
     @ApiOperation(value = "채용공고 캘린더 조회", httpMethod = "GET", notes = "채용공고 캘린더 조회")
     @GetMapping
     public ResponseEntity calendar(@ApiParam(value = "start_date , end_date", required = true) 
         @RequestBody GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO){
 
-
-/*    !validationDate(getRecruitCalendarRequestDTO.getStartTime()) ||
-                !validationDate(getRecruitCalendarRequestDTO.getEndTime())*/
         if ( getRecruitCalendarRequestDTO.getEndTime() == null ||
                 getRecruitCalendarRequestDTO.getStartTime() == null ||
                 getRecruitCalendarRequestDTO.getEndTime().isEmpty() ||
@@ -53,9 +50,7 @@ public class RecruitController {
                     .message("필요한 값이 잘못되었습니다")
                     .status("400")
                     .success("false").build());
-
         }
-
 
         return recruitService.GetRecruitCalendarByDate(getRecruitCalendarRequestDTO);
     }
@@ -63,12 +58,11 @@ public class RecruitController {
     @ApiOperation(value = "상세 채용공고 페이지 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회")
     @GetMapping("/detail/{recruitIdx}")
     public ResponseEntity detailRecuitPage(@ApiParam(value = "recruitIdx", required = true) 
-    @PathVariable("recruitIdx") int recruitIdx){
+    @PathVariable("recruitIdx") int recruitIdx){ return recruitService.GetDetailRecruitPage(recruitIdx); }
 
-        return recruitService.GetDetailRecruitPage(recruitIdx);
-    }
-
-    //스케쥴링@Scheduled(cron="0 0 0 * * ?")
+    //스케쥴링
+    //일요일 정각
+    @Scheduled(cron="0 0 0 * * 0")
     @ApiOperation(value = "채용공고 db to redis", httpMethod = "POST", notes ="채용공고 DB를 REDIS에 업로드")
     @PostMapping("/ranking/updateRedis")
     public ResponseEntity DbToRedis(){
@@ -77,17 +71,18 @@ public class RecruitController {
 
 
     //스케쥴링
+    //매일정각
     @Scheduled(cron="0 0 0 * * ?")
     @ApiOperation(value = "redis to 채용공고 db", httpMethod = "PUT", notes ="REDIS를 채용공고 DB에 업로드")
     @PostMapping("/ranking/updateDB")
-    public ResponseEntity RedisToDb(){
+    public ResponseEntity RedisToDb() throws ParseException {
         return rankingService.RedisToDb();
     }
 
 
     @ApiOperation(value = "7일내 마감하는 조회수 랭킹", httpMethod = "GET", notes ="7일내 마감하는 조회수 랭킹")
-    @PostMapping("/ranking/visit")
-    public ResponseEntity getRankingByVisitCnt(){
+    @GetMapping("/ranking/visit")
+    public ResponseEntity getRankingByVisitCnt() throws ParseException {
         return rankingService.getRankingByVisitCnt();
     }
 

@@ -17,10 +17,9 @@ import javax.annotation.Resource;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -33,61 +32,106 @@ public class RankingService {
     RedisTemplate<String, String> redisTemplate;
 
     public ResponseEntity DbToRedis() {
-
-        //회사들의 CNT를 DB에 넣기
-// //zset zSetOperations.add("t기est:user:kingbbode:wish", "배포한 것에 장애없길", 1);
-        // zSetOperations.incrementScore("test:user:kingbbode:wish", "경력직 채용", -1);
-
-
+        
         List<SimpleRecruit> recruitDetail = recruitMapper.getSimpleRecruit();
+
         ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
+        Set<ZSetOperations.TypedTuple<String>> rankingSet =
+                zsetOperations.reverseRangeWithScores("redis-visit", 0, -1);
 
+        if(rankingSet.size() == 0){
+                for(SimpleRecruit tmp : recruitDetail){
+                    System.out.print("tmp!\n");
+                    System.out.print("Inter\n");
+                    System.out.print(tmp.getRecruitId());
+                        String tmpString = "ranking:" + tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
+                                tmp.getCompanyId() + ":" + tmp.getCompanyName();
+                        zsetOperations.add("redis-visit", tmpString, tmp.getViewCount());
+                        zsetOperations.add("redis-like", tmpString, tmp.getFavoriteCount());
+                }
 
-        for (SimpleRecruit tmp : recruitDetail) {
-            String tmpString = "ranking:" + tmp.getRecruitId() + ":" +
-                    tmp.getCompanyId() + ":" + tmp.getCompanyName()+":"+tmp.getEndTime();
-            zsetOperations.add("redis-visit", tmpString, tmp.getViewCount());
-            zsetOperations.add("redis-like", tmpString, tmp.getFavoriteCount());
+            return SimpleResponse.ok(rankingSet);
+        }
 
+            for (ZSetOperations.TypedTuple<String> rank : rankingSet) {
+                for(SimpleRecruit tmp : recruitDetail){
+                System.out.print("tmp!\n");
+                String[] array = rank.getValue().split(":");
+
+                System.out.print("Inter\n");
+                System.out.print(tmp.getRecruitId());
+                if(tmp.getRecruitId() != Integer.parseInt(array[2])){
+
+                    String tmpString = "ranking:" + tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
+                            tmp.getCompanyId() + ":" + tmp.getCompanyName();
+                    zsetOperations.add("redis-visit", tmpString, tmp.getViewCount());
+                    zsetOperations.add("redis-like", tmpString, tmp.getFavoriteCount());
+                }
+            }
         }
 
 
-        return SimpleResponse.ok();
-    }
-
-    public ResponseEntity RedisToDb() {
-
-
-        //redis에서 recruitId와 cnt찾은 후
-        //update Cnt
-
-//        recruitMapper.updateRecruitCnt(
-//        /
-/*   <update id="updateRecruitCnt" useGeneratedKeys="true" parameterType="com.rest.recruit.model.RecruitDetail">
-        UPDATE recruit SET  recruit.view_count = recruit.view_count + 1
-        WHERE recruit.id = #{recruitIdx};
-    </update>*/
-
 
         return SimpleResponse.ok();
     }
 
+    public ResponseEntity RedisToDb() throws ParseException {
 
-    public ResponseEntity getRankingByVisitCnt() {
+
         ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
-        Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations.reverseRangeWithScores("redis-visit", 0, 4);
-
-
-        List<GetRankingByVisitCntResponseDTO> getRankingByVisitCntResponseDTOList = new ArrayList<>();
+        Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations
+                .reverseRangeWithScores("redis-visit", 0, -1);
+        SimpleDateFormat format1 = new SimpleDateFormat( "yyyy-MM-dd-HH-mm");
+        Date time = new Date();
 
         for (ZSetOperations.TypedTuple<String> rank : rankingSet) {
             String[] array = rank.getValue().split(":");
-            getRankingByVisitCntResponseDTOList
-                    .add(new GetRankingByVisitCntResponseDTO(array,rank.getScore()));
+            //String tmpString = "ranking:" + tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
+            //                    tmp.getCompanyId() + ":" + tmp.getCompanyName();
+            String from = array[1];
+            //ss????
+            SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+            Date date = transFormat.parse(from);
+//Integer.parseInt(String.valueOf(Math.round(rank.getScore())))
+
+            //db업데이트
+            int tmp = recruitMapper.updateViewCount(Integer.parseInt(array[2]),
+                    Integer.parseInt(String.valueOf(Math.round(rank.getScore()))));
+
+            if(tmp < 0){
+                return SimpleResponse.badRequest();
+            }
+
+            if(date.compareTo(time)  < 0){
+                zsetOperations.remove("redis-visit",rank.getValue());
+            }
+
+
         }
 
+        return SimpleResponse.ok();
+    }
 
 
+    public ResponseEntity getRankingByVisitCnt() throws ParseException {
+        ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
+        Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations.reverseRangeWithScores("redis-visit", 0, 4);
+
+        List<GetRankingByVisitCntResponseDTO> getRankingByVisitCntResponseDTOList = new ArrayList<>();
+        int i = 1;
+
+        for (ZSetOperations.TypedTuple<String> rank : rankingSet) {
+
+
+            System.out.print("\nrank\n");
+            System.out.print(rank.getValue());
+            String[] array = rank.getValue().split(":");
+//Integer.parseInt(String.valueOf(Math.round(score))))
+
+                getRankingByVisitCntResponseDTOList
+                        .add(new GetRankingByVisitCntResponseDTO(array,rank.getScore(),i++));
+
+        }
 
         return SimpleResponse.ok(ResultResponse.builder()
                 .message("7일내 조회수 랭킹 조회 성공")

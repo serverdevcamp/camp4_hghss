@@ -19,9 +19,11 @@ public interface RecruitMapper {
 
     List<Position> getPosition(int recruitIdx);
 
-    public int updateViewCount(int recruitIdx);
-
     public List<SimpleRecruit> getSimpleRecruit();
+
+    public int updateViewCount(int recruitIdx, int viewCount);
+
+    public SimpleRecruit getSimpleRecruitById(int recruitIdx);
 
 //    public boolean updateRecruitCnt();
 }

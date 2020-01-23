@@ -12,8 +12,11 @@ import com.rest.recruit.mapper.RecruitMapper;
 import com.rest.recruit.model.Position;
 import com.rest.recruit.model.Question;
 import com.rest.recruit.model.RecruitDetail;
+import com.rest.recruit.model.SimpleRecruit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +32,8 @@ public class RecruitService {
     @Autowired
     RecruitMapper recruitMapper;
 
+    @Autowired
+    RedisTemplate<String, String> redisTemplate;
 
     public ResponseEntity GetRecruitCalendarByDate(GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO) {
 
@@ -60,19 +65,37 @@ public class RecruitService {
 
         try {
 
-            int updateCnt = recruitMapper.updateViewCount(recruitIdx);
-            RecruitDetail tmp = recruitMapper.GetDetailRecruitPage(recruitIdx);
+            SimpleRecruit tmp = recruitMapper.getSimpleRecruitById(recruitIdx);
+
+            System.out.print("\ntmp1\n");
+            System.out.print(tmp.getRecruitId());
+            System.out.print("\ntmp2\n");
+            System.out.print(tmp.getCompanyId());
+            System.out.print("\ntmp3\n");
+            System.out.print(tmp.getCompanyName());
+            System.out.print("\ntmp4\n");
+            System.out.print(tmp.getEndTime());
+
+            String tmpString = "ranking:" + tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
+                    tmp.getCompanyId() + ":" + tmp.getCompanyName();
+
+            ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
+            double score = zsetOperations.incrementScore("redis-visit",tmpString,1);//+1 하기.
 
 
+
+            RecruitDetail tmpdetail = recruitMapper.GetDetailRecruitPage(recruitIdx);
             List<Position> tmpPosition = recruitMapper.getPosition(recruitIdx);
             List<Question> tmpQuestion = new ArrayList<>();
+
+            tmpdetail.setViewCount( Integer.parseInt(String.valueOf(Math.round(score))));
 
             for (int i = 0;i<tmpPosition.size();i++) {
                 tmpQuestion.add(new Question(tmpPosition.get(i).getQuestionId(),tmpPosition.get(i).getQuestionContent()));
             }
 
             GetRecruitDetailResponseDTO getRecruitDetailResponseDTO
-                    = new GetRecruitDetailResponseDTO(tmp,GetRecruitPositionResponseDTO.of(tmpPosition.get(0),tmpQuestion));
+                    = new GetRecruitDetailResponseDTO(tmpdetail,GetRecruitPositionResponseDTO.of(tmpPosition.get(0),tmpQuestion));
 
 
             return SimpleResponse.ok(ResultResponse.builder()
