@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="chat-section" v-if="$route.name != 'HghssPage'">
-        <p class="nav-btn icon-btn" @click="$store.state.ChatState = !$store.state.ChatState">
+        <p class="nav-btn icon-btn" @click="$store.state.template.ChatState = !$store.state.template.ChatState">
           <font-awesome-icon :icon="['far', 'comment-dots']" />
         </p>
       </div>

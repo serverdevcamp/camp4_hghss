@@ -13,23 +13,23 @@
           <p class="subtitle point-font">작성 중</p>
           <div id="1-1" class="drop-box" v-on:drop="drop($event)" v-on:dragover="allowDrop($event)">
             <!-- CARD -->
-            <div class="resume-card" 
-              draggable="true" 
-              v-on:dragstart="drag($event)" 
-              v-for="resume in $store.state.resume_list['1']['1']"
+            <div
+              class="resume-card"
+              draggable="true"
+              v-on:dragstart="drag($event)"
+              v-for="resume in getResume['1']['1']"
               :key="resume"
               :id="resume.recruitId"
             >
-              <div class="card" v-on:click="showModal('여기에 회사 아이디')" >
+              <div class="card" v-on:click="showModal('여기에 회사 아이디')">
                 <div class="company">{{resume.companyName}}</div>
                 <div class="date" v-if="new Date(resume.endTime) > today">
-                  <span class="d-day">{{ getDDay(resume.endTime) }}</span> 
-                  {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }} 
+                  <span class="d-day">{{ getDDay(resume.endTime) }}</span>
+                  {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
                   {{ resume.endTime.substring(11,16)}}
                 </div>
-                <div class="date-alert" v-else >
-                  <font-awesome-icon icon="bell" />
-                  기간이 지났습니다.
+                <div class="date-alert" v-else>
+                  <font-awesome-icon icon="bell" />기간이 지났습니다.
                 </div>
               </div>
             </div>
@@ -38,20 +38,20 @@
         <v-row>
           <p class="subtitle point-font">제출완료</p>
           <div id="1-2" class="drop-box" v-on:drop="drop($event)" v-on:dragover="allowDrop($event)">
-           
-           <!-- CARD -->
-            <div class="resume-card" 
-              draggable="true" 
-              v-on:dragstart="drag($event)" 
-              v-for="resume in $store.state.resume_list['1']['2']"
+            <!-- CARD -->
+            <div
+              class="resume-card"
+              draggable="true"
+              v-on:dragstart="drag($event)"
+              v-for="resume in getResume['1']['2']"
               :key="resume"
               :id="resume.recruitId"
             >
-              <div class="card" v-on:click="showModal('여기에 회사 아이디')" >
+              <div class="card" v-on:click="showModal('여기에 회사 아이디')">
                 <div class="company">{{resume.companyName}}</div>
                 <div class="date" v-if="new Date(resume.endTime) > today">
-                  <span class="d-day">{{ getDDay(resume.endTime) }}</span> 
-                  {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }} 
+                  <span class="d-day">{{ getDDay(resume.endTime) }}</span>
+                  {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
                   {{ resume.endTime.substring(11,16)}}
                 </div>
               </div>
@@ -62,14 +62,15 @@
           <p class="subtitle point-font">미제출</p>
           <div id="1-3" class="drop-box" v-on:drop="drop($event)" v-on:dragover="allowDrop($event)">
             <!-- CARD -->
-            <div class="resume-card" 
-              draggable="true" 
-              v-on:dragstart="drag($event)" 
-              v-for="resume in $store.state.resume_list['1']['3']"
+            <div
+              class="resume-card"
+              draggable="true"
+              v-on:dragstart="drag($event)"
+              v-for="resume in getResume['1']['3']"
               :key="resume"
               :id="resume.recruitId"
             >
-              <div class="card" v-on:click="showModal('여기에 회사 아이디')" >
+              <div class="card" v-on:click="showModal('여기에 회사 아이디')">
                 <div class="company">{{resume.companyName}}</div>
               </div>
             </div>
@@ -92,14 +93,15 @@
                 v-on:dragover="allowDrop($event)"
               >
                 <!-- CARD -->
-                <div class="resume-card" 
-                  draggable="true" 
-                  v-on:dragstart="drag($event)" 
-                  v-for="resume in $store.state.resume_list['2']['1']"
+                <div
+                  class="resume-card"
+                  draggable="true"
+                  v-on:dragstart="drag($event)"
+                  v-for="resume in getResume['2']['1']"
                   :key="resume"
                   :id="resume.recruitId"
                 >
-                  <div class="card" v-on:click="showModal('여기에 회사 아이디')" >
+                  <div class="card" v-on:click="showModal('여기에 회사 아이디')">
                     <div class="company">{{resume.companyName}}</div>
                   </div>
                 </div>
@@ -114,14 +116,15 @@
                 v-on:dragover="allowDrop($event)"
               >
                 <!-- CARD -->
-                <div class="resume-card" 
-                  draggable="true" 
-                  v-on:dragstart="drag($event)" 
-                  v-for="resume in $store.state.resume_list['2']['2']"
+                <div
+                  class="resume-card"
+                  draggable="true"
+                  v-on:dragstart="drag($event)"
+                  v-for="resume in getResume['2']['2']"
                   :key="resume"
                   :id="resume.recruitId"
                 >
-                  <div class="card" v-on:click="showModal('여기에 회사 아이디')" >
+                  <div class="card" v-on:click="showModal('여기에 회사 아이디')">
                     <div class="company">{{resume.companyName}}</div>
                   </div>
                 </div>
@@ -140,15 +143,16 @@
                 v-on:drop="drop($event)"
                 v-on:dragover="allowDrop($event)"
               >
-                 <!-- CARD -->
-                <div class="resume-card" 
-                  draggable="true" 
-                  v-on:dragstart="drag($event)" 
-                  v-for="resume in $store.state.resume_list['3']['1']"
+                <!-- CARD -->
+                <div
+                  class="resume-card"
+                  draggable="true"
+                  v-on:dragstart="drag($event)"
+                  v-for="resume in getResume['3']['1']"
                   :key="resume"
                   :id="resume.recruitId"
                 >
-                  <div class="card" v-on:click="showModal('여기에 회사 아이디')" >
+                  <div class="card" v-on:click="showModal('여기에 회사 아이디')">
                     <div class="company">{{resume.companyName}}</div>
                   </div>
                 </div>
@@ -162,15 +166,16 @@
                 v-on:drop="drop($event)"
                 v-on:dragover="allowDrop($event)"
               >
-                  <!-- CARD -->
-                <div class="resume-card" 
-                  draggable="true" 
-                  v-on:dragstart="drag($event)" 
-                  v-for="resume in $store.state.resume_list['3']['2']"
+                <!-- CARD -->
+                <div
+                  class="resume-card"
+                  draggable="true"
+                  v-on:dragstart="drag($event)"
+                  v-for="resume in getResume['3']['2']"
                   :key="resume"
                   :id="resume.recruitId"
                 >
-                  <div class="card" v-on:click="showModal('여기에 회사 아이디')" >
+                  <div class="card" v-on:click="showModal('여기에 회사 아이디')">
                     <div class="company">{{resume.companyName}}</div>
                   </div>
                 </div>
@@ -189,15 +194,16 @@
                 v-on:drop="drop($event)"
                 v-on:dragover="allowDrop($event)"
               >
-                 <!-- CARD -->
-                <div class="resume-card" 
-                  draggable="true" 
-                  v-on:dragstart="drag($event)" 
-                  v-for="resume in $store.state.resume_list['4']['1']"
+                <!-- CARD -->
+                <div
+                  class="resume-card"
+                  draggable="true"
+                  v-on:dragstart="drag($event)"
+                  v-for="resume in getResume['4']['1']"
                   :key="resume"
                   :id="resume.recruitId"
                 >
-                  <div class="card" v-on:click="showModal('여기에 회사 아이디')" >
+                  <div class="card" v-on:click="showModal('여기에 회사 아이디')">
                     <div class="company">{{resume.companyName}}</div>
                   </div>
                 </div>
@@ -211,15 +217,16 @@
                 v-on:drop="drop($event)"
                 v-on:dragover="allowDrop($event)"
               >
-                  <!-- CARD -->
-                <div class="resume-card" 
-                  draggable="true" 
-                  v-on:dragstart="drag($event)" 
-                  v-for="resume in $store.state.resume_list['4']['2']"
+                <!-- CARD -->
+                <div
+                  class="resume-card"
+                  draggable="true"
+                  v-on:dragstart="drag($event)"
+                  v-for="resume in getResume['4']['2']"
                   :key="resume"
                   :id="resume.recruitId"
                 >
-                  <div class="card" v-on:click="showModal('여기에 회사 아이디')" >
+                  <div class="card" v-on:click="showModal('여기에 회사 아이디')">
                     <div class="company">{{resume.companyName}}</div>
                   </div>
                 </div>
@@ -235,21 +242,17 @@
         </v-row>
         <v-row>
           <p class="subtitle point-font">합격</p>
-          <div
-            id="5-1"
-            class="drop-box"
-            v-on:drop="drop($event)"
-            v-on:dragover="allowDrop($event)"
-          >
+          <div id="5-1" class="drop-box" v-on:drop="drop($event)" v-on:dragover="allowDrop($event)">
             <!-- CARD -->
-            <div class="resume-card" 
-              draggable="true" 
-              v-on:dragstart="drag($event)" 
-              v-for="resume in $store.state.resume_list['5']['1']"
+            <div
+              class="resume-card"
+              draggable="true"
+              v-on:dragstart="drag($event)"
+              v-for="resume in getResume.resume_list['5']['1']"
               :key="resume"
               :id="resume.recruitId"
             >
-              <div class="card" v-on:click="showModal('여기에 회사 아이디')" >
+              <div class="card" v-on:click="showModal('여기에 회사 아이디')">
                 <div class="company">{{resume.companyName}}</div>
               </div>
             </div>
@@ -257,21 +260,17 @@
         </v-row>
         <v-row>
           <p class="subtitle point-font">불합격</p>
-          <div
-            id="5-2"
-            class="drop-box"
-            v-on:drop="drop($event)"
-            v-on:dragover="allowDrop($event)"
-          >
+          <div id="5-2" class="drop-box" v-on:drop="drop($event)" v-on:dragover="allowDrop($event)">
             <!-- CARD -->
-            <div class="resume-card" 
-              draggable="true" 
-              v-on:dragstart="drag($event)" 
-              v-for="resume in $store.state.resume_list['5']['1']"
+            <div
+              class="resume-card"
+              draggable="true"
+              v-on:dragstart="drag($event)"
+              v-for="resume in $store.state.resume.resume_list['5']['1']"
               :key="resume"
               :id="resume.recruitId"
             >
-              <div class="card" v-on:click="showModal('여기에 회사 아이디')" >
+              <div class="card" v-on:click="showModal('여기에 회사 아이디')">
                 <div class="company">{{resume.companyName}}</div>
               </div>
             </div>
@@ -283,45 +282,50 @@
   </section>
 </template>
 <script>
-import ResumeModal from './ResumeModal'
+import ResumeModal from "./ResumeModal";
+import { mapGetters } from "vuex";
 export default {
   components: {
-    ResumeModal,
+    ResumeModal
   },
   data: () => ({
-    today: new Date(),
+    today: new Date()
   }),
+  computed: {
+    ...mapGetters([
+      "getResume",
+    ])
+  },
   methods: {
     drag(e) {
       e.dataTransfer.setData("text", e.target.id);
     },
     drop(e) {
       e.preventDefault();
-      for(var i in e.path){
-        if(e.path[i].classList.contains('drop-box')){
+      for (var i in e.path) {
+        if (e.path[i].classList.contains("drop-box")) {
           var data = e.dataTransfer.getData("text");
           e.path[i].appendChild(document.getElementById(data));
-          break
+          break;
         }
       }
-      
     },
     allowDrop(e) {
       e.preventDefault();
     },
     showModal(target) {
-      this.$modal.show('resume-modal', { target: target });
+      this.$modal.show("resume-modal", { target: target });
     },
-    getDDay(endDate){
-      var end_date =  new Date(endDate)
-      var between = end_date - this.today
-      if(between < 0) return "기간이 지났습니다."
+    getDDay(endDate) {
+      var end_date = new Date(endDate);
+      var between = end_date - this.today;
+      if (between < 0) return "기간이 지났습니다.";
 
-      var d_day = between/(24 * 3600 * 1000)
-      if(d_day < 1 ){
-        return "D-"+parseInt(d_day*24)+"시"
+      var d_day = between / (24 * 3600 * 1000);
+      if (d_day < 1) {
+        return "D-" + parseInt(d_day * 24) + "시";
       }
-      return "D-"+parseInt(d_day)+"일"
+      return "D-" + parseInt(d_day) + "일";
     }
   }
 };
@@ -345,36 +349,37 @@ $drop-box: #dddee0;
     display: inline-block;
     width: 100%;
     padding: 0 15px;
-    .col.resume-items-1,  .col.resume-items-2, .col.resume-items-3{
+    .col.resume-items-1,
+    .col.resume-items-2,
+    .col.resume-items-3 {
       float: left;
       display: inline-block;
       padding: 0 10px 10px;
       background: $drop-box;
       border-radius: 3px;
     }
-    .col.resume-items-1{
+    .col.resume-items-1 {
       margin: 0 15px;
-      width: calc( (100% - 60px) / 12 * 4 );
+      width: calc((100% - 60px) / 12 * 4);
       .resume-card {
         width: 50%;
       }
     }
-    .col.resume-items-2{
-      width: calc((100% - 60px) / 12 * 6 );
+    .col.resume-items-2 {
+      width: calc((100% - 60px) / 12 * 6);
       padding: 0 5px 10px;
       .resume-card {
         width: 100%;
       }
     }
-    .col.resume-items-3{
+    .col.resume-items-3 {
       margin: 0 15px;
-      width: calc((100% - 60px) / 12 * 2 );
+      width: calc((100% - 60px) / 12 * 2);
       .resume-card {
         width: 100%;
       }
-      
     }
-    .col-items{
+    .col-items {
       width: calc(100% / 3);
       padding: 0 5px;
     }
@@ -425,14 +430,14 @@ $drop-box: #dddee0;
               border-radius: 3px;
             }
           }
-          .date-alert{
+          .date-alert {
             margin-top: 8px;
             padding: 2px 0;
-            color: rgb(255, 104, 19);;
+            color: rgb(255, 104, 19);
             font-size: 0.7rem;
             font-weight: 600;
-            path{
-              color:rgb(255, 104, 19);;
+            path {
+              color: rgb(255, 104, 19);
             }
           }
         }
