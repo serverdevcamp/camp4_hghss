@@ -21,14 +21,13 @@ new Vue({
   store,
   vuetify,
   async beforeCreate() {
-    // TODO: USER INFO 불러오기
     if(typeof(Storage) === 'undefined') {
       console.error('로컬스토리지를 사용 할 수 없습니다.');
       return;
     }
 
     if(localStorage.hasOwnProperty('refreshToken')){
-      await this.$store.dispatch('setUserInfo');
+      await this.$store.dispatch('refreshToken');
     }
   },
   render: h => h(App),

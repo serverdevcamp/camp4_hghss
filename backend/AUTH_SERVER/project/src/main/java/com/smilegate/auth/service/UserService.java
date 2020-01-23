@@ -102,6 +102,8 @@ public class UserService {
 
         User user = (User)redisUtil.get(key);
 
+        if(user==null) throw new TimeoutException();
+
         // TODO : Random Nickname
         user.setNickname("test");
 

@@ -38,7 +38,7 @@ public class UserController {
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
-                        .success("true")
+                        .success(true)
                         .status(HttpStatus.OK.value())
                         .message("로그인 되었습니다.")
                         .data(tokenResponseDto)
@@ -56,7 +56,7 @@ public class UserController {
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
-                        .success("true")
+                        .success(true)
                         .status(HttpStatus.OK.value())
                         .message("로그아웃 되었습니다.")
                         .build()
@@ -70,7 +70,7 @@ public class UserController {
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
-                        .success("true")
+                        .success(true)
                         .status(HttpStatus.OK.value())
                         .message("인증 메일을 보냈습니다.")
                         .build()
@@ -93,7 +93,7 @@ public class UserController {
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
-                        .success("true")
+                        .success(true)
                         .status(HttpStatus.OK.value())
                         .message("비밀번호 변경 메일을 보냈습니다.")
                         .build()
@@ -110,7 +110,7 @@ public class UserController {
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
-                        .success("true")
+                        .success(true)
                         .status(HttpStatus.OK.value())
                         .message("비밀번호가 변경되었습니다.")
                         .build()
@@ -126,7 +126,7 @@ public class UserController {
         TokenResponseDto tokenResponseDto = userService.refreshToken(refreshToken);
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
-                        .success("true")
+                        .success(true)
                         .status(HttpStatus.OK.value())
                         .message("새로운 Access Token이 발급되었습니다.")
                         .data(tokenResponseDto)

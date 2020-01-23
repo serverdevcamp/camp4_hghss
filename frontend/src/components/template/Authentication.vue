@@ -63,17 +63,22 @@ export default {
   },
   methods: {
     async signin() {
-      await this.$store.dispatch("signin", this.user);
+      let signinSuccess = await this.$store.dispatch("signin", this.user);
+      if(signinSuccess) this.$modal.hide('account-modal');
     },
     async signup() {
-      // TODO: password check
-      await this.$store.dispatch("signup", this.user);
+      if (this.user.password == this.password2 && this.password != '') {
+        let signupSuccess = await this.$store.dispatch("signup", this.user);
+        if(signupSuccess) this.$modal.hide('account-modal');
+      }else {
+        alert('비밀번호가 일치하지 않습니다.');
+      }
     },
     beforeOpen(event) {
       // 데이터 초기화
-      this.email = "";
-      this.passwd = "";
-      this.passwd2 = "";
+      this.user.email = "";
+      this.user.password = "";
+      this.password2 = "";
 
       this.target = event.params.target;
     },
