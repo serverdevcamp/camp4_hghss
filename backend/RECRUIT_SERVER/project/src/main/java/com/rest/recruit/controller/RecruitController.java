@@ -4,6 +4,9 @@ import com.rest.recruit.dto.ResultResponse;
 import com.rest.recruit.dto.ResultResponseWithoutData;
 import com.rest.recruit.dto.SimpleResponse;
 import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
+import com.rest.recruit.dto.response.GetCalendarResponse;
+import com.rest.recruit.dto.response.GetRankingByVisitCntResponseDTO;
+import com.rest.recruit.dto.response.GetRecruitDetailResponseDTO;
 import com.rest.recruit.service.RankingService;
 import com.rest.recruit.service.RecruitService;
 import com.rest.recruit.util.DateValidation;
@@ -32,16 +35,26 @@ public class RecruitController {
 
     private final RankingService rankingService;
 
+
     public RecruitController(RecruitService recruitService,RankingService rankingService) {
         this.rankingService = rankingService;
         this.recruitService = recruitService;
     }
 
 
-    @ApiOperation(value = "채용공고 캘린더 조회", httpMethod = "GET", notes = "채용공고 캘린더 조회")
+    /*   @PostMapping
+    public simpleResponse insertExternalService(@RequestBody Map<String,Object> param) {
+        String name = (String)param.get("name");
+        String url = (String)param.get("url");*/
+/*@RequestBody GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO*/
+    //List<GetCalendarResponse> results
+    @ApiOperation(value = "채용공고 캘린더 조회", httpMethod = "GET", notes = "채용공고 캘린더 조회" , response=GetCalendarResponse.class)
     @GetMapping
-    public ResponseEntity calendar(@ApiParam(value = "start_date , end_date", required = true) 
-        @RequestBody GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO){
+    public ResponseEntity calendar(@ApiParam(value = "start_date , end_date", required = true)
+                                       @RequestParam("startTime") String startTime , @RequestParam("endTime") String endTime){
+
+        GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO
+                = new GetRecruitCalendarRequestDTO(startTime,endTime);
 
         if ( getRecruitCalendarRequestDTO.getEndTime() == null ||
                 getRecruitCalendarRequestDTO.getStartTime() == null ||
@@ -56,10 +69,11 @@ public class RecruitController {
                     .success("false").build());
         }
 
+
         return recruitService.GetRecruitCalendarByDate(getRecruitCalendarRequestDTO);
     }
 
-    @ApiOperation(value = "상세 채용공고 페이지 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회")
+    @ApiOperation(value = "상세 채용공고 페이지 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회",response= GetRecruitDetailResponseDTO.class)
     @GetMapping("/detail/{recruitIdx}")
     public ResponseEntity detailRecuitPage(@ApiParam(value = "recruitIdx", required = true) 
     @PathVariable("recruitIdx") int recruitIdx){ return recruitService.GetDetailRecruitPage(recruitIdx); }
@@ -84,7 +98,8 @@ public class RecruitController {
     }
 
 
-    @ApiOperation(value = "7일내 마감하는 조회수 랭킹", httpMethod = "GET", notes ="7일내 마감하는 조회수 랭킹")
+//    @ApiOperation(value = "상세 채용공고 페이지 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회",response= GetRecruitDetailResponseDTO.class)
+    @ApiOperation(value = "7일내 마감하는 조회수 랭킹", httpMethod = "GET", notes ="7일내 마감하는 조회수 랭킹",response= GetRankingByVisitCntResponseDTO.class)
     @GetMapping("/ranking/visit")
     public ResponseEntity getRankingByVisitCnt() throws ParseException {
         return rankingService.getRankingByVisitCnt();

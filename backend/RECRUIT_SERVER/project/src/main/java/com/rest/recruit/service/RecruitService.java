@@ -71,20 +71,7 @@ public class RecruitService {
                     tmp.getCompanyId() + ":" + tmp.getCompanyName();
 
             ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
-//db vs redis!!
-/*
-*
 
-         Long rank = zsetOperations.reverseRank("ranking-visit",tmpString); //몇위인지
-           if(rank != null){
-               //이미 존재한다면
-               continue;
-           }
-*
-*
-*
-*
-* */
 
             RecruitDetail tmpdetail = recruitMapper.GetDetailRecruitPage(recruitIdx);
             List<Position> tmpPosition = recruitMapper.getPosition(recruitIdx);
@@ -92,10 +79,6 @@ public class RecruitService {
 
 
             if(zsetOperations.reverseRank("ranking-visit",tmpString) != null){
-
-                System.out.print("tmpString\n");
-                System.out.print(tmpString);
-
                 double score = zsetOperations.incrementScore("ranking-visit",tmpString,1);
                 tmpdetail.setViewCount( Integer.parseInt(String.valueOf(Math.round(score))));
             }else{

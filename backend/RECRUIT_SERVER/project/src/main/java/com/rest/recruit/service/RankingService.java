@@ -103,8 +103,6 @@ public class RankingService {
         SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
         for (ZSetOperations.TypedTuple<String> rank : rankingSet) {
 
-            System.out.print("\nrank\n");
-            System.out.print(rank.getValue());
             String[] array = rank.getValue().split(":");
 
             String endTime = array[0];
