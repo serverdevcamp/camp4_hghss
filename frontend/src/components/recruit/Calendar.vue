@@ -155,6 +155,10 @@ export default {
     this.year = this.today.getFullYear();
     this.month = this.today.getMonth();
     this.date = this.today.getDate();
+    
+    // if(this.getCalendarRecruit.length == 0) {
+    //   console.log(this.getCalendarRecruit.length())
+    // }
     this.createCalendar(this.year, this.month);
   },
 };
