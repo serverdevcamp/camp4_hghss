@@ -117,19 +117,11 @@ public class UserService {
         if(mailUtil.sendPasswordMail(key, email)) redisUtil.set(key, email, 10);
     }
 
-    public String getUpdatePasswordToken(String key) {
+    public void updatePassword(String key, String password) {
 
         String email = (String) redisUtil.get(key);
 
-        // 비밀번호 찾기 후 이메일 링크를 통해 토큰 요청 시, 10분안에 비밀번호를 변경
-        String token = jwtUtil.createToken(null, email, null, Collections.singletonList("USER"), "ACCESS_TOKEN", 10);
-
-        redisUtil.delete(key);
-
-        return token;
-    }
-
-    public void updatePassword(String email, String password) {
+        if(email == null) throw new UnauthorizedException();
 
         if(userRepository.countUser(email) == 0) throw new EmailNotExistException(email);
 
@@ -141,5 +133,7 @@ public class UserService {
                 .hashedPassword(hashedPassword)
                 .build()
         );
+
+        redisUtil.delete(key);
     }
 }

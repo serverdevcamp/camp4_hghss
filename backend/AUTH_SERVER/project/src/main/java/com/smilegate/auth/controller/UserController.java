@@ -86,7 +86,7 @@ public class UserController {
         response.sendRedirect("http://localhost:8080/");
     }
 
-    @PostMapping("/findPassword")
+    @PostMapping("/password/find")
     public ResponseEntity<ResultResponse> findPassword(@RequestBody FindPasswordRequestDto findPasswordRequestDto) {
 
         userService.sendPasswordMail(findPasswordRequestDto.getEmail());
@@ -100,28 +100,13 @@ public class UserController {
         );
     }
 
-    @GetMapping("/findPassword/confirm")
-    public void findPasswordConfirm(@RequestParam("key")String key, HttpServletResponse response) throws IOException {
+    @PostMapping("/password/update")
+    public ResponseEntity<ResultResponse> update(@RequestBody UpdatePasswordRequestDto updatePasswordRequestDto) {
 
-        String token = userService.getUpdatePasswordToken(key);
-
-        // TODO: 토큰전달 어떻게?
-        // TODO: 비밀번호 변경 페이지로
-        response.sendRedirect("http://localhost:8080/" + token);
-    }
-
-    @PostMapping("/updatePassword")
-    public ResponseEntity<ResultResponse> update(
-            HttpServletRequest request,
-            @RequestBody UpdatePasswordRequestDto updatePasswordRequestDto
-    ) {
-
-        String accessToken = jwtUtil.getToken(request);
-        if(!jwtUtil.isAccessToken(accessToken)) throw new UnauthorizedException();
-
-        String email = jwtUtil.getClaims(accessToken).getSubject();
+        String key = updatePasswordRequestDto.getKey();
         String password = updatePasswordRequestDto.getPassword();
-        userService.updatePassword(email, password);
+
+        userService.updatePassword(key, password);
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
