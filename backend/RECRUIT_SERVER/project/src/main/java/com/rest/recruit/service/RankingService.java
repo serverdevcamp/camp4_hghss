@@ -77,6 +77,7 @@ public class RankingService {
                     Integer.parseInt(String.valueOf(Math.round(rank.getScore()))));
 
             if(tmp < 0){
+//simpleResponse.ok
                 return SimpleResponse.badRequest();
             }
 

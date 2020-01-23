@@ -3,6 +3,7 @@ package com.rest.recruit.controller;
 import com.rest.recruit.dto.ResultResponse;
 import com.rest.recruit.dto.ResultResponseWithoutData;
 import com.rest.recruit.dto.SimpleResponse;
+import com.rest.recruit.dto.request.DataWithToken;
 import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
 import com.rest.recruit.dto.response.GetCalendarResponse;
 import com.rest.recruit.dto.response.GetRankingByVisitCntResponseDTO;
@@ -10,6 +11,7 @@ import com.rest.recruit.dto.response.GetRecruitDetailResponseDTO;
 import com.rest.recruit.service.RankingService;
 import com.rest.recruit.service.RecruitService;
 import com.rest.recruit.util.DateValidation;
+import lombok.Builder;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.stream.Stream;
 
 //또한, 특정 도메인만 접속을 허용할 수도 있습니다.
   //      - @CrossOrigin(origins = "허용주소:포트")
@@ -51,32 +54,55 @@ public class RecruitController {
     @ApiOperation(value = "채용공고 캘린더 조회", httpMethod = "GET", notes = "채용공고 캘린더 조회" , response=GetCalendarResponse.class)
     @GetMapping
     public ResponseEntity calendar(@ApiParam(value = "start_date , end_date", required = true)
-                                       @RequestParam("startTime") String startTime , @RequestParam("endTime") String endTime){
+                                   @RequestParam(value = "startTime" ,required = false) String startTime,
+                                   @RequestParam(value = "endTime",required = false) String endTime){
 
-        GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO
-                = new GetRecruitCalendarRequestDTO(startTime,endTime);
+        if ( endTime == null ||
+                startTime == null ||
+                endTime.isEmpty() ||
+                startTime.isEmpty() ||
+                !DateValidation.validationDate(startTime) ||
+                !DateValidation.validationDate(endTime)) {
 
-        if ( getRecruitCalendarRequestDTO.getEndTime() == null ||
-                getRecruitCalendarRequestDTO.getStartTime() == null ||
-                getRecruitCalendarRequestDTO.getEndTime().isEmpty() ||
-                getRecruitCalendarRequestDTO.getStartTime().isEmpty() ||
-                !DateValidation.validationDate(getRecruitCalendarRequestDTO.getStartTime()) ||
-                !DateValidation.validationDate(getRecruitCalendarRequestDTO.getEndTime())) {
-
-            return SimpleResponse.badRequest(ResultResponseWithoutData.builder()
+            System.out.print("test\n");
+            System.out.print("false");
+            return SimpleResponse.ok(ResultResponseWithoutData.builder()
                     .message("필요한 값이 잘못되었습니다")
                     .status("400")
                     .success("false").build());
         }
 
-
-        return recruitService.GetRecruitCalendarByDate(getRecruitCalendarRequestDTO);
+/*
+        if(token != null || !token.isEmpty()){
+            //return recruitService.GetRecruitCalendarByDateWithToken(getRecruitCalendarRequestDTO,token);
+        }
+  */
+        return recruitService.GetRecruitCalendarByDate(new GetRecruitCalendarRequestDTO(startTime,endTime));
     }
 
     @ApiOperation(value = "상세 채용공고 페이지 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회",response= GetRecruitDetailResponseDTO.class)
     @GetMapping("/detail/{recruitIdx}")
-    public ResponseEntity detailRecuitPage(@ApiParam(value = "recruitIdx", required = true) 
-    @PathVariable("recruitIdx") int recruitIdx){ return recruitService.GetDetailRecruitPage(recruitIdx); }
+    public ResponseEntity detailRecuitPage(@ApiParam(value = "recruitIdx", required = true)
+                                               @RequestHeader(value="Authorization", required=false) String token,
+                                           @PathVariable(value = "recruitIdx", required=false) int recruitIdx){
+
+        if ( recruitIdx <= 0) {
+            System.out.print("test\n");
+            System.out.print("false");
+            return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                    .message("필요한 값이 잘못되었습니다")
+                    .status("400")
+                    .success("false").build());
+        }
+
+        if(token== null || token.isEmpty()){
+            return recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).build());
+        }
+
+        String tokenString = token.substring("Bearer ".length());
+
+        return recruitService.GetDetailRecruitPage(DataWithToken.builder().token(tokenString).recruitIdx(recruitIdx).build());
+    }
 
     //스케쥴링
     //일요일 정각
@@ -109,3 +135,4 @@ public class RecruitController {
 
 
 }
+

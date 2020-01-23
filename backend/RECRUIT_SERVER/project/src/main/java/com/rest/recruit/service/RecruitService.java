@@ -3,6 +3,7 @@ package com.rest.recruit.service;
 import com.rest.recruit.dto.ResultResponse;
 import com.rest.recruit.dto.ResultResponseWithoutData;
 import com.rest.recruit.dto.SimpleResponse;
+import com.rest.recruit.dto.request.DataWithToken;
 import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
 import com.rest.recruit.dto.response.GetCalendarResponse;
 import com.rest.recruit.dto.response.GetRecruitCalendarSimpleResponseDTO;
@@ -13,6 +14,7 @@ import com.rest.recruit.model.Position;
 import com.rest.recruit.model.Question;
 import com.rest.recruit.model.RecruitDetail;
 import com.rest.recruit.model.SimpleRecruit;
+import com.rest.recruit.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -60,23 +62,46 @@ public class RecruitService {
     }
 
 
+
     //채용공고 상세 페이지
-    public ResponseEntity GetDetailRecruitPage(int recruitIdx) {
+    public ResponseEntity GetDetailRecruitPage(DataWithToken dataWithToken) {
 
         try {
 
-            SimpleRecruit tmp = recruitMapper.getSimpleRecruitById(recruitIdx);
+            //token
+            //eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YmNoYWUwODAxQGdtYWlsLmNvbSIsInVzZXJJZCI6OSwiZW1haWwiOiJ5YmNoYWUwODAxQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoidGVzdCIsInJvbGVzIjpbIlVTRVIiXSwidG9rZW5UeXBlIjoiQUNDRVNTX1RPS0VOIiwiZXhwIjoxNTc5NzYwOTYyfQ.U-0kZR0QgV9FSxws_n8V3GiYDdWiMDEwH9-zwCiB884
+
+            if(!dataWithToken.getToken().isEmpty() || dataWithToken.getToken() != null) {
+/*
+                JwtUtil jwtUtil = new JwtUtil();
+
+                System.out.print("\ntokendecode\n");
+                System.out.print(dataWithToken.getToken());
+                System.out.print("\ntokendecode22\n");
+                System.out.print(jwtUtil.getAuthentication(dataWithToken.getToken()));
+                System.out.print("\n@@\n");
+                System.out.print(jwtUtil.isValidToken(dataWithToken.getToken()) ? "true" : "false");
+                System.out.print("\n@@@@@@@@@\n");
+*/
+            }
+            SimpleRecruit tmp = recruitMapper.getSimpleRecruitById(dataWithToken.getRecruitIdx());
+
+            System.out.print("\n@@Companyname\n");
+            System.out.print(tmp.getCompanyName());
+            System.out.print("\n@@@@@@@@@\n");
 
             String tmpString = tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
                     tmp.getCompanyId() + ":" + tmp.getCompanyName();
 
             ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
 
-
-            RecruitDetail tmpdetail = recruitMapper.GetDetailRecruitPage(recruitIdx);
-            List<Position> tmpPosition = recruitMapper.getPosition(recruitIdx);
+            RecruitDetail tmpdetail = recruitMapper.GetDetailRecruitPage(dataWithToken.getRecruitIdx());
+            List<Position> tmpPosition = recruitMapper.getPosition(dataWithToken.getRecruitIdx());
             List<Question> tmpQuestion = new ArrayList<>();
 
+            System.out.print("\n@@pageurl\n");
+            System.out.print(tmpdetail.getEmploymentPageUrl());
+            System.out.print("\n@@@@@@@@@\n");
 
             if(zsetOperations.reverseRank("ranking-visit",tmpString) != null){
                 double score = zsetOperations.incrementScore("ranking-visit",tmpString,1);
@@ -84,10 +109,10 @@ public class RecruitService {
             }else{
 
                 tmpdetail.setViewCount(tmpdetail.getViewCount()+1);
-                int updateCheck = recruitMapper.updateViewCountWithDB(recruitIdx);
+                int updateCheck = recruitMapper.updateViewCountWithDB(dataWithToken.getRecruitIdx());
             //레디스에없다면 update +1
                 if(updateCheck < 0){
-                    return SimpleResponse.badRequest();
+                    return SimpleResponse.ok();
                 }
             }
 
@@ -105,11 +130,9 @@ public class RecruitService {
                     .success("true")
                     .data(getRecruitDetailResponseDTO).build());
 
-
-
         } catch (Exception e) {
 
-            return SimpleResponse.badRequest(ResultResponseWithoutData.builder()
+            return SimpleResponse.ok(ResultResponseWithoutData.builder()
                     .message("상세 채용공고 조회 에러")
                     .status("500")
                     .success("false").build());
@@ -117,4 +140,6 @@ public class RecruitService {
 
 
     }
+
+
 }

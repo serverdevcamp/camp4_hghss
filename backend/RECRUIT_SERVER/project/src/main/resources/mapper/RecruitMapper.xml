@@ -68,9 +68,9 @@
         recruit.id AS recruitId,
         recruit.company_id AS companyId,
         DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS endTime,
+        company.name AS companyName,
         recruit.view_count AS viewCount,
-        COUNT(recruit_like.user_id) AS 'favoriteCnt',
-        company.name AS companyName
+        COUNT(recruit_like.user_id) AS 'favoriteCount',
         FROM recruit
         LEFT JOIN recruit_like ON recruit_like.recruit_id = recruit.id
         INNER JOIN company ON company.id = recruit.company_id
