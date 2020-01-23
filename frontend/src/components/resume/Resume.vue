@@ -248,7 +248,7 @@
               class="resume-card"
               draggable="true"
               v-on:dragstart="drag($event)"
-              v-for="resume in getResume.resume_list['5']['1']"
+              v-for="resume in getResume['5']['1']"
               :key="resume"
               :id="resume.recruitId"
             >
@@ -266,7 +266,7 @@
               class="resume-card"
               draggable="true"
               v-on:dragstart="drag($event)"
-              v-for="resume in $store.state.resume.resume_list['5']['1']"
+              v-for="resume in getResume['5']['1']"
               :key="resume"
               :id="resume.recruitId"
             >
