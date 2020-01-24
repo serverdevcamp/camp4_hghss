@@ -8,21 +8,28 @@ import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
 import com.rest.recruit.dto.response.GetCalendarResponse;
 import com.rest.recruit.dto.response.GetRankingByVisitCntResponseDTO;
 import com.rest.recruit.dto.response.GetRecruitDetailResponseDTO;
+import com.rest.recruit.exception.GetCalendarException;
+import com.rest.recruit.exception.UnValidatedDateTypeException;
 import com.rest.recruit.service.RankingService;
 import com.rest.recruit.service.RecruitService;
 import com.rest.recruit.util.DateValidation;
 import lombok.Builder;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 //또한, 특정 도메인만 접속을 허용할 수도 있습니다.
@@ -36,46 +43,21 @@ public class RecruitController {
 
     private final RecruitService recruitService;
 
-
-
-
     public RecruitController(RecruitService recruitService) {
         this.recruitService = recruitService;
     }
 
 
-    /*   @PostMapping
-    public simpleResponse insertExternalService(@RequestBody Map<String,Object> param) {
-        String name = (String)param.get("name");
-        String url = (String)param.get("url");*/
-/*@RequestBody GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO*/
-    //List<GetCalendarResponse> results
     @ApiOperation(value = "채용공고 캘린더 조회", httpMethod = "GET", notes = "채용공고 캘린더 조회" , response=GetCalendarResponse.class)
     @GetMapping
     public ResponseEntity calendar(@ApiParam(value = "start_date , end_date", required = true)
-                                   @RequestParam(value = "startTime" ,required = false) String startTime,
-                                   @RequestParam(value = "endTime",required = false) String endTime){
+                                   @RequestParam(value = "startTime")  String startTime,
+                                   @RequestParam(value = "endTime") String endTime){
 
-        if ( endTime == null ||
-                startTime == null ||
-                endTime.isEmpty() ||
-                startTime.isEmpty() ||
-                !DateValidation.validationDate(startTime) ||
-                !DateValidation.validationDate(endTime)) {
-
-            System.out.print("test\n");
-            System.out.print("false");
-            return SimpleResponse.ok(ResultResponseWithoutData.builder()
-                    .message("필요한 값이 잘못되었습니다")
-                    .status("400")
-                    .success("false").build());
+        if (!DateValidation.validationDate(startTime) || !DateValidation.validationDate(endTime)) {
+            throw new UnValidatedDateTypeException();
         }
 
-/*
-        if(token != null || !token.isEmpty()){
-            //return recruitService.GetRecruitCalendarByDateWithToken(getRecruitCalendarRequestDTO,token);
-        }
-  */
         return recruitService.GetRecruitCalendarByDate(new GetRecruitCalendarRequestDTO(startTime,endTime));
     }
 
@@ -83,17 +65,7 @@ public class RecruitController {
     @GetMapping("/detail/{recruitIdx}")
     public ResponseEntity detailRecuitPage(@ApiParam(value = "recruitIdx", required = true)
                                                @RequestHeader(value="Authorization", required=false) String token,
-                                           @PathVariable(value = "recruitIdx", required=false) int recruitIdx){
-
-        if ( recruitIdx <= 0) {
-            System.out.print("test\n");
-            System.out.print("false");
-            return SimpleResponse.ok(ResultResponseWithoutData.builder()
-                    .message("필요한 값이 잘못되었습니다")
-                    .status("400")
-                    .success("false").build());
-        }
-
+                                           @PathVariable(value = "recruitIdx") int recruitIdx){
         if(token== null || token.isEmpty()){
             return recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).build());
         }
