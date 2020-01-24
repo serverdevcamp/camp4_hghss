@@ -16,6 +16,7 @@ import com.rest.recruit.model.Position;
 import com.rest.recruit.model.Question;
 import com.rest.recruit.model.RecruitDetail;
 import com.rest.recruit.model.SimpleRecruit;
+import com.rest.recruit.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -66,6 +67,11 @@ public class RecruitService {
 
             if(!dataWithToken.getToken().isEmpty() || dataWithToken.getToken() != null) {
 
+                JwtUtil jwtUtil = new JwtUtil();
+                System.out.print("\ntokentest\n");
+                System.out.print(jwtUtil.getAuthentication(dataWithToken.getToken()));
+                System.out.print("\ntokenTest2\n");
+                System.out.print(jwtUtil.getClaims(dataWithToken.getToken()));
             }
             SimpleRecruit tmp = recruitMapper.getSimpleRecruitById(dataWithToken.getRecruitIdx());
 
