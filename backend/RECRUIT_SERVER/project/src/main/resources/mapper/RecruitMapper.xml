@@ -63,10 +63,39 @@
         WHERE recruit.id = #{recruitIdx};
     </select>
 
-    <update id="updateViewCount" useGeneratedKeys="true" parameterType="com.rest.recruit.model.RecruitDetail">
-        UPDATE recruit SET  recruit.view_count = recruit.view_count + 1 
+    <select id="getSimpleRecruit" resultType="com.rest.recruit.model.SimpleRecruit">
+        SELECT
+        recruit.id AS recruitId,
+        recruit.company_id AS companyId,
+        DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS endTime,
+        company.name AS companyName,
+        recruit.view_count AS viewCount,
+        COUNT(recruit_like.user_id) AS 'favoriteCount',
+        FROM recruit
+        LEFT JOIN recruit_like ON recruit_like.recruit_id = recruit.id
+        INNER JOIN company ON company.id = recruit.company_id
+        WHERE recruit.id IN (SELECT recruit.id FROM recruit)
+        GROUP BY recruit.id;
+    </select>
+
+    <select id="getSimpleRecruitById" resultType="com.rest.recruit.model.SimpleRecruit">
+        SELECT
+        recruit.id AS recruitId,
+        recruit.company_id AS companyId,
+        DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS endTime,
+        company.name AS companyName
+        FROM recruit
+        INNER JOIN company ON company.id = recruit.company_id
+        WHERE recruit.id = #{recruitIdx};
+    </select>
+
+    <update id="updateViewCountWithDB" useGeneratedKeys="true" parameterType="int">
+        UPDATE recruit SET  recruit.view_count = recruit.view_count+1
         WHERE recruit.id = #{recruitIdx};
     </update>
 
-
+    <update id="updateViewCount" useGeneratedKeys="true" parameterType="int">
+        UPDATE recruit SET  recruit.view_count = #{viewCount}
+        WHERE recruit.id = #{recruitIdx};
+    </update>
 </mapper>

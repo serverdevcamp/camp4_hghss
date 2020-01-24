@@ -5,6 +5,7 @@ import com.rest.recruit.dto.response.GetRecruitCalendarSimpleResponseDTO;
 import com.rest.recruit.dto.response.GetRecruitDetailResponseDTO;
 import com.rest.recruit.model.Position;
 import com.rest.recruit.model.RecruitDetail;
+import com.rest.recruit.model.SimpleRecruit;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -18,5 +19,13 @@ public interface RecruitMapper {
 
     List<Position> getPosition(int recruitIdx);
 
-    public int updateViewCount(int recruitIdx);
+    public List<SimpleRecruit> getSimpleRecruit();
+
+    public int updateViewCount(int recruitIdx, int viewCount);
+
+    public SimpleRecruit getSimpleRecruitById(int recruitIdx);
+
+    public int updateViewCountWithDB(int recruitIdx);
+
+//    public boolean updateRecruitCnt();
 }

@@ -3,18 +3,39 @@ package com.rest.recruit.controller;
 import com.rest.recruit.dto.ResultResponse;
 import com.rest.recruit.dto.ResultResponseWithoutData;
 import com.rest.recruit.dto.SimpleResponse;
+import com.rest.recruit.dto.request.DataWithToken;
 import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
+import com.rest.recruit.dto.response.GetCalendarResponse;
+import com.rest.recruit.dto.response.GetRankingByVisitCntResponseDTO;
+import com.rest.recruit.dto.response.GetRecruitDetailResponseDTO;
+import com.rest.recruit.exception.GetCalendarException;
+import com.rest.recruit.exception.UnValidatedDateTypeException;
+import com.rest.recruit.service.RankingService;
 import com.rest.recruit.service.RecruitService;
+import com.rest.recruit.util.DateValidation;
+import lombok.Builder;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
+//또한, 특정 도메인만 접속을 허용할 수도 있습니다.
+  //      - @CrossOrigin(origins = "허용주소:포트")
+
+@CrossOrigin("*")
 @Api(tags={"채용공고"})
 @RestController
 @RequestMapping("/recruits")
@@ -27,55 +48,36 @@ public class RecruitController {
     }
 
 
-    //email confirm
-    @ApiOperation(value = "채용공고 캘린더 조회", httpMethod = "GET", notes = "채용공고 캘린더 조회")
+    @ApiOperation(value = "채용공고 캘린더 조회", httpMethod = "GET", notes = "채용공고 캘린더 조회" , response=GetCalendarResponse.class)
     @GetMapping
-    public ResponseEntity calendar(@ApiParam(value = "start_date , end_date", required = true) 
-        @RequestBody GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO){
+    public ResponseEntity calendar(@ApiParam(value = "start_date , end_date", required = true)
+                                   @RequestParam(value = "startTime")  String startTime,
+                                   @RequestParam(value = "endTime") String endTime){
 
-/*    !validationDate(getRecruitCalendarRequestDTO.getStartTime()) ||
-                !validationDate(getRecruitCalendarRequestDTO.getEndTime())*/
-        if ( getRecruitCalendarRequestDTO.getEndTime() == null ||
-                getRecruitCalendarRequestDTO.getStartTime() == null ||
-                getRecruitCalendarRequestDTO.getEndTime().isEmpty() ||
-                getRecruitCalendarRequestDTO.getStartTime().isEmpty() ||
-                !validationDate(getRecruitCalendarRequestDTO.getStartTime()) ||
-                !validationDate(getRecruitCalendarRequestDTO.getEndTime())) {
-
-            return SimpleResponse.badRequest(ResultResponseWithoutData.builder()
-                    .message("필요한 값이 잘못되었습니다")
-                    .status("400")
-                    .success("false").build());
-
+        if (!DateValidation.validationDate(startTime) || !DateValidation.validationDate(endTime)) {
+            throw new UnValidatedDateTypeException();
         }
 
-
-        return recruitService.GetRecruitCalendarByDate(getRecruitCalendarRequestDTO);
+        return recruitService.GetRecruitCalendarByDate(new GetRecruitCalendarRequestDTO(startTime,endTime));
     }
 
-    @ApiOperation(value = "상세 채용공고 페이지 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회")
+    @ApiOperation(value = "상세 채용공고 페이지 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회",response= GetRecruitDetailResponseDTO.class)
     @GetMapping("/detail/{recruitIdx}")
-    public ResponseEntity detailRecuitPage(@ApiParam(value = "recruitIdx", required = true) 
-    @PathVariable("recruitIdx") int recruitIdx){
-
-        return recruitService.GetDetailRecruitPage(recruitIdx);
-    }
-
-
-    private boolean validationDate(String checkDate) {
-
-        try{
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-            dateFormat.setLenient(false);
-            dateFormat.parse(checkDate);
-            return  true;
-
-        }catch (ParseException e){
-            return  false;
+    public ResponseEntity detailRecuitPage(@ApiParam(value = "recruitIdx", required = true)
+                                               @RequestHeader(value="Authorization", required=false) String token,
+                                           @PathVariable(value = "recruitIdx") int recruitIdx){
+        if(token== null || token.isEmpty()){
+            return recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).build());
         }
 
+        String tokenString = token.substring("Bearer ".length());
+
+        return recruitService.GetDetailRecruitPage(DataWithToken.builder().token(tokenString).recruitIdx(recruitIdx).build());
     }
+
+
+
 
 
 }
+

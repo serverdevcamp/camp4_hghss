@@ -9,4 +9,9 @@ public class GetRecruitCalendarRequestDTO {
 
     private String startTime;
     private String endTime;
+
+    public GetRecruitCalendarRequestDTO(String startTime, String endTime) {
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
 }
