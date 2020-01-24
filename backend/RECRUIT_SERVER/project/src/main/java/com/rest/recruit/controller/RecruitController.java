@@ -36,11 +36,10 @@ public class RecruitController {
 
     private final RecruitService recruitService;
 
-    private final RankingService rankingService;
 
 
-    public RecruitController(RecruitService recruitService,RankingService rankingService) {
-        this.rankingService = rankingService;
+
+    public RecruitController(RecruitService recruitService) {
         this.recruitService = recruitService;
     }
 
@@ -104,32 +103,6 @@ public class RecruitController {
         return recruitService.GetDetailRecruitPage(DataWithToken.builder().token(tokenString).recruitIdx(recruitIdx).build());
     }
 
-    //스케쥴링
-    //일요일 정각
-    @Scheduled(cron="0 0 0 * * 0")
-    @ApiOperation(value = "채용공고 db to redis", httpMethod = "POST", notes ="채용공고 DB를 REDIS에 업로드")
-    @PostMapping("/ranking/updateRedis")
-    public ResponseEntity DbToRedis(){
-        return rankingService.DbToRedis();
-    }
-
-
-    //스케쥴링
-    //매일정각
-    @Scheduled(cron="0 0 0 * * ?")
-    @ApiOperation(value = "redis to 채용공고 db", httpMethod = "PUT", notes ="REDIS를 채용공고 DB에 업로드")
-    @PostMapping("/ranking/updateDB")
-    public ResponseEntity RedisToDb() throws ParseException {
-        return rankingService.RedisToDb();
-    }
-
-
-//    @ApiOperation(value = "상세 채용공고 페이지 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회",response= GetRecruitDetailResponseDTO.class)
-    @ApiOperation(value = "7일내 마감하는 조회수 랭킹", httpMethod = "GET", notes ="7일내 마감하는 조회수 랭킹",response= GetRankingByVisitCntResponseDTO.class)
-    @GetMapping("/ranking/visit")
-    public ResponseEntity getRankingByVisitCnt() throws ParseException {
-        return rankingService.getRankingByVisitCnt();
-    }
 
 
 
