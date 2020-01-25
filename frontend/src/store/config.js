@@ -1,6 +1,6 @@
 export default {
-    // auth_path : ''
-    recruit_path : 'http://10.99.13.21:8080',
-    // resume_path : ''
-    // chat_path : ''
+    // AUTH_HOST : ''
+    RECRUIT_HOST : 'http://10.99.13.21:8080',
+    // RESUME_HOST : ''
+    CHAT_HOST : 'localhost:8081'
 }

@@ -24,13 +24,14 @@
         <p class="subtitle point-font">즐겨찾기/작성한 기업</p>
       </v-row>
       <v-row class="chat-room">
+        \
       </v-row>
     </v-col>
   </v-row>
   <v-row class="hot-chat">
     <v-col>
       <v-row>
-        <p class="subtitle point-font">인기 채팅</p>
+        <p class="subtitle point-font" @click="sendMessage()">인기 채팅</p>
       </v-row>
       <v-row class="chat-room">
       </v-row>
@@ -39,10 +40,28 @@
   
 </div>
 </template>
-
 <script>
+import { mapGetters, mapActions } from "vuex";
 export default {
   data: () => ({}),
+  computed: {
+    ...mapGetters([
+      "getSocket",
+    ])
+  },
+  methods: {
+    ...mapActions([
+      "openSocket"
+    ]),
+    sendMessage : function(){
+      var socket = this.getSocket('company1')
+      var msg = {message:"이거슨 추가된 메시지!", nickname: "닉네임"}
+      socket.send(JSON.stringify(msg))
+    }
+  },
+  created(){
+    this.openSocket('company1')
+  }
 };
 </script>
 <style lang="scss">

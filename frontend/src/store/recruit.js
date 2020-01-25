@@ -14,7 +14,7 @@ export default {
     calendarAPI(context, payload) {
       return axios({
         method: 'get',
-        url: config.recruit_path + '/recruits',
+        url: config.RECRUIT_HOST + '/recruits',
         params: payload,
         headers: {
           "Content-Type": "application/json",
