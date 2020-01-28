@@ -50,7 +50,7 @@ public class RecruitService {
         for (int i = 0; i < tmp.size(); i++) {
             results.add(GetCalendarResponse.of(tmp.get(i)));
         }
-        
+
 
         return SimpleResponse.ok(ResultResponse.builder()
                 .message("캘린더 조회 성공")
@@ -87,20 +87,18 @@ public class RecruitService {
 
             RecruitDetail tmpdetail = recruitMapper.GetDetailRecruitPage(dataWithToken.getRecruitIdx());
 
-
-
             List<Position> tmpPosition = recruitMapper.getPosition(dataWithToken.getRecruitIdx());
             List<Question> tmpQuestion = new ArrayList<>();
 
             if(zsetOperations.reverseRank("ranking-visit",tmpString) != null){
                 double score = zsetOperations.incrementScore("ranking-visit",tmpString,1);
                 tmpdetail.setViewCount( Integer.parseInt(String.valueOf(Math.round(score))));
-            }else{
+            } else {
 
                 tmpdetail.setViewCount(tmpdetail.getViewCount()+1);
                 int updateCheck = recruitMapper.updateViewCountWithDB(dataWithToken.getRecruitIdx());
             //레디스에없다면 update +1
-                if(updateCheck < 0){
+                if (updateCheck < 0) {
                     return SimpleResponse.ok();
                 }
             }
@@ -135,7 +133,7 @@ public class RecruitService {
 
         //SELECT * FROM recruit_like
         //        WHERE user_id = #{userIdx} AND recruit_id = #{recruitIdx};
-        if(recruitMapper.GetFavorite(userIdx,dataWithToken.getRecruitIdx()) > 0){
+        if (recruitMapper.GetFavorite(userIdx,dataWithToken.getRecruitIdx()) > 0) {
             getRecruitDetailResponseDTO.setFavorite(true);
         }
 
@@ -144,12 +142,6 @@ public class RecruitService {
                 .status("200")
                 .success("true")
                 .data(getRecruitDetailResponseDTO).build());
-
-
-
-
-
     }
-
 
 }

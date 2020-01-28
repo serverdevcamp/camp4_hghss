@@ -82,10 +82,13 @@
         DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS endTime,
         company.name AS companyName,
         recruit.view_count AS viewCount,
-        recruit.favorite_count AS 'favoriteCount',
-        recruit.resume_count AS 'applyCount'
+        COUNT(recruit_like.user_id) AS 'favoriteCount',
+        COUNT(resume.user_id) AS 'applyCount'
         FROM recruit
         INNER JOIN company ON company.id = recruit.company_id
+        LEFT JOIN recruit_like ON recruit_like.recruit_id = recruit.id
+        INNER JOIN position ON position.recruit_id = recruit.id
+        LEFT JOIN resume ON position.id = resume.position_id
         WHERE recruit.id IN (SELECT recruit.id FROM recruit)
         GROUP BY recruit.id;
     </select>

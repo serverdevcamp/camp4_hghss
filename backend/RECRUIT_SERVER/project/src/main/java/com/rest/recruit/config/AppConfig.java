@@ -3,6 +3,7 @@ package com.rest.recruit.config;
 
 
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
@@ -44,6 +45,7 @@ public class AppConfig {
 
         SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
         sessionFactory.setDataSource(getDataSource());
+        //sessionFactory.setTransactionFactory(new ManagedTransactionFactory());
         sessionFactory.setConfiguration(configuration);
         sessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:mapper/*.xml"));
         return sessionFactory.getObject();

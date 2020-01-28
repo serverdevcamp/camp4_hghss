@@ -35,9 +35,9 @@ public class RankingService {
         for(SimpleRecruit tmp : recruitDetail){
             String tmpString =  tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
                     tmp.getCompanyId() + ":" + tmp.getCompanyName();
-            Long visitRank = zsetOperations.reverseRank("ranking-visit",tmpString); //몇위인지
-            Long likeRank = zsetOperations.reverseRank("ranking-like",tmpString); //몇위인지
-            Long applyRank = zsetOperations.reverseRank("ranking-apply",tmpString); //몇위인지
+            Long visitRank = zsetOperations.reverseRank("ranking-visit",tmpString);
+            Long likeRank = zsetOperations.reverseRank("ranking-like",tmpString);
+            Long applyRank = zsetOperations.reverseRank("ranking-apply",tmpString);
 
             if(visitRank != null || likeRank != null || applyRank != null){
                //이미 존재한다면
@@ -77,7 +77,6 @@ public class RankingService {
             //db 업데이트 favorite_count 체크!!
 
             if(tmp < 0){
-//simpleResponse.ok
                 return SimpleResponse.badRequest();
             }
 
@@ -85,8 +84,6 @@ public class RankingService {
                 //이미지난채용이면 캐시에서 지우기
                 zsetOperations.remove("ranking-visit",rank.getValue());
             }
-
-
         }
 
         //좋아요 랭킹시 remove하는 경우:레디스에있는 cnt를 넣을 때 이미 endTIme이 지난 건 레디스에서 삭제
@@ -98,13 +95,26 @@ public class RankingService {
             String from = array[0];
             Date date = transFormat.parse(from);
 
-            if(date.compareTo(time)  < 0){
+            if (date.compareTo(time)  < 0) {
                 //이미지난채용이면 캐시에서 지우기
                 zsetOperations.remove("ranking-like",rank.getValue());
             }
         }
 
+        //자기소개서 랭킹시 remove!!!
+        Set<ZSetOperations.TypedTuple<String>> applyRankingSet = zsetOperations
+                .reverseRangeWithScores("ranking-apply", 0, -1);
 
+        for (ZSetOperations.TypedTuple<String> rank : applyRankingSet) {
+            String[] array = rank.getValue().split(":");
+            String from = array[0];
+            Date date = transFormat.parse(from);
+
+            if (date.compareTo(time)  < 0) {
+                //이미지난채용이면 캐시에서 지우기
+                zsetOperations.remove("ranking-apply",rank.getValue());
+            }
+        }
 
         return SimpleResponse.ok();
     }
@@ -135,12 +145,6 @@ public class RankingService {
             if(endDate.compareTo(time) <0  || endDate.compareTo(cal.getTime()) > 0) {
                 continue;
             }
-
-            System.out.print("\ntest\n");
-            System.out.print(rank.getValue());
-
-            System.out.print("\ntest\n");
-            System.out.print(array);
 
             getRankingResponseDTOList
                         .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
@@ -231,11 +235,6 @@ public class RankingService {
                 continue;
             }
 
-            System.out.print("\ntest\n");
-            System.out.print(rank.getValue());
-
-            System.out.print("\ntest\n");
-            System.out.print(array);
 
             getRankingResponseDTOList
                     .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
