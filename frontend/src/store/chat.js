@@ -1,31 +1,58 @@
-import config from "./config";
-// import axios from 'axios'
+import config from "./config"
+import Vue from "vue"
 
 export default {
   state: {
-    // 채팅 목록
+    room: false,
+    // 채팅 목록 => 로그인할때 가져온다.
+    myChat : {
+      0 : {
+        company : '전체',
+        logo_url : 'https://jasoseol.s3-ap-northeast-2.amazonaws.com/chats/images/000/000/001/thumb/%E1%84%80%E1%85%B3%E1%84%85%E1%85%AE%E1%86%B8_271_2x_%281%29.png?1533027704'
+      }
+    },
+    favChat : {},
+    hotChat : {},
+    // 채팅 내용
     chatList: {
       // 이런구조로 넣을 것임
       // 0: {
       //   state: false,
       //   socket: '',
-      //   chat: []
+      //   user_cnt: 1,
+      //   chat: [] // 채팅내용저장
       // }
     }
+    
   },
   mutations: {
+    setRoomState(state,payload){
+      state.room = payload
+    },
     setSocket(state, payload) {
-      state.chatList[payload.company_id] = {
+      Vue.set(state.chatList,payload.company_id,{
         'state': payload.socket.readyState,
         'socket': payload.socket,
+        'user_cnt': 1,
         'chat': [],
-      }
-      // 소켓 생성이 완료되면 리스너를 달아주자
+      })
+      // 소켓 리스너
       payload.socket.onmessage = function (event) {
-        var chat_list = JSON.parse(event.data).chat_list
+        var socket_data = JSON.parse(event.data)
+        var type = socket_data.type
+        var chat_list = socket_data.chat_list
+        
+        if(type === 1){
+          // 현재 소켓을 열고있는 유저 수
+          state.chatList[payload.company_id].user_cnt = socket_data.user_cnt
+        }
+
         chat_list.forEach(chat =>{
-          if (typeof chat == 'string') chat = JSON.parse(chat)
-          Object.assign(state.chatList[payload.company_id].chat, chat)
+          if (type === 1) chat = JSON.parse(chat)
+          
+          let chat_list2 = state.chatList[payload.company_id].chat
+          chat_list2.push(chat)
+          Object.assign(state.chatList[payload.company_id].chat, chat_list2)
         })
         
       }
@@ -44,8 +71,24 @@ export default {
     }
   },
   getters: {
+    getRoomState(state){
+      return state.room
+    },
+    getMyChat(state) {
+      return state.myChat
+    },
+    getFavChat(state) {
+      return state.favChat
+    },
+    getHotChat(state) {
+      return state.hotChat
+    },
     getSocket: state => company_id =>{
       return state.chatList[company_id].socket
-    }
+    },
+    getChatList: state => company_id =>{
+      if(state.chatList.hasOwnProperty(company_id)) return state.chatList[company_id]
+      return []
+    },
   }
 }
