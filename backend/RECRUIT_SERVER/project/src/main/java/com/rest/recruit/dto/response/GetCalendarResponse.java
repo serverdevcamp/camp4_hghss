@@ -18,17 +18,28 @@ public class GetCalendarResponse {
     private String companyName;
     private String startTime;
     private String endTime;
+    private boolean favorite;
     private int recruitType;
     private String imageFileName;//EMPLOYEE TYPE, USER_LIKE
-
-    private boolean favorite;
-
     private List<Integer> employType;
 
 
+    public static GetCalendarResponse of(GetRecruitCalendarSimpleResponseDTO getRecruitCalendarSimpleResponseDTO,
+                                         List<Integer> employTypeTmp) {
+        return GetCalendarResponse.builder()
+                .companyId(getRecruitCalendarSimpleResponseDTO.getCompanyId())
+                .recruitId(getRecruitCalendarSimpleResponseDTO.getRecruitId())
+                .companyName(getRecruitCalendarSimpleResponseDTO.getCompanyName())
+                .recruitType(getRecruitCalendarSimpleResponseDTO.getRecruitType())
+                .imageFileName(getRecruitCalendarSimpleResponseDTO.getImageFileName())
+                .startTime(getRecruitCalendarSimpleResponseDTO.getStartTime())
+                .endTime(getRecruitCalendarSimpleResponseDTO.getEndTime())
+                .employType(employTypeTmp).build();
+    }
 
     public static GetCalendarResponse of(GetRecruitCalendarSimpleResponseDTO getRecruitCalendarSimpleResponseDTO) {
         //convert string to array
+
 
         return GetCalendarResponse.builder()
                 .companyId(getRecruitCalendarSimpleResponseDTO.getCompanyId())
@@ -38,8 +49,8 @@ public class GetCalendarResponse {
                 .imageFileName(getRecruitCalendarSimpleResponseDTO.getImageFileName())
                 .startTime(getRecruitCalendarSimpleResponseDTO.getStartTime())
                 .endTime(getRecruitCalendarSimpleResponseDTO.getEndTime())
-                .favorite(getRecruitCalendarSimpleResponseDTO.getFavorite() == 1 ? true : false)
                 .employType(convertToArray(getRecruitCalendarSimpleResponseDTO.getEmployType()))
+                .favorite(getRecruitCalendarSimpleResponseDTO.getFavorite() != 0 ? true : false)
                 .build();
     }
 

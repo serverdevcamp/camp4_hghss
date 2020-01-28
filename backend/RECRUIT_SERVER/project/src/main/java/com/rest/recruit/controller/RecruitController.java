@@ -49,11 +49,13 @@ public class RecruitController {
 
         String tokenString = token.substring("Bearer ".length());
         JwtUtil jwtUtil = new JwtUtil();
-        int userIdx = jwtUtil.getAuthentication(tokenString);
+        String userIdx = Integer.toString(jwtUtil.getAuthentication(tokenString));
 
         return recruitService.GetRecruitCalendarByDate(GetRecruitCalendarRequestDTO.builder()
                 .startTime(startTime).endTime(endTime)
                 .userIdx(userIdx).build());
+
+
     }
 
     @ApiOperation(value = "상세 채용공고 페이지 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회",response= GetRecruitDetailResponseDTO.class)

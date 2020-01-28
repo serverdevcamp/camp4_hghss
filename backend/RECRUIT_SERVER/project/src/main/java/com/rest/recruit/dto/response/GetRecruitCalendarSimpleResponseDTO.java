@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import java.util.List;
 
+
 @Getter
 @Setter
 public class GetRecruitCalendarSimpleResponseDTO {
@@ -17,4 +18,7 @@ public class GetRecruitCalendarSimpleResponseDTO {
     private String startTime;
     private String endTime;
     private int favorite;
+
+
 }
+

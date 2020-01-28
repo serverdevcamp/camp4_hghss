@@ -39,15 +39,18 @@ public class RecruitService {
 
     public ResponseEntity GetRecruitCalendarByDate(GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO) {
 
-        System.out.print("\ntest1\n");
         List<GetRecruitCalendarSimpleResponseDTO> tmp = recruitMapper.getRecruitCalendarByDate(getRecruitCalendarRequestDTO);
 
-        if (tmp.size() == 0 ||tmp.isEmpty()) { throw new GetCalendarException(); }
+
+        if (tmp.size() == 0 ||tmp.isEmpty()) {
+            throw new GetCalendarException(); }
 
         List<GetCalendarResponse> results = new ArrayList<>();
+
         for (int i = 0; i < tmp.size(); i++) {
             results.add(GetCalendarResponse.of(tmp.get(i)));
         }
+        
 
         return SimpleResponse.ok(ResultResponse.builder()
                 .message("캘린더 조회 성공")

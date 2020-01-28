@@ -3,6 +3,7 @@
 
 <mapper namespace="com.rest.recruit.mapper.RecruitMapper">
 
+
     <sql id = "field">
         recruit.id AS recruitId,
         company.id AS companyId,
@@ -12,7 +13,7 @@
         GROUP_CONCAT(position.division) AS employType,
         recruit.start_time AS startTime,
         recruit.end_time AS endTime,
-        IFNULL(recruit_like.user_id,0) AS favorite
+        IFNULL(recruit_like.recruit_id,0) AS favorite
     </sql>
 
     <sql id = "detail">
@@ -41,7 +42,7 @@
         AND DATE(recruit.start_time) <![CDATA[<=]]>  DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
         OR (DATE(recruit.end_time) <![CDATA[>=]]>  DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i')
         AND DATE(recruit.end_time)  <![CDATA[<=]]> DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
-        <if test="userIdx != null and userIdx !=''">
+        <if test="userIdx != null and userIdx != ''">
             AND recruit_like.user_id = #{userIdx}
         </if>
         GROUP BY recruit.id
