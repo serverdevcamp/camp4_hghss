@@ -12,4 +12,5 @@ public class SimpleRecruit {
     private String companyName;
     private int viewCount;
     private int favoriteCount;
+    private int applyCount;
 }

@@ -2,22 +2,15 @@ package com.rest.recruit.service;
 
 import com.rest.recruit.dto.ResultResponse;
 import com.rest.recruit.dto.SimpleResponse;
-import com.rest.recruit.dto.response.GetRankingByLikeCntResponseDTO;
-import com.rest.recruit.dto.response.GetRankingByVisitCntResponseDTO;
+import com.rest.recruit.dto.response.GetRankingResponseDTO;
 import com.rest.recruit.mapper.RecruitMapper;
 import com.rest.recruit.model.SimpleRecruit;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.dynamic.ClassFileLocator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
-import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.stereotype.Service;
-import sun.util.resources.cldr.gv.LocaleNames_gv;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,12 +37,14 @@ public class RankingService {
                     tmp.getCompanyId() + ":" + tmp.getCompanyName();
             Long visitRank = zsetOperations.reverseRank("ranking-visit",tmpString); //몇위인지
             Long likeRank = zsetOperations.reverseRank("ranking-like",tmpString); //몇위인지
+            Long applyRank = zsetOperations.reverseRank("ranking-apply",tmpString); //몇위인지
 
-            if(visitRank != null || likeRank != null){
+            if(visitRank != null || likeRank != null || applyRank != null){
                //이미 존재한다면
                continue;
            }
 
+            zsetOperations.add("ranking-apply", tmpString, tmp.getApplyCount());
             zsetOperations.add("ranking-visit", tmpString, tmp.getViewCount());
             zsetOperations.add("ranking-like", tmpString, tmp.getFavoriteCount());
         }
@@ -78,6 +73,8 @@ public class RankingService {
             //db업데이트
             int tmp = recruitMapper.updateViewCount(Integer.parseInt(array[1]),
                     Integer.parseInt(String.valueOf(Math.round(rank.getScore()))));
+
+            //db 업데이트 favorite_count 체크!!
 
             if(tmp < 0){
 //simpleResponse.ok
@@ -117,7 +114,7 @@ public class RankingService {
         ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
         Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations.reverseRangeWithScores("ranking-visit", 0, 9);
 
-        List<GetRankingByVisitCntResponseDTO> getRankingByVisitCntResponseDTOList = new ArrayList<>();
+        List<GetRankingResponseDTO> getRankingResponseDTOList = new ArrayList<>();
         int i = 1;
 
         Date time = new Date();
@@ -125,7 +122,7 @@ public class RankingService {
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(time);
-        cal.add(Calendar.DATE,7);
+        cal.add(Calendar.DATE,30);
 
         for (ZSetOperations.TypedTuple<String> rank : rankingSet) {
 
@@ -139,8 +136,14 @@ public class RankingService {
                 continue;
             }
 
-            getRankingByVisitCntResponseDTOList
-                        .add(new GetRankingByVisitCntResponseDTO(array,rank.getScore(),i++));
+            System.out.print("\ntest\n");
+            System.out.print(rank.getValue());
+
+            System.out.print("\ntest\n");
+            System.out.print(array);
+
+            getRankingResponseDTOList
+                        .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
 
             if(i > 5){
                 break;
@@ -151,15 +154,15 @@ public class RankingService {
                 .message("7일내 조회수 랭킹 조회 성공")
                 .status("200")
                 .success("true")
-                .data(getRankingByVisitCntResponseDTOList).build());
+                .data(getRankingResponseDTOList).build());
     }
 
+
     public ResponseEntity getRankingByLikeCnt() throws ParseException {
-//7일 내 마감하는 즐겨찾기 랭킹
         ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
         Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations.reverseRangeWithScores("ranking-like", 0, 9);
 
-        List<GetRankingByLikeCntResponseDTO> getRankingByLikeCntResponseDTOList = new ArrayList<>();
+        List<GetRankingResponseDTO> getRankingResponseDTOList = new ArrayList<>();
         int i = 1;
 
         Date time = new Date();
@@ -167,7 +170,7 @@ public class RankingService {
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(time);
-        cal.add(Calendar.DATE,7);
+        cal.add(Calendar.DATE,30);
 
         for (ZSetOperations.TypedTuple<String> rank : rankingSet) {
 
@@ -176,13 +179,19 @@ public class RankingService {
             String endTime = array[0];
             Date endDate = transFormat.parse(endTime);
 
-            //7일이후마감하면
-            if(endDate.compareTo(time) <0 || endDate.compareTo(cal.getTime()) > 0) {
+            //7일 이후마감이면 제외
+            if(endDate.compareTo(time) <0  || endDate.compareTo(cal.getTime()) > 0) {
                 continue;
             }
 
-            getRankingByLikeCntResponseDTOList
-                    .add(new GetRankingByLikeCntResponseDTO(array,rank.getScore(),i++));
+            System.out.print("\ntest\n");
+            System.out.print(rank.getValue());
+
+            System.out.print("\ntest\n");
+            System.out.print(array);
+
+            getRankingResponseDTOList
+                    .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
 
             if(i > 5){
                 break;
@@ -193,7 +202,53 @@ public class RankingService {
                 .message("7일내 즐겨찾기 랭킹 조회 성공")
                 .status("200")
                 .success("true")
-                .data(getRankingByLikeCntResponseDTOList).build());
+                .data(getRankingResponseDTOList).build());
+    }
 
+    public ResponseEntity getRankingByApplyCnt() throws ParseException {
+        ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
+        Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations.reverseRangeWithScores("ranking-apply", 0, 9);
+
+        List<GetRankingResponseDTO> getRankingResponseDTOList = new ArrayList<>();
+        int i = 1;
+
+        Date time = new Date();
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(time);
+        cal.add(Calendar.DATE,30);
+
+        for (ZSetOperations.TypedTuple<String> rank : rankingSet) {
+
+            String[] array = rank.getValue().split(":");
+
+            String endTime = array[0];
+            Date endDate = transFormat.parse(endTime);
+
+            //7일 이후마감이면 제외
+            if(endDate.compareTo(time) <0  || endDate.compareTo(cal.getTime()) > 0) {
+                continue;
+            }
+
+            System.out.print("\ntest\n");
+            System.out.print(rank.getValue());
+
+            System.out.print("\ntest\n");
+            System.out.print(array);
+
+            getRankingResponseDTOList
+                    .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
+
+            if(i > 5){
+                break;
+            }
+        }
+
+        return SimpleResponse.ok(ResultResponse.builder()
+                .message("7일내 지원자수 랭킹 조회 성공")
+                .status("200")
+                .success("true")
+                .data(getRankingResponseDTOList).build());
     }
 }

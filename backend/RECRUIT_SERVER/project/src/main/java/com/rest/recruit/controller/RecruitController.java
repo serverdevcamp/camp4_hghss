@@ -1,36 +1,19 @@
 package com.rest.recruit.controller;
 
-import com.rest.recruit.dto.ResultResponse;
-import com.rest.recruit.dto.ResultResponseWithoutData;
-import com.rest.recruit.dto.SimpleResponse;
 import com.rest.recruit.dto.request.DataWithToken;
 import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
 import com.rest.recruit.dto.response.GetCalendarResponse;
-import com.rest.recruit.dto.response.GetRankingByVisitCntResponseDTO;
 import com.rest.recruit.dto.response.GetRecruitDetailResponseDTO;
-import com.rest.recruit.exception.GetCalendarException;
 import com.rest.recruit.exception.UnValidatedDateTypeException;
-import com.rest.recruit.service.RankingService;
 import com.rest.recruit.service.RecruitService;
 import com.rest.recruit.util.DateValidation;
-import lombok.Builder;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpStatus;
+import com.rest.recruit.util.JwtUtil;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-
-import javax.validation.Valid;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 //또한, 특정 도메인만 접속을 허용할 수도 있습니다.
   //      - @CrossOrigin(origins = "허용주소:포트")
@@ -50,7 +33,8 @@ public class RecruitController {
 
     @ApiOperation(value = "채용공고 캘린더 조회", httpMethod = "GET", notes = "채용공고 캘린더 조회" , response=GetCalendarResponse.class)
     @GetMapping
-    public ResponseEntity calendar(@ApiParam(value = "start_date , end_date", required = true)
+    public ResponseEntity calendar(@ApiParam(value = "startTime , endTime", required = true)
+                                       @RequestHeader(value="Authorization", required=false) String token,
                                    @RequestParam(value = "startTime")  String startTime,
                                    @RequestParam(value = "endTime") String endTime){
 
@@ -58,7 +42,18 @@ public class RecruitController {
             throw new UnValidatedDateTypeException();
         }
 
-        return recruitService.GetRecruitCalendarByDate(new GetRecruitCalendarRequestDTO(startTime,endTime));
+        if(token== null || token.isEmpty()){
+            return recruitService.GetRecruitCalendarByDate
+                    (GetRecruitCalendarRequestDTO.builder().startTime(startTime).endTime(endTime).build());
+        }
+
+        String tokenString = token.substring("Bearer ".length());
+        JwtUtil jwtUtil = new JwtUtil();
+        int userIdx = jwtUtil.getAuthentication(tokenString);
+
+        return recruitService.GetRecruitCalendarByDate(GetRecruitCalendarRequestDTO.builder()
+                .startTime(startTime).endTime(endTime)
+                .userIdx(userIdx).build());
     }
 
     @ApiOperation(value = "상세 채용공고 페이지 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회",response= GetRecruitDetailResponseDTO.class)

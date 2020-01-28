@@ -39,6 +39,7 @@ public class RecruitService {
 
     public ResponseEntity GetRecruitCalendarByDate(GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO) {
 
+        System.out.print("\ntest1\n");
         List<GetRecruitCalendarSimpleResponseDTO> tmp = recruitMapper.getRecruitCalendarByDate(getRecruitCalendarRequestDTO);
 
         if (tmp.size() == 0 ||tmp.isEmpty()) { throw new GetCalendarException(); }
@@ -61,23 +62,20 @@ public class RecruitService {
 
     //채용공고 상세 페이지
     public ResponseEntity GetDetailRecruitPage(DataWithToken dataWithToken) {
+        /*
+        *
+        * 프린세스불암산 <meme91322367@gmail.com>
 
-            //token
-            //eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YmNoYWUwODAxQGdtYWlsLmNvbSIsInVzZXJJZCI6OSwiZW1haWwiOiJ5YmNoYWUwODAxQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoidGVzdCIsInJvbGVzIjpbIlVTRVIiXSwidG9rZW5UeXBlIjoiQUNDRVNTX1RPS0VOIiwiZXhwIjoxNTc5NzYwOTYyfQ.U-0kZR0QgV9FSxws_n8V3GiYDdWiMDEwH9-zwCiB884
+오후 1:51 (11분 전)
 
-            if(!dataWithToken.getToken().isEmpty() || dataWithToken.getToken() != null) {
+나에게
+"accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YmNoYWUwODAxQGdtYWlsLmNvbSIsInVzZXJJZCI6MSwiZW1haWwiOiJ5YmNoYWUwODAxQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoidGVzdCIsInJvbGVzIjpbIlVTRVIiXSwidG9rZW5UeXBlIjoiQUNDRVNTX1RPS0VOIiwiZXhwIjoxNTgwMTg4ODMxfQ.euTJS0o9_uI6-Q5oLbZsv9e1xJ6SOo_7lfKZtz5L_IU",
+        "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YmNoYWUwODAxQGdtYWlsLmNvbSIsInVzZXJJZCI6MSwiZW1haWwiOiJ5YmNoYWUwODAxQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoidGVzdCIsInJvbGVzIjpbIlVTRVIiXSwidG9rZW5UeXBlIjoiUkVGUkVTSF9UT0tFTiIsImV4cCI6MTU4MTM5NjYzMX0.l5whELZ4WcE3tAqPPLoQAJfzr4HmdRj6d0bUOUqTkNw",
+        *
+        * */
 
-                JwtUtil jwtUtil = new JwtUtil();
-                System.out.print("\ntokentest\n");
-                System.out.print(jwtUtil.getAuthentication(dataWithToken.getToken()));
-                System.out.print("\ntokenTest2\n");
-                System.out.print(jwtUtil.getClaims(dataWithToken.getToken()));
-            }
+
             SimpleRecruit tmp = recruitMapper.getSimpleRecruitById(dataWithToken.getRecruitIdx());
-
-            System.out.print("\n@@Companyname\n");
-            System.out.print(tmp.getCompanyName());
-            System.out.print("\n@@@@@@@@@\n");
 
             String tmpString = tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
                     tmp.getCompanyId() + ":" + tmp.getCompanyName();
@@ -85,12 +83,11 @@ public class RecruitService {
             ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
 
             RecruitDetail tmpdetail = recruitMapper.GetDetailRecruitPage(dataWithToken.getRecruitIdx());
+
+
+
             List<Position> tmpPosition = recruitMapper.getPosition(dataWithToken.getRecruitIdx());
             List<Question> tmpQuestion = new ArrayList<>();
-
-            System.out.print("\n@@pageurl\n");
-            System.out.print(tmpdetail.getEmploymentPageUrl());
-            System.out.print("\n@@@@@@@@@\n");
 
             if(zsetOperations.reverseRank("ranking-visit",tmpString) != null){
                 double score = zsetOperations.incrementScore("ranking-visit",tmpString,1);
@@ -106,20 +103,46 @@ public class RecruitService {
             }
 
             for (int i = 0;i<tmpPosition.size();i++) {
-                tmpQuestion.add(new Question(tmpPosition.get(i).getQuestionId(),tmpPosition.get(i).getQuestionContent()));
+                tmpQuestion.add(new Question(tmpPosition.get(i).getQuestionId(),
+                        tmpPosition.get(i).getQuestionContent(),tmpPosition.get(i).getQuestionLimit()));
             }
 
             GetRecruitDetailResponseDTO getRecruitDetailResponseDTO
                     = new GetRecruitDetailResponseDTO(tmpdetail,GetRecruitPositionResponseDTO.of(tmpPosition.get(0),tmpQuestion));
 
+            getRecruitDetailResponseDTO.setFavorite(false);
 
             if (getRecruitDetailResponseDTO == null ) { throw new GetDetailRecruitPageException(); }
+
+        if(dataWithToken.getToken() == null || dataWithToken.getToken().isEmpty()) {
 
             return SimpleResponse.ok(ResultResponse.builder()
                     .message("상세 조회 성공")
                     .status("200")
                     .success("true")
                     .data(getRecruitDetailResponseDTO).build());
+
+
+        }
+
+
+        JwtUtil jwtUtil = new JwtUtil();
+
+        int userIdx = jwtUtil.getAuthentication(dataWithToken.getToken());
+
+        //SELECT * FROM recruit_like
+        //        WHERE user_id = #{userIdx} AND recruit_id = #{recruitIdx};
+        if(recruitMapper.GetFavorite(userIdx,dataWithToken.getRecruitIdx()) > 0){
+            getRecruitDetailResponseDTO.setFavorite(true);
+        }
+
+        return SimpleResponse.ok(ResultResponse.builder()
+                .message("상세 조회 성공")
+                .status("200")
+                .success("true")
+                .data(getRecruitDetailResponseDTO).build());
+
+
 
 
 

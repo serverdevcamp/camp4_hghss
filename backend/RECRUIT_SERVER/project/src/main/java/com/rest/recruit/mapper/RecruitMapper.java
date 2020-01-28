@@ -2,7 +2,6 @@ package com.rest.recruit.mapper;
 
 import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
 import com.rest.recruit.dto.response.GetRecruitCalendarSimpleResponseDTO;
-import com.rest.recruit.dto.response.GetRecruitDetailResponseDTO;
 import com.rest.recruit.model.Position;
 import com.rest.recruit.model.RecruitDetail;
 import com.rest.recruit.model.SimpleRecruit;
@@ -17,7 +16,7 @@ public interface RecruitMapper {
 
     public RecruitDetail GetDetailRecruitPage(int recruitIdx);
 
-    List<Position> getPosition(int recruitIdx);
+    public List<Position> getPosition(int recruitIdx);
 
     public List<SimpleRecruit> getSimpleRecruit();
 
@@ -27,5 +26,5 @@ public interface RecruitMapper {
 
     public int updateViewCountWithDB(int recruitIdx);
 
-//    public boolean updateRecruitCnt();
+    public int GetFavorite(int userIdx, int recruitIdx);
 }

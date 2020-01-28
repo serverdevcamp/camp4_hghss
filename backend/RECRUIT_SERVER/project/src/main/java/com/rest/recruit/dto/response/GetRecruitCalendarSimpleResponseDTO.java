@@ -16,6 +16,5 @@ public class GetRecruitCalendarSimpleResponseDTO {
     private String employType;
     private String startTime;
     private String endTime;
-
-
+    private int favorite;
 }

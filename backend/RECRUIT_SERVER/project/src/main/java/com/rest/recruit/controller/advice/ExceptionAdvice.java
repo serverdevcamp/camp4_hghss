@@ -23,7 +23,7 @@ public class ExceptionAdvice {
         System.out.println(name + " parameter is missing");
         // Actual exception handling
         return SimpleResponse.ok(ResultResponseWithoutData.builder()
-                .message("필요한 값이 없습니다.")
+                .message("필요한 값이 잘못되었습니다.")
                 .status("400")
                 .success("false").build());
     }
@@ -31,7 +31,7 @@ public class ExceptionAdvice {
     @ExceptionHandler(UnValidatedDateTypeException.class)
     public ResponseEntity handleDateType(UnValidatedDateTypeException e) {
         return SimpleResponse.ok(ResultResponseWithoutData.builder()
-                .message(e.getMessage())
+                .message(e.getMessage()) //유효하지 않은 date type입니다.
                 .status("400")
                 .success("false").build());
     }
@@ -52,8 +52,8 @@ public class ExceptionAdvice {
     protected ResponseEntity handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
 
         return SimpleResponse.ok(ResultResponseWithoutData.builder()
-                .message(HttpStatus.METHOD_NOT_ALLOWED.toString())
-                .status("405")
+                .message("지원하지 않는 HTTP method 호출입니다")
+                .status("400")
                 .success("false").build());
     }
 

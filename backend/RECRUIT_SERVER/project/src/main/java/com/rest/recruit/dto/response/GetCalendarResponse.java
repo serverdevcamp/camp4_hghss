@@ -20,24 +20,15 @@ public class GetCalendarResponse {
     private String endTime;
     private int recruitType;
     private String imageFileName;//EMPLOYEE TYPE, USER_LIKE
+
+    private boolean favorite;
+
     private List<Integer> employType;
 
-    public static GetCalendarResponse of(GetRecruitCalendarSimpleResponseDTO getRecruitCalendarSimpleResponseDTO,
-                                         List<Integer> employTypeTmp) {
-     return GetCalendarResponse.builder()
-         .companyId(getRecruitCalendarSimpleResponseDTO.getCompanyId())
-         .recruitId(getRecruitCalendarSimpleResponseDTO.getRecruitId())
-        .companyName(getRecruitCalendarSimpleResponseDTO.getCompanyName())
-        .recruitType(getRecruitCalendarSimpleResponseDTO.getRecruitType())
-        .imageFileName(getRecruitCalendarSimpleResponseDTO.getImageFileName())
-        .startTime(getRecruitCalendarSimpleResponseDTO.getStartTime())
-        .endTime(getRecruitCalendarSimpleResponseDTO.getEndTime())
-        .employType(employTypeTmp).build();
-    }
+
 
     public static GetCalendarResponse of(GetRecruitCalendarSimpleResponseDTO getRecruitCalendarSimpleResponseDTO) {
         //convert string to array
-
 
         return GetCalendarResponse.builder()
                 .companyId(getRecruitCalendarSimpleResponseDTO.getCompanyId())
@@ -47,7 +38,9 @@ public class GetCalendarResponse {
                 .imageFileName(getRecruitCalendarSimpleResponseDTO.getImageFileName())
                 .startTime(getRecruitCalendarSimpleResponseDTO.getStartTime())
                 .endTime(getRecruitCalendarSimpleResponseDTO.getEndTime())
-                .employType(convertToArray(getRecruitCalendarSimpleResponseDTO.getEmployType())).build();
+                .favorite(getRecruitCalendarSimpleResponseDTO.getFavorite() == 1 ? true : false)
+                .employType(convertToArray(getRecruitCalendarSimpleResponseDTO.getEmployType()))
+                .build();
     }
 
     private static List<Integer> convertToArray(String employType) {
