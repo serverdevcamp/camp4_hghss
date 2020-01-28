@@ -10,8 +10,9 @@ public class Question {
     private String questionContent;
     private int questionLimit;//check!!!
 
-    public Question(int questionId, String questionContent) {
+    public Question(int questionId, String questionContent, int questionLimit) {
         this.questionId = questionId;
         this.questionContent = questionContent;
+        this.questionLimit = questionLimit;
     }
 }

@@ -3,6 +3,7 @@
 
 <mapper namespace="com.rest.recruit.mapper.RecruitMapper">
 
+
     <sql id = "field">
         recruit.id AS recruitId,
         company.id AS companyId,
@@ -11,7 +12,8 @@
         company.logo_url AS imageFileName,
         GROUP_CONCAT(position.division) AS employType,
         recruit.start_time AS startTime,
-        recruit.end_time AS endTime
+        recruit.end_time AS endTime,
+        IFNULL(recruit_like.recruit_id,0) AS favorite
     </sql>
 
     <sql id = "detail">
@@ -35,10 +37,14 @@
         FROM company
         INNER JOIN recruit ON company.id= recruit.company_id
         INNER JOIN position ON recruit.id = position.recruit_id
+        LEFT JOIN recruit_like ON recruit_like.recruit_id = recruit.id
         WHERE (DATE(recruit.start_time) <![CDATA[>=]]> DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i')
         AND DATE(recruit.start_time) <![CDATA[<=]]>  DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
         OR (DATE(recruit.end_time) <![CDATA[>=]]>  DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i')
         AND DATE(recruit.end_time)  <![CDATA[<=]]> DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
+        <if test="userIdx != null and userIdx != ''">
+            AND recruit_like.user_id = #{userIdx}
+        </if>
         GROUP BY recruit.id
         ORDER BY recruit.start_time ASC;
     </select>
@@ -53,10 +59,16 @@
         WHERE recruit.id = #{recruitIdx};
     </select>
 
+
+    <select id = "GetFavorite" resultType="int">
+        SELECT * FROM recruit_like WHERE user_id = #{userIdx} AND recruit_id = #{recruitIdx};
+    </select>
+
     <select id = "getPosition" resultType="com.rest.recruit.model.Position">
         SELECT
         position.id AS 'position_id', position.field , position.division,
-        question.id AS 'question_id',question.question_content
+        question.id AS 'question_id',question.question_content,
+        question.question_limit
         FROM recruit
         INNER JOIN position ON position.recruit_id = recruit.id
         INNER JOIN question ON question.position_id = position.id
@@ -71,9 +83,12 @@
         company.name AS companyName,
         recruit.view_count AS viewCount,
         COUNT(recruit_like.user_id) AS 'favoriteCount',
+        COUNT(resume.user_id) AS 'applyCount'
         FROM recruit
-        LEFT JOIN recruit_like ON recruit_like.recruit_id = recruit.id
         INNER JOIN company ON company.id = recruit.company_id
+        LEFT JOIN recruit_like ON recruit_like.recruit_id = recruit.id
+        INNER JOIN position ON position.recruit_id = recruit.id
+        LEFT JOIN resume ON position.id = resume.position_id
         WHERE recruit.id IN (SELECT recruit.id FROM recruit)
         GROUP BY recruit.id;
     </select>

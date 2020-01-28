@@ -19,11 +19,13 @@ public class GetRecruitDetailResponseDTO {
     private String employmentPageUrl;
     private String startTime;
     private String endTime;
+    private boolean favorite;
     private int recruitType;
     private String content;
     private int viewCount;
     private int favoriteCount;
     private GetRecruitPositionResponseDTO employments;
+
  /*   private RecruitDetail tmp;
     private GetRecruitPositionResponseDTO getRecruitPositionResponseDTO;
 */
@@ -47,4 +49,7 @@ public class GetRecruitDetailResponseDTO {
         this.employments = getRecruitPositionResponseDTO;
     }
 
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
+    }
 }

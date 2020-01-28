@@ -18,6 +18,8 @@ public class Position {
     private String questionContent;
     private List<Question> quesitons;
 
+    private int questionLimit;
+
     public void setEmployments(List<Question> tmpQuestion) {
         this.quesitons = tmpQuestion;
 

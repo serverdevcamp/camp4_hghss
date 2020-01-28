@@ -1,7 +1,7 @@
 package com.rest.recruit.controller;
 
 
-import com.rest.recruit.dto.response.GetRankingByVisitCntResponseDTO;
+import com.rest.recruit.dto.response.GetRankingResponseDTO;
 import com.rest.recruit.service.RankingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -45,17 +45,23 @@ public class RankingController {
     }
 
     @ApiOperation(value = "7일내 마감하는 조회수 랭킹", httpMethod = "GET", notes ="7일내 마감하는 조회수 랭킹",
-            response= GetRankingByVisitCntResponseDTO.class)
+            response= GetRankingResponseDTO.class)
     @GetMapping("/visit")
     public ResponseEntity getRankingByVisitCnt() throws ParseException {
         return rankingService.getRankingByVisitCnt();
     }
 
     @ApiOperation(value = "7일내 마감하는 즐겨찾기 랭킹", httpMethod = "GET", notes ="7일내 마감하는 즐겨찾기 랭킹",
-            response= GetRankingByVisitCntResponseDTO.class)
+            response= GetRankingResponseDTO.class)
     @GetMapping("/like")
     public ResponseEntity getRankingByLikeCnt() throws ParseException {
         return rankingService.getRankingByLikeCnt();
     }
 
+    @ApiOperation(value = "7일내 마감하는 지원자 수 랭킹", httpMethod = "GET", notes ="7일내 마감하는 지원자 수 랭킹",
+            response= GetRankingResponseDTO.class)
+    @GetMapping("/apply")
+    public ResponseEntity getRankingByApplyCnt() throws ParseException {
+        return rankingService.getRankingByApplyCnt();
+    }
 }
