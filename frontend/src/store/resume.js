@@ -1,6 +1,6 @@
 export default {
   state: {
-    resume_list: {
+    resume: {
       1: {
         1: [
           {
@@ -20,7 +20,7 @@ export default {
             "recruitId": 12,
             "companyName": "네이버",
             "startTime": "2019-12-29 15:00:00",
-            "endTime": "2020-01-22 10:00:00",
+            "endTime": "2020-01-27 10:00:00",
             "recruitType": 1,
             "employType": [
               1,
@@ -47,12 +47,13 @@ export default {
       3: { 1: [], 2: [] },
       4: { 1: [], 2: [] },
       5: { 1: [], 2: [] },
-
-
-
     }
   },
   mutations: {},
   actions: {},
-  getters: {}
+  getters: {
+    getResume(state){
+      return state.resume
+    }
+  }
 }

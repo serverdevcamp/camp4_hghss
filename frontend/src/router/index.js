@@ -5,7 +5,6 @@ import RecruitPage from '../views/RecruitPage'
 import ResetPasswd from '../components/template/ResetPasswd'
 import ChangePasswd from '../components/template/ChangePasswd'
 import AdminPage from '../views/AdminPage.vue'
-// import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
 
