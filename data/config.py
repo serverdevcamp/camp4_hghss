@@ -1,5 +1,5 @@
-HOST = '10.99.13.21'
+HOST = 'localhost'
 PORT = 3306
-USER = 'root'
-PASSWORD = 'welcome1'
+USER = 'yun'
+PASSWORD = 'yun'
 DATABASE = 'hghssdb'

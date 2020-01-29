@@ -15,7 +15,7 @@ public class UserExceptionAdvice {
     @ExceptionHandler(UnauthorizedException.class)
     public ResultResponse handleAdminAuthNeeded(Exception e) {
         return ResultResponse.builder()
-                            .success("false")
+                            .success(false)
                             .status(HttpStatus.UNAUTHORIZED.value())
                             .message(e.getMessage())
                             .build();
@@ -25,7 +25,7 @@ public class UserExceptionAdvice {
     @ExceptionHandler(SignoutException.class)
     public ResultResponse handelSignoutException(Exception e) {
         return ResultResponse.builder()
-                .success("false")
+                .success(false)
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())
                 .build();
@@ -35,7 +35,7 @@ public class UserExceptionAdvice {
     @ExceptionHandler(EmailNotExistException.class)
     public ResultResponse handleEmailNotExist(Exception e) {
         return ResultResponse.builder()
-                .success("false")
+                .success(false)
                 .status(HttpStatus.NOT_FOUND.value())
                 .message(e.getMessage())
                 .build();
@@ -45,7 +45,7 @@ public class UserExceptionAdvice {
     @ExceptionHandler(ExistEmailException.class)
     public ResultResponse handleExistEmail(Exception e) {
         return ResultResponse.builder()
-                .success("false")
+                .success(false)
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())
                 .build();
@@ -55,7 +55,7 @@ public class UserExceptionAdvice {
     @ExceptionHandler(ExpiredRefreshTokenException.class)
     public ResultResponse handleExpiredRefreshToken(Exception e) {
         return ResultResponse.builder()
-                .success("false")
+                .success(false)
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .message(e.getMessage())
                 .build();
@@ -65,7 +65,7 @@ public class UserExceptionAdvice {
     @ExceptionHandler(InvalidTokenException.class)
     public ResultResponse handleInvalidToken(Exception e) {
         return ResultResponse.builder()
-                .success("false")
+                .success(false)
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .message(e.getMessage())
                 .build();
@@ -75,7 +75,7 @@ public class UserExceptionAdvice {
     @ExceptionHandler(LoginNeededException.class)
     public ResultResponse handleLoginNeeded(Exception e) {
         return ResultResponse.builder()
-                .success("false")
+                .success(false)
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .message(e.getMessage())
                 .build();
@@ -85,7 +85,7 @@ public class UserExceptionAdvice {
     @ExceptionHandler(PasswordWrongException.class)
     public ResultResponse handlePasswordWrong(Exception e) {
         return ResultResponse.builder()
-                .success("false")
+                .success(false)
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())
                 .build();
@@ -95,7 +95,7 @@ public class UserExceptionAdvice {
     @ExceptionHandler(AuthenticationEntryPointException.class)
     public ResultResponse handleAuthenticationEntryPoint(Exception e) {
         return ResultResponse.builder()
-                .success("false")
+                .success(false)
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .message(e.getMessage())
                 .build();
@@ -105,8 +105,18 @@ public class UserExceptionAdvice {
     @ExceptionHandler(AccessDeniedException.class)
     public ResultResponse handleAccessDenied(Exception e) {
         return ResultResponse.builder()
-                .success("false")
+                .success(false)
                 .status(HttpStatus.UNAUTHORIZED.value())
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(TimeoutException.class)
+    public ResultResponse handleTimeout(Exception e) {
+        return ResultResponse.builder()
+                .success(false)
+                .status(HttpStatus.REQUEST_TIMEOUT.value())
                 .message(e.getMessage())
                 .build();
     }

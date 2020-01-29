@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,14 +41,16 @@ public class UserService {
         if(!passwordEncoder.matches(password, user.getHashedPassword())) throw new PasswordWrongException();
 
         // token 발급
-        String accessToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), Collections.singletonList(user.getRole()), "ACCESS_TOKEN", 30);
-        String refreshToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), Collections.singletonList(user.getRole()), "REFRESH_TOKEN", 60*24*14);
+        String accessToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "ACCESS_TOKEN", 30);
+        String refreshToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "REFRESH_TOKEN", 60*24*14);
 
         redisUtil.set(refreshToken, user.getRole(), 60*24*14);
 
         return TokenResponseDto.builder()
+                .id(user.getId())
                 .email(email)
                 .nickname(user.getNickname())
+                .role(user.getRole())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
@@ -69,13 +70,15 @@ public class UserService {
         int userId = (int) claims.get("userId");
         String email = claims.getSubject();
         String nickname  = (String) claims.get("nickname");
-        String grade = (String) ((List) claims.get("roles")).get(0);
+        String role = (String) ((List) claims.get("roles")).get(0);
 
-        String accessToken = jwtUtil.createToken(userId, email, nickname, Collections.singletonList(grade), "ACCESS_TOKEN", 30);
+        String accessToken = jwtUtil.createToken(userId, email, nickname, role, "ACCESS_TOKEN", 30);
 
         return TokenResponseDto.builder()
+                .id(userId)
                 .email(email)
                 .nickname(nickname)
+                .role(role)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
@@ -91,6 +94,7 @@ public class UserService {
         String key = UUID.randomUUID().toString();
         User user = User.builder()
                         .email(email)
+                        .nickname("temp")
                         .hashedPassword(hashedPassword)
                         .role("USER")
                         .build();
@@ -102,10 +106,14 @@ public class UserService {
 
         User user = (User)redisUtil.get(key);
 
-        // TODO : Random Nickname
-        user.setNickname("test");
+        if(user==null) throw new TimeoutException();
 
-        if(userRepository.registerUser(user) > 0) redisUtil.delete(key);
+        int userId = userRepository.registerUser(user);
+        if(userId > 0) redisUtil.delete(key);
+
+        String nickname = userRepository.getNickname(userId);
+        userRepository.updateNickname(userId, nickname);
+
     }
 
     public void sendPasswordMail(String email) {
@@ -117,19 +125,11 @@ public class UserService {
         if(mailUtil.sendPasswordMail(key, email)) redisUtil.set(key, email, 10);
     }
 
-    public String getUpdatePasswordToken(String key) {
+    public void updatePassword(String key, String password) {
 
         String email = (String) redisUtil.get(key);
 
-        // 비밀번호 찾기 후 이메일 링크를 통해 토큰 요청 시, 10분안에 비밀번호를 변경
-        String token = jwtUtil.createToken(null, email, null, Collections.singletonList("USER"), "ACCESS_TOKEN", 10);
-
-        redisUtil.delete(key);
-
-        return token;
-    }
-
-    public void updatePassword(String email, String password) {
+        if(email == null) throw new UnauthorizedException();
 
         if(userRepository.countUser(email) == 0) throw new EmailNotExistException(email);
 
@@ -141,5 +141,7 @@ public class UserService {
                 .hashedPassword(hashedPassword)
                 .build()
         );
+
+        redisUtil.delete(key);
     }
 }

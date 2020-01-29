@@ -10,12 +10,12 @@
         <p class="nav-btn icon-btn" @click="user_menu = !user_menu">
           <font-awesome-icon :icon="['far', 'user-circle']" />
         </p>
-        <div v-if="user_menu && !$store.state.user.email" class="user-menu">
+        <div v-if="user_menu && !$store.state.auth.user.email" class="user-menu">
           <div class="sign-in-btn btn" @click="showModal(0)">SIGN IN</div>
           <div class="sign-up-btn btn" @click="showModal(1)">REGISTER</div>
         </div>
-        <div v-else-if="user_menu && $store.state.user.email" class="user-menu">
-          <div class="accounts btn">{{ $store.state.user.email }}</div>
+        <div v-else-if="user_menu && $store.state.auth.user.email" class="user-menu">
+          <div class="accounts btn">{{ $store.state.auth.user.email }}</div>
           <div class="sign-out-btn btn" @click="signout">LOGOUT</div>
         </div>
       </div>
@@ -30,6 +30,7 @@
 </template>
 <script>
 import Authentication from "./Authentication";
+import { mapActions } from 'vuex';
 
 export default {
   components: {
@@ -41,12 +42,10 @@ export default {
     };
   },
   methods: {
+    ...mapActions (['signout']),
     showModal(target) {
       this.user_menu = false;
       this.$modal.show("account-modal", { target: target });
-    },
-    async signout() {
-      await this.$store.dispatch("signout");
     }
   }
 };
