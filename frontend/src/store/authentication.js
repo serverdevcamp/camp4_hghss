@@ -4,7 +4,7 @@ export default {
   state: {
     user: {
       email: "",
-      nickname: ""
+      nickname: "혜자 다이온쥐잡이뱀"
     },
   },
   mutations: {

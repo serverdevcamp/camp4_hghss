@@ -2,12 +2,12 @@
   <v-row id="recruit">
     <div
       class="main-section"
-      :class="{'chat-open':$store.state.ChatState}"
+      :class="{'chat-open':$store.state.template.ChatState}"
     >
       <Calendar v-if="$route.name == 'RecruitPage'"/>
       <Resume v-if="$route.name == 'ResumePage'"/>
     </div>
-    <div class="chat-section" :class="{'chat-open':$store.state.ChatState}">
+    <div class="chat-section" :class="{'chat-open':$store.state.template.ChatState}">
       <Chat />
     </div>
   </v-row>
