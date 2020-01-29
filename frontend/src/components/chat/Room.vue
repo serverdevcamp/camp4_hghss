@@ -7,10 +7,10 @@
         class="user_cnt"
       >({{getChatList(company_id).user_cnt}}명)</span>
     </v-row>
-    <v-row class="chat-room">
+    <v-row class="chat-room" id="chat-room">
       <div class="chat" v-for="chat in getChatList(company_id).chat" :key="chat">
-        <div class="nickname point-font">{{chat.nickname}}</div>
-        <div class="content">
+        <div v-if="getUser.nickname != chat.nickname" class="nickname point-font">{{chat.nickname}}</div>
+        <div class="content" :class="{right: getUser.nickname == chat.nickname}">
           <div class="message">
             {{chat.message}}
             <div class="time">{{chat.time}}</div>
@@ -18,7 +18,7 @@
         </div>
       </div>
     </v-row>
-    <v-row class="send-section">
+    <v-row class="send-section" :class="{anonymous: !getUser.nickname}" @click="showLoginModal">
       <div v-if="getUser.nickname" class="send-box">
         <div class="nickname point-font">{{getUser.nickname}}</div>
         <textarea
@@ -28,10 +28,12 @@
           v-on:keyup.enter="sendMessage"
         ></textarea>
       </div>
-      <!-- 내일 추가 -->
-      <div v-else @click="alert('로그인해라')" class="send-box">
-        <div class="nickname">비회원</div>
-        <div class="message">채팅에 참여하려면 로그인을 해주세요.</div>
+      <div v-else class="send-box">
+        <div class="nickname point-font">비회원</div>
+        <textarea
+          class="message"
+          placeholder="채팅에 참여하려면 로그인을 해주세요."
+        ></textarea>
       </div>
     </v-row>
   </div>
@@ -50,7 +52,7 @@ export default {
   methods: {
     ...mapMutations(["setRoomState"]),
     // 메시지 보내기
-    sendMessage: function() {
+    sendMessage() {
       this.message = this.message.replace(/(^\s*)|(\s*$)/g, "");
       if (this.message !== "") {
         var socket = this.getSocket(this.company_id);
@@ -67,7 +69,16 @@ export default {
         // 메시지 초기화
         this.message = "";
       }
-    }
+    },
+    showLoginModal(){
+      if(!this.getUser.nickname){
+        this.$modal.show("account-modal", { target: 0 });
+      }
+    },
+  },
+  mounted(){
+    var scorll = document.getElementById('chat-room')
+    scorll.scrollTop = scorll.scrollHeight
   }
 };
 </script>
@@ -134,13 +145,33 @@ $calendar-title: #fafafa;
             font-size: 0.7rem;
           }
         }
+        &.right{
+          .message{
+            background:#ffe58ac7;
+            float: right;
+          }
+          .time {
+            left: -40px;
+          }
+        }
       }
     }
   }
   .row.send-section {
+    position:relative;
     height: 150px;
     padding: 20px 12px;
     background: #fafafa;
+    &.anonymous::after{
+      content: "";
+      position: absolute;
+      width: auto;
+      height: auto;
+      top: 0;
+      bottom:0;
+      left:0;
+      right:0;
+    }
     .send-box {
       width: 100%;
       .nickname {

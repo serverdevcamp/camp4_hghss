@@ -206,7 +206,6 @@ export default {
 $calendar-border: #f0f0f0;
 $calendar-day: #bbbbbb;
 $calendar-title: #fafafa;
-$start: #f4d569;
 $star1: #dadada;
 $star2: #f4d569;
 $end: #3f4b5e;
@@ -309,7 +308,7 @@ $end: #3f4b5e;
           font-size: 0.7rem;
         }
         .info-start-icon {
-          background: $start;
+          background: $star2;
         }
         .info-end-icon {
           background: $end;
