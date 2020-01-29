@@ -1,5 +1,6 @@
 import axios from 'axios'
 import router from '../router/index.js'
+import config from './config'
 
 export default {
   state: {
@@ -37,7 +38,7 @@ export default {
   actions: {
     async signin({ commit }, payload) {
 
-      const response = await axios.post('http://localhost:8000/users/signin', payload);
+      const response = await axios.post(config.AUTH_HOST + '/users/signin', payload);
       console.log(response);
 
       if (!response.data.success) {
@@ -59,12 +60,12 @@ export default {
       return true;
     },
     async signup(context, payload) {
-      const response = await axios.post('http://localhost:8000/users/signup', payload);
+      const response = await axios.post(config.AUTH_HOST + '/users/signup', payload);
       alert(response.data.message);
       return (response.data.success === "true")? true : false;
     },
     async signout({ commit }) {
-      const response = await axios.get('http://localhost:8000/users/signout', {
+      const response = await axios.get(config.AUTH_HOST + '/users/signout', {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('refreshToken')
         }
@@ -85,7 +86,7 @@ export default {
     },
     async refreshToken({ commit }) {
       let refreshToken = localStorage.getItem('refreshToken');
-      const response = await axios.get('http://localhost:8000/users/refresh', {
+      const response = await axios.get(config.AUTH_HOST + '/users/refresh', {
         headers: {
           Authorization: 'Bearer ' + refreshToken
         }
