@@ -113,4 +113,5 @@
         UPDATE recruit SET  recruit.view_count = #{viewCount}
         WHERE recruit.id = #{recruitIdx};
     </update>
+
 </mapper>

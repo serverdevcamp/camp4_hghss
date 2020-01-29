@@ -1,8 +1,10 @@
 package com.rest.recruit.service;
 
 import com.rest.recruit.dto.ResultResponse;
+import com.rest.recruit.dto.ResultResponseWithoutData;
 import com.rest.recruit.dto.SimpleResponse;
 import com.rest.recruit.dto.response.GetRankingResponseDTO;
+import com.rest.recruit.exception.RedisToDbException;
 import com.rest.recruit.mapper.RecruitMapper;
 import com.rest.recruit.model.SimpleRecruit;
 import lombok.extern.slf4j.Slf4j;
@@ -49,12 +51,19 @@ public class RankingService {
             zsetOperations.add("ranking-like", tmpString, tmp.getFavoriteCount());
         }
 
+        return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                .message("db to redis 성공")
+                .status("200")
+                .success("true")
+                .build());
 
 
-        return SimpleResponse.ok();
     }
 
     public ResponseEntity RedisToDb() throws ParseException {
+
+        //좋아요 랭킹시 remove하는 경우:레디스에있는 cnt를 넣을 때 이미 endTIme이 지난 건 레디스에서 삭제
+        //자기소개서 랭킹시 remove!!!
 
         ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
         Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations
@@ -70,53 +79,25 @@ public class RankingService {
             String from = array[0];
             Date date = transFormat.parse(from);
 
-            //db업데이트
             int tmp = recruitMapper.updateViewCount(Integer.parseInt(array[1]),
                     Integer.parseInt(String.valueOf(Math.round(rank.getScore()))));
 
-            //db 업데이트 favorite_count 체크!!
-
-            if(tmp < 0){
-                return SimpleResponse.badRequest();
-            }
-
-            if(date.compareTo(time)  < 0){
-                //이미지난채용이면 캐시에서 지우기
-                zsetOperations.remove("ranking-visit",rank.getValue());
-            }
-        }
-
-        //좋아요 랭킹시 remove하는 경우:레디스에있는 cnt를 넣을 때 이미 endTIme이 지난 건 레디스에서 삭제
-        Set<ZSetOperations.TypedTuple<String>> likeRankingSet = zsetOperations
-                .reverseRangeWithScores("ranking-like", 0, -1);
-
-        for (ZSetOperations.TypedTuple<String> rank : likeRankingSet) {
-            String[] array = rank.getValue().split(":");
-            String from = array[0];
-            Date date = transFormat.parse(from);
+            //db viewCount update fail
+            if (tmp < 0) {throw new RedisToDbException(); }
 
             if (date.compareTo(time)  < 0) {
                 //이미지난채용이면 캐시에서 지우기
+                zsetOperations.remove("ranking-visit",rank.getValue());
+                zsetOperations.remove("ranking-apply",rank.getValue());
                 zsetOperations.remove("ranking-like",rank.getValue());
             }
         }
 
-        //자기소개서 랭킹시 remove!!!
-        Set<ZSetOperations.TypedTuple<String>> applyRankingSet = zsetOperations
-                .reverseRangeWithScores("ranking-apply", 0, -1);
-
-        for (ZSetOperations.TypedTuple<String> rank : applyRankingSet) {
-            String[] array = rank.getValue().split(":");
-            String from = array[0];
-            Date date = transFormat.parse(from);
-
-            if (date.compareTo(time)  < 0) {
-                //이미지난채용이면 캐시에서 지우기
-                zsetOperations.remove("ranking-apply",rank.getValue());
-            }
-        }
-
-        return SimpleResponse.ok();
+        return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                .message("redis to db 성공")
+                .status("200")
+                .success("true")
+                .build());
     }
 
 
@@ -234,7 +215,6 @@ public class RankingService {
             if(endDate.compareTo(time) <0  || endDate.compareTo(cal.getTime()) > 0) {
                 continue;
             }
-
 
             getRankingResponseDTOList
                     .add(new GetRankingResponseDTO(array,rank.getScore(),i++));

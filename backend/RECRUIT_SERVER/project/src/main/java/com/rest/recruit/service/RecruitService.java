@@ -41,7 +41,6 @@ public class RecruitService {
 
         List<GetRecruitCalendarSimpleResponseDTO> tmp = recruitMapper.getRecruitCalendarByDate(getRecruitCalendarRequestDTO);
 
-
         if (tmp.size() == 0 ||tmp.isEmpty()) {
             throw new GetCalendarException(); }
 
@@ -77,7 +76,16 @@ public class RecruitService {
         *
         * */
 
-
+        /*    <select id="getSimpleRecruitById" resultType="com.rest.recruit.model.SimpleRecruit">
+        SELECT
+        recruit.id AS recruitId,
+        recruit.company_id AS companyId,
+        DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS endTime,
+        company.name AS companyName
+        FROM recruit
+        INNER JOIN company ON company.id = recruit.company_id
+        WHERE recruit.id = #{recruitIdx};
+    </select>*/
             SimpleRecruit tmp = recruitMapper.getSimpleRecruitById(dataWithToken.getRecruitIdx());
 
             String tmpString = tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
@@ -86,8 +94,42 @@ public class RecruitService {
             ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
 
             RecruitDetail tmpdetail = recruitMapper.GetDetailRecruitPage(dataWithToken.getRecruitIdx());
+/*
+<sql id = "detail">
+        recruit.id AS 'recruit_id',
+        company.name AS 'company_name',
+        company.logo_url AS 'image_file_name',
+        recruit.employment_page_url,
+        DATE_FORMAT(recruit.start_time,'%Y-%m-%d %h:%i') AS 'start_time',
+        DATE_FORMAT(recruit.end_time,'%Y-%m-%d %h:%i') AS 'end_time',
+        recruit.content,
+        recruit.recruit_type AS 'recruit_type',
+        recruit.view_count,
+        COUNT(recruit_like.user_id) AS 'favorite_count'
+    </sql>
+
+<select id = "GetDetailRecruitPage" resultType="com.rest.recruit.model.RecruitDetail">
+        SELECT
+        <include refid = "detail"/>
+        FROM recruit
+        INNER JOIN company ON company.id = recruit.company_id
+        INNER JOIN recruit_like ON recruit_like.recruit_id = recruit.id
+        WHERE recruit.id = #{recruitIdx};
+    </select>
+*/
 
             List<Position> tmpPosition = recruitMapper.getPosition(dataWithToken.getRecruitIdx());
+    /*    <select id = "getPosition" resultType="com.rest.recruit.model.Position">
+        SELECT
+        position.id AS 'position_id', position.field , position.division,
+        question.id AS 'question_id',question.question_content,
+        question.question_limit
+        FROM recruit
+        INNER JOIN position ON position.recruit_id = recruit.id
+        INNER JOIN question ON question.position_id = position.id
+        WHERE recruit.id = #{recruitIdx};
+    </select>*/
+
             List<Question> tmpQuestion = new ArrayList<>();
 
             if(zsetOperations.reverseRank("ranking-visit",tmpString) != null){

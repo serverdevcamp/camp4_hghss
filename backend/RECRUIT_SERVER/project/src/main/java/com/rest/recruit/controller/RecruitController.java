@@ -72,9 +72,5 @@ public class RecruitController {
         return recruitService.GetDetailRecruitPage(DataWithToken.builder().token(tokenString).recruitIdx(recruitIdx).build());
     }
 
-
-
-
-
 }
 

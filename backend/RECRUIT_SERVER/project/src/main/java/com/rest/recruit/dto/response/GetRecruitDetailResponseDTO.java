@@ -26,13 +26,6 @@ public class GetRecruitDetailResponseDTO {
     private int favoriteCount;
     private GetRecruitPositionResponseDTO employments;
 
- /*   private RecruitDetail tmp;
-    private GetRecruitPositionResponseDTO getRecruitPositionResponseDTO;
-*/
-
-
-    //좋아요 여부!!
-
 
     public GetRecruitDetailResponseDTO(RecruitDetail tmp, GetRecruitPositionResponseDTO getRecruitPositionResponseDTO) {
 
