@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rest.recruit.mapper.ChattingMapper">
+
+    <select id="getUserChattingList" resultType="com.rest.recruit.model.Chatting">
+        SELECT company_id AS 'companyIdx',name AS 'company', logo_url AS 'logoUrl'
+        FROM chatting_like
+        INNER JOIN company ON chatting_like.company_id = company.id
+        WHERE user_id = #{userIdx};
+    </select>
+
+
+    <select id="getFavoriteChattingList" resultType="com.rest.recruit.model.Chatting">
+        SELECT DISTINCT company_id AS 'companyIdx',name AS 'company', logo_url AS 'logoUrl'
+        FROM recruit_like
+        INNER JOIN recruit ON recruit.id = recruit_like.recruit_id
+        INNER JOIN company ON company.id = recruit.company_id
+        WHERE user_id = #{userIdx}
+        UNION
+        SELECT DISTINCT company_id AS 'companyIdx',name AS 'company', logo_url AS 'logoUrl'
+        FROM company
+        INNER JOIN recruit ON recruit.company_id = company.id
+        INNER JOIN position ON position.recruit_id = recruit.id
+        INNER JOIN resume ON resume.position_id = position.id
+        WHERE recruit.end_time > CURDATE() AND resume.user_id = #{userIdx}
+    </select>
+
+    <select id="getHotChattingList" resultType="com.rest.recruit.model.Chatting">
+        SELECT company_id AS 'companyIdx',name AS 'company', logo_url AS 'logoUrl'
+        FROM chatting_like
+        INNER JOIN company ON chatting_like. company_id = company.id
+        GROUP BY chatting_like.user_id
+        ORDER BY company_id DESC LIMIT 5;
+    </select>
+</mapper>

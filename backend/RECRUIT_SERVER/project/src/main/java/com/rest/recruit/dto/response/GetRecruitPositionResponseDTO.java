@@ -17,7 +17,7 @@ public class GetRecruitPositionResponseDTO {
     private String field;
     private int division;
     private int questionId;
-    private List<Question> employments;
+    private List<Question> resumeQuestion;
 
     public GetRecruitPositionResponseDTO(int positionId, String field, int division, int questionId, List<Question> tmpQuestion) {
 
@@ -25,7 +25,7 @@ public class GetRecruitPositionResponseDTO {
         this.field = field;
         this.division = division;
         this.questionId = questionId;
-        this.employments = tmpQuestion;
+        this.resumeQuestion = tmpQuestion;
     }
 
     public static GetRecruitPositionResponseDTO of(Position position, List<Question> tmpQuestion) {
@@ -34,7 +34,7 @@ public class GetRecruitPositionResponseDTO {
                 .field(position.getField())
                 .division(position.getDivision())
                 .questionId(position.getQuestionId())
-                .employments(tmpQuestion).build();
+                .resumeQuestion(tmpQuestion).build();
 
 
     }

@@ -18,15 +18,17 @@
 
     <sql id = "detail">
         recruit.id AS 'recruit_id',
+        company.id AS 'company_id',
         company.name AS 'company_name',
         company.logo_url AS 'image_file_name',
         recruit.employment_page_url,
-        DATE_FORMAT(recruit.start_time,'%Y-%m-%d %h:%i') AS 'start_time',
-        DATE_FORMAT(recruit.end_time,'%Y-%m-%d %h:%i') AS 'end_time',
+        DATE_FORMAT(recruit.start_time,'%Y-%m-%d-%h-%i') AS 'start_time',
+        DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS 'end_time',
         recruit.content,
         recruit.recruit_type AS 'recruit_type',
         recruit.view_count,
-        COUNT(recruit_like.user_id) AS 'favorite_count'
+        COUNT(recruit_like.user_id) AS 'favorite_count',
+        IFNULL(recruit_like.recruit_id,0) AS favorite
     </sql>
 
 
@@ -41,7 +43,7 @@
         WHERE (DATE(recruit.start_time) <![CDATA[>=]]> DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i')
         AND DATE(recruit.start_time) <![CDATA[<=]]>  DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
         OR (DATE(recruit.end_time) <![CDATA[>=]]>  DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i')
-        AND DATE(recruit.end_time)  <![CDATA[<=]]> DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
+        AND DATE(recruit.end_time) <![CDATA[<=]]> DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
         <if test="userIdx != null and userIdx != ''">
             AND recruit_like.user_id = #{userIdx}
         </if>
@@ -56,7 +58,11 @@
         FROM recruit
         INNER JOIN company ON company.id = recruit.company_id
         INNER JOIN recruit_like ON recruit_like.recruit_id = recruit.id
-        WHERE recruit.id = #{recruitIdx};
+        WHERE
+        <if test="userIdx != null and userIdx != ''">
+            recruit_like.user_id = #{userIdx} AND
+        </if>
+        recruit.id = #{recruitIdx};
     </select>
 
 
@@ -113,4 +119,5 @@
         UPDATE recruit SET  recruit.view_count = #{viewCount}
         WHERE recruit.id = #{recruitIdx};
     </update>
+
 </mapper>

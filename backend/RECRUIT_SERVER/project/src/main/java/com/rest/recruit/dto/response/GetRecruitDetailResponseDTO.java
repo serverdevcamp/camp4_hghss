@@ -24,29 +24,22 @@ public class GetRecruitDetailResponseDTO {
     private String content;
     private int viewCount;
     private int favoriteCount;
-    private GetRecruitPositionResponseDTO employments;
-
- /*   private RecruitDetail tmp;
-    private GetRecruitPositionResponseDTO getRecruitPositionResponseDTO;
-*/
+    private List<GetRecruitPositionResponseDTO> employments;
 
 
-    //좋아요 여부!!
 
-
-    public GetRecruitDetailResponseDTO(RecruitDetail tmp, GetRecruitPositionResponseDTO getRecruitPositionResponseDTO) {
-
-        this.recruitId = tmp.getRecruitId();
-        this.companyName = tmp.getCompanyName();
-        this.imageFileName = tmp.getImageFileName();
-        this.employmentPageUrl = tmp.getEmploymentPageUrl();
-        this.startTime = tmp.getStartTime();
-        this.endTime = tmp.getEndTime();
-        this.recruitType = tmp.getRecruitType();
-        this.content = tmp.getContent();
-        this.viewCount = tmp.getViewCount();
-        this.favoriteCount = tmp.getFavoriteCount();
-        this.employments = getRecruitPositionResponseDTO;
+    public GetRecruitDetailResponseDTO(RecruitDetail tmpdetail, List<GetRecruitPositionResponseDTO> tmpEmployments) {
+        this.recruitId = tmpdetail.getRecruitId();
+        this.companyName = tmpdetail.getCompanyName();
+        this.imageFileName = tmpdetail.getImageFileName();
+        this.employmentPageUrl = tmpdetail.getEmploymentPageUrl();
+        this.startTime = tmpdetail.getStartTime();
+        this.endTime = tmpdetail.getEndTime();
+        this.recruitType = tmpdetail.getRecruitType();
+        this.content = tmpdetail.getContent();
+        this.viewCount = tmpdetail.getViewCount();
+        this.favoriteCount = tmpdetail.getFavoriteCount();
+        this.employments = tmpEmployments;
     }
 
     public void setFavorite(boolean favorite) {
