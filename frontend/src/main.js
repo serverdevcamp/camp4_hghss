@@ -26,7 +26,13 @@ new Vue({
       return;
     }
 
-    if(localStorage.hasOwnProperty('refreshToken')){
+    if(sessionStorage.hasOwnProperty('email')){
+      let email = sessionStorage.getItem('email');
+      let nickname = sessionStorage.getItem('nickname');
+      let role = sessionStorage.getItem('role');
+
+      this.$store.commit('setUserInfo', {email: email, nickname: nickname, role: role});
+    }else if(localStorage.hasOwnProperty('refreshToken')){
       await this.$store.dispatch('refreshToken');
     }
   },

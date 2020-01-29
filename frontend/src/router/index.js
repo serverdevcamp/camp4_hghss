@@ -4,7 +4,7 @@ import HghssPage from '../views/HghssPage.vue'
 import RecruitPage from '../views/RecruitPage'
 import ResetPasswd from '../components/template/ResetPasswd'
 import ChangePasswd from '../components/template/ChangePasswd'
-
+import AdminPage from '../views/AdminPage.vue'
 // import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
@@ -35,6 +35,11 @@ const routes = [
     name: 'ChangePasswd',
     component: ChangePasswd
   },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: AdminPage
+  }
   // {
   //   path: '/about',
   //   name: 'about',
