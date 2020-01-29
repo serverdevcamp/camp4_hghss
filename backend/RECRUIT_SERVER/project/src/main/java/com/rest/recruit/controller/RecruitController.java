@@ -15,6 +15,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+import java.text.ParseException;
+
 //또한, 특정 도메인만 접속을 허용할 수도 있습니다.
   //      - @CrossOrigin(origins = "허용주소:포트")
 
@@ -62,14 +64,16 @@ public class RecruitController {
     @GetMapping("/detail/{recruitIdx}")
     public ResponseEntity detailRecuitPage(@ApiParam(value = "recruitIdx", required = true)
                                                @RequestHeader(value="Authorization", required=false) String token,
-                                           @PathVariable(value = "recruitIdx") int recruitIdx){
+                                           @PathVariable(value = "recruitIdx") int recruitIdx) throws ParseException {
         if(token== null || token.isEmpty()){
             return recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).build());
         }
 
         String tokenString = token.substring("Bearer ".length());
+        JwtUtil jwtUtil = new JwtUtil();
 
-        return recruitService.GetDetailRecruitPage(DataWithToken.builder().token(tokenString).recruitIdx(recruitIdx).build());
+        return recruitService.GetDetailRecruitPage(DataWithToken.builder()
+                .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
     }
 
 }

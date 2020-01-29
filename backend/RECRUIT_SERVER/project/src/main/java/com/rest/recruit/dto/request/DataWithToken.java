@@ -9,5 +9,5 @@ import lombok.Setter;
 @Builder
 public class DataWithToken {
     private int recruitIdx;
-    private String token;
+    private int userIdx;
 }

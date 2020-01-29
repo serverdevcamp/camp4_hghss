@@ -24,6 +24,8 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -63,7 +65,7 @@ public class RecruitService {
 
 
     //채용공고 상세 페이지
-    public ResponseEntity GetDetailRecruitPage(DataWithToken dataWithToken) {
+    public ResponseEntity GetDetailRecruitPage(DataWithToken dataWithToken) throws ParseException {
         /*
         *
         * 프린세스불암산 <meme91322367@gmail.com>
@@ -86,17 +88,29 @@ public class RecruitService {
         INNER JOIN company ON company.id = recruit.company_id
         WHERE recruit.id = #{recruitIdx};
     </select>*/
-            SimpleRecruit tmp = recruitMapper.getSimpleRecruitById(dataWithToken.getRecruitIdx());
 
-            String tmpString = tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
-                    tmp.getCompanyId() + ":" + tmp.getCompanyName();
+
+//            SimpleRecruit tmp = recruitMapper.getSimpleRecruitById(dataWithToken.getRecruitIdx());
+
+        RecruitDetail tmpdetail = recruitMapper.GetDetailRecruitPage(dataWithToken);
+//date format바꾸기/*        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+//        String endTime = array[0];
+//        Date endDate = transFormat.parse(endTime);*/
+
+        //SELECT * FROM recruit_like
+        //        WHERE user_id = #{userIdx} AND recruit_id = #{recruitIdx};
+
+
+            String tmpString = tmpdetail.getEndTime()+":"+tmpdetail.getRecruitId() + ":" +
+                    tmpdetail.getCompanyId() + ":" + tmpdetail.getCompanyName();
 
             ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
 
-            RecruitDetail tmpdetail = recruitMapper.GetDetailRecruitPage(dataWithToken.getRecruitIdx());
+
 /*
 <sql id = "detail">
         recruit.id AS 'recruit_id',
+        companyId 추가!
         company.name AS 'company_name',
         company.logo_url AS 'image_file_name',
         recruit.employment_page_url,
@@ -118,19 +132,8 @@ public class RecruitService {
     </select>
 */
 
-            List<Position> tmpPosition = recruitMapper.getPosition(dataWithToken.getRecruitIdx());
-    /*    <select id = "getPosition" resultType="com.rest.recruit.model.Position">
-        SELECT
-        position.id AS 'position_id', position.field , position.division,
-        question.id AS 'question_id',question.question_content,
-        question.question_limit
-        FROM recruit
-        INNER JOIN position ON position.recruit_id = recruit.id
-        INNER JOIN question ON question.position_id = position.id
-        WHERE recruit.id = #{recruitIdx};
-    </select>*/
 
-            List<Question> tmpQuestion = new ArrayList<>();
+
 
             if(zsetOperations.reverseRank("ranking-visit",tmpString) != null){
                 double score = zsetOperations.incrementScore("ranking-visit",tmpString,1);
@@ -145,18 +148,97 @@ public class RecruitService {
                 }
             }
 
-            for (int i = 0;i<tmpPosition.size();i++) {
-                tmpQuestion.add(new Question(tmpPosition.get(i).getQuestionId(),
-                        tmpPosition.get(i).getQuestionContent(),tmpPosition.get(i).getQuestionLimit()));
+
+
+
+
+        List<Position> tmpPosition = recruitMapper.getPosition(dataWithToken.getRecruitIdx());
+    /*    <select id = "getPosition" resultType="com.rest.recruit.model.Position">
+        SELECT
+        position.id AS 'position_id', position.field , position.division,
+        question.id AS 'question_id',question.question_content,
+        question.question_limit
+        FROM recruit
+        INNER JOIN position ON position.recruit_id = recruit.id
+        INNER JOIN question ON question.position_id = position.id
+        WHERE recruit.id = #{recruitIdx};
+    </select>*/
+
+
+
+        List<Question> tmpQuestionList = new ArrayList<>();
+
+
+        /*private int positionId;
+    private String field;
+    private int division;
+    private int questionId;
+    private List<Question> resumeQuestion;*/
+        List<GetRecruitPositionResponseDTO> tmpEmployments = new ArrayList<>();
+
+
+        int j = 0;
+        for (int i = 1;i<tmpPosition.size();i++) {
+
+            System.out.print("\ntest\n");
+            System.out.print(i);
+            //new Question(tmpPosition.get(i).getQuestionId(),
+            //                    tmpPosition.get(i).getQuestionContent(),tmpPosition.get(i).getQuestionLimit())
+
+            tmpQuestionList.add(new Question(tmpPosition.get(i).getQuestionId(),
+                    tmpPosition.get(i).getQuestionContent(),tmpPosition.get(i).getQuestionLimit()));
+
+            if (tmpPosition.get(i).getPositionId() != tmpPosition.get(i-1).getPositionId()) {
+
+                tmpEmployments.add(new GetRecruitPositionResponseDTO(tmpPosition.get(i-1).getPositionId(),
+                        tmpPosition.get(i-1).getField(),
+                        tmpPosition.get(i-1).getDivision(),
+                        tmpPosition.get(i-1).getQuestionId(),tmpQuestionList));
+                j = i;
+                tmpQuestionList = new ArrayList<>();
             }
 
-            GetRecruitDetailResponseDTO getRecruitDetailResponseDTO
-                    = new GetRecruitDetailResponseDTO(tmpdetail,GetRecruitPositionResponseDTO.of(tmpPosition.get(0),tmpQuestion));
+
+        }
+
+        System.out.print("\nj - test\n");
+        System.out.print(j);
+
+        tmpQuestionList = new ArrayList<>();
+        for(int k = j;k<=tmpPosition.size()-1;k++){
+            tmpQuestionList.add(new Question(tmpPosition.get(k).getQuestionId(),
+                    tmpPosition.get(k).getQuestionContent(),tmpPosition.get(k).getQuestionLimit()));
+        }
+        tmpEmployments.add(new GetRecruitPositionResponseDTO(tmpPosition.get(j).getPositionId(),
+                tmpPosition.get(j).getField(),
+                tmpPosition.get(j).getDivision(),
+                tmpPosition.get(j).getQuestionId(),tmpQuestionList));
+/*    private int recruitId;
+    private String companyName;
+    private String imageFileName;
+    private String employmentPageUrl;
+    private String startTime;
+    private String endTime;
+    private boolean favorite;
+    private int recruitType;
+    private String content;
+    private int viewCount;
+    private int favoriteCount;
+    private List<GetRecruitPositionResponseDTO> employments;
+*/
+
+        GetRecruitDetailResponseDTO getRecruitDetailResponseDTO
+                = new GetRecruitDetailResponseDTO(tmpdetail,tmpEmployments);
 
             getRecruitDetailResponseDTO.setFavorite(false);
 
+        if (tmpdetail.getFavorite() > 0) {
+            getRecruitDetailResponseDTO.setFavorite(true);
+        }
+
             if (getRecruitDetailResponseDTO == null ) { throw new GetDetailRecruitPageException(); }
 
+            /*
         if(dataWithToken.getToken() == null || dataWithToken.getToken().isEmpty()) {
 
             return SimpleResponse.ok(ResultResponse.builder()
@@ -164,20 +246,9 @@ public class RecruitService {
                     .status("200")
                     .success("true")
                     .data(getRecruitDetailResponseDTO).build());
-
-
         }
+*/
 
-
-        JwtUtil jwtUtil = new JwtUtil();
-
-        int userIdx = jwtUtil.getAuthentication(dataWithToken.getToken());
-
-        //SELECT * FROM recruit_like
-        //        WHERE user_id = #{userIdx} AND recruit_id = #{recruitIdx};
-        if (recruitMapper.GetFavorite(userIdx,dataWithToken.getRecruitIdx()) > 0) {
-            getRecruitDetailResponseDTO.setFavorite(true);
-        }
 
         return SimpleResponse.ok(ResultResponse.builder()
                 .message("상세 조회 성공")

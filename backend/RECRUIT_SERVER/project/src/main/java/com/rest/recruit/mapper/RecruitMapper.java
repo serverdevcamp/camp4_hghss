@@ -1,5 +1,6 @@
 package com.rest.recruit.mapper;
 
+import com.rest.recruit.dto.request.DataWithToken;
 import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
 import com.rest.recruit.dto.response.GetRecruitCalendarSimpleResponseDTO;
 import com.rest.recruit.model.Position;
@@ -14,7 +15,7 @@ public interface RecruitMapper {
     public List<GetRecruitCalendarSimpleResponseDTO> getRecruitCalendarByDate(
             GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO);
 
-    public RecruitDetail GetDetailRecruitPage(int recruitIdx);
+    public RecruitDetail GetDetailRecruitPage(DataWithToken dataWithToken);
 
     public List<Position> getPosition(int recruitIdx);
 
