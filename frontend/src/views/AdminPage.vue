@@ -44,6 +44,7 @@
 
 <script>
   import axios from 'axios';
+  import config from '../store/config'
   import {mapGetters} from 'vuex';
 
   export default {
@@ -58,7 +59,7 @@
         this.$router.push('/');
       }
 
-      let response = await axios.get('http://localhost:8000/admin/users', {
+      let response = await axios.get(config.AUTH_HOST + '/admin/users', {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('accessToken')
         }
@@ -82,7 +83,7 @@
       async save (item) {
         let payload = { id: item.id, role: item.role };
         let config = {headers: { Authorization: 'Bearer ' + localStorage.getItem('accessToken') }};
-        let response = await axios.put('http://localhost:8000/admin/users/update/role', payload, config);
+        let response = await axios.put(config.AUTH_HOST + '/admin/users/update/role', payload, config);
 
         alert(response.data.message);
       }
