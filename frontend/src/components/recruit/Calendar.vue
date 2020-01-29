@@ -34,6 +34,7 @@
               class="company"
               v-for="company in recruit[getCalendarDate(7*(week-1)+day-1)].start"
               :key="company.recruitId"
+              @click="showCompanyModal(company)"
             >
               <span class="info-start-icon point-font">시</span>
               <span class="company-name">{{ company.companyName}}</span>
@@ -46,6 +47,7 @@
               class="company"
               v-for="company in recruit[getCalendarDate(7*(week-1)+day-1)].end"
               :key="company.recruitId"
+              @click="showCompanyModal(company)"
             >
               <span class="info-end-icon point-font">끝</span>
               <span class="company-name">{{ company.companyName}}</span>
@@ -57,12 +59,17 @@
         </v-col>
       </v-row>
     </div>
+    <Detail />
   </section>
 </template>
 <script>
+import Detail from './Detail'
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+  components: {
+    Detail,
+  },
   data: () => ({
     months: [
       "January",
@@ -95,7 +102,9 @@ export default {
   },
   methods: {
     ...mapActions(["calendarAPI"]),
-
+    showCompanyModal(company){
+      this.$modal.show("company-modal", { company:  company})
+    },
     // 해당 년, 월의 캘린더 시작일, 끝일 구하기
     createCalendar(year, month) {
       var start = new Date(year, month, 1);
@@ -291,6 +300,7 @@ $end: #3f4b5e;
         padding: 5px 0;
       }
       .company {
+        cursor: pointer;
         display: block;
         &:hover {
           background: $calendar-title;
