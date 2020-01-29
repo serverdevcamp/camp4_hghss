@@ -21,7 +21,7 @@ public class ExceptionController {
 
     @GetMapping("/accessdenied")
     public EntityResponse<ResultResponse> accessdeniedException() {
-        throw new AccessDeniedException("");
+        throw new AccessDeniedException("요청 권한이 없습니다.");
     }
 
 }

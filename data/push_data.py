@@ -10,12 +10,12 @@ headers = { 'Content-Type': 'application/json'}
 def pushNickName() :
     noun, adjective = [], []
 
-    with open('./seed/noun.csv', newline='') as csvfile:
+    with open('./seed/noun.csv',  'rt', encoding='UTF8', newline='') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
         for row in spamreader:
             noun = ', '.join(row).split(',')
 
-    with open('./seed/adjective.csv', newline='') as csvfile:
+    with open('./seed/adjective.csv', 'rt', encoding='UTF8', newline='') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
         for row in spamreader:
             adjective = ', '.join(row).split(',')

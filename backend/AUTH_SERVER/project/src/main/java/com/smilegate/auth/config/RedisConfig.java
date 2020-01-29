@@ -1,6 +1,5 @@
 package com.smilegate.auth.config;
 
-import com.smilegate.auth.utils.RedisUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -25,9 +24,9 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-    @Bean
-    public RedisUtil redisUtil() {
-        return new RedisUtil();
-    }
+//    @Bean
+//    public RedisUtil redisUtil() {
+//        return new RedisUtil();
+//    }
 
 }

@@ -26,11 +26,6 @@ public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello";
-    }
-
     @PostMapping("/signin")
     public ResponseEntity<ResultResponse> signin(@RequestBody SigninRequestDto signinRequestDto) {
 
@@ -48,8 +43,8 @@ public class UserController {
 
     @GetMapping("/signout")
     public ResponseEntity<ResultResponse> signout(@RequestHeader("Authorization")String token) {
+
         String refreshToken = token.substring("Bearer ".length());
-//        String refreshToken = jwtUtil.getToken(request);
         if(!jwtUtil.isRefreshToken(refreshToken)) throw new UnauthorizedException();
 
         userService.signout(refreshToken);
