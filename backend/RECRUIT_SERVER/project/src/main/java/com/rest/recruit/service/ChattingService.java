@@ -1,6 +1,7 @@
 package com.rest.recruit.service;
 
 import com.rest.recruit.dto.ResultResponse;
+import com.rest.recruit.dto.ResultResponseWithoutData;
 import com.rest.recruit.dto.SimpleResponse;
 import com.rest.recruit.mapper.ChattingMapper;
 import com.rest.recruit.model.Chatting;
@@ -67,4 +68,81 @@ public class ChattingService {
                 .success("true")
                 .data(map).build());
     }
+
+    public ResponseEntity postEnterChatting(int userIdx, int companyIdx) {
+
+        //채팅방 입장
+        // 이미있으면 넣지x
+        Chatting tmp = chattingMapper.getChatting(userIdx,companyIdx);
+
+        if(tmp != null){
+            return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                    .message("이미 구독하셨습니다.")
+                    .status("400")
+                    .success("false")
+                    .build());
+        }
+
+        int  tmpdetail = chattingMapper.postEnterChatting(userIdx,companyIdx);
+
+        if(tmpdetail > 0){
+
+            return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                        .message("채팅방 구독 성공")
+                        .status("200")
+                        .success("true")
+                        .build());
+        }else{
+            return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                        .message("채팅방 구독 실패")
+                        .status("400")
+                        .success("true")
+                        .build());
+        }
+    }
+
+
+    public ResponseEntity postEscapeChatting(int userIdx, int companyIdx) {
+
+        //채팅방 구독 취소
+        //조회된결과 있는 경우만 delete
+
+        /*
+        chatting class
+
+        public int companyIdx;
+    public String company;
+    public String logoUrl;
+
+    */
+        Chatting tmp = chattingMapper.getChatting(userIdx,companyIdx);
+
+        if(tmp != null){
+            int  tmpdetail = chattingMapper.postEscapeChatting(userIdx,companyIdx);
+
+            if(tmpdetail > 0){
+
+                return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                        .message("채팅방 구독 취소 성공")
+                        .status("200")
+                        .success("true")
+                        .build());
+            }else{
+                return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                        .message("채팅방 구독 취소 실패")
+                        .status("400")
+                        .success("true")
+                        .build());
+            }
+        }else{
+            return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                    .message("채팅방 구독 조회 결과가 없습니다.")
+                    .status("400")
+                    .success("true")
+                    .build());
+        }
+
+    }
+
+
 }

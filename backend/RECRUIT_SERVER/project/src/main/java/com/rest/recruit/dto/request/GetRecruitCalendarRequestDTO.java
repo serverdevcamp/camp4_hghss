@@ -11,5 +11,4 @@ public class GetRecruitCalendarRequestDTO {
     private String startTime;
     private String endTime;
     private String userIdx;
-
 }

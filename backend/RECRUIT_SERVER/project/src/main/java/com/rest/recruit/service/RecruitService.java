@@ -44,10 +44,10 @@ public class RecruitService {
 
         List<GetCalendarResponse> results = new ArrayList<>();
 
+
         for (int i = 0; i < tmp.size(); i++) {
             results.add(GetCalendarResponse.of(tmp.get(i)));
         }
-
 
         return SimpleResponse.ok(ResultResponse.builder()
                 .message("캘린더 조회 성공")
@@ -146,6 +146,20 @@ public class RecruitService {
             int  tmpdetail = recruitMapper.PostUnlikeRecruit(dataWithToken);
 
             if(tmpdetail > 0){
+
+                RecruitDetail tmpRedis = recruitMapper.GetDetailRecruitPage(dataWithToken);
+
+                String tmpString = tmpRedis.getEndTime()+":"+tmpRedis.getRecruitId() + ":" +
+                        tmpRedis.getCompanyId() + ":" + tmpRedis.getCompanyName();
+
+                ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
+
+
+                if (zsetOperations.reverseRank("ranking-like",tmpString) != null) {
+                    double score = zsetOperations.incrementScore("ranking-like",tmpString,-1);
+                }
+
+
                 return SimpleResponse.ok(ResultResponseWithoutData.builder()
                         .message("채용공고 즐겨찾기 취소 성공")
                         .status("200")
@@ -184,6 +198,20 @@ public class RecruitService {
         int tmpdetail = recruitMapper.PostLikeRecruit(dataWithToken);
 
         if(tmpdetail > 0){
+
+            RecruitDetail tmpRedis = recruitMapper.GetDetailRecruitPage(dataWithToken);
+
+            String tmpString = tmpRedis.getEndTime()+":"+tmpRedis.getRecruitId() + ":" +
+                    tmpRedis.getCompanyId() + ":" + tmpRedis.getCompanyName();
+
+            ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
+
+
+            if (zsetOperations.reverseRank("ranking-like",tmpString) != null) {
+                double score = zsetOperations.incrementScore("ranking-like",tmpString,1);
+            }
+
+
             return SimpleResponse.ok(ResultResponseWithoutData.builder()
                     .message("채용공고 즐겨찾기 성공")
                     .status("200")

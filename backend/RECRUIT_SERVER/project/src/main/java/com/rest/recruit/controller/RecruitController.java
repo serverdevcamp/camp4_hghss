@@ -77,7 +77,7 @@ public class RecruitController {
                 .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
     }
 
-    @ApiOperation(value = "채용공고 즐겨찾기", httpMethod = "GET", notes = "채용공고 즐겨찾기",response= ResultResponseWithoutData.class)
+    @ApiOperation(value = "채용공고 즐겨찾기", httpMethod = "POST", notes = "채용공고 즐겨찾기",response= ResultResponseWithoutData.class)
     @PostMapping("/detail/{recruitIdx}/like")
     public ResponseEntity likeRecuit(@ApiParam(value = "recruitIdx, token", required = true)
                                            @RequestHeader(value="Authorization") String token,
@@ -90,7 +90,7 @@ public class RecruitController {
                 .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
     }
 
-    @ApiOperation(value = "채용공고 즐겨찾기 취소", httpMethod = "GET", notes = "채용공고 즐겨찾기",response= ResultResponseWithoutData.class)
+    @ApiOperation(value = "채용공고 즐겨찾기 취소", httpMethod = "DELETE", notes = "채용공고 즐겨찾기 취소",response= ResultResponseWithoutData.class)
     @DeleteMapping("/detail/{recruitIdx}/unlike")
     public ResponseEntity unlikeRecuit(@ApiParam(value = "recruitIdx, token", required = true)
                                            @RequestHeader(value="Authorization") String token,
@@ -103,8 +103,5 @@ public class RecruitController {
         return recruitService.PostUnlikeRecruit(DataWithToken.builder()
                 .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
     }
-
-
-
 }
 
