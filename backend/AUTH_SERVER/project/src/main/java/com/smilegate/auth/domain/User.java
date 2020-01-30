@@ -10,15 +10,24 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 public class User {
 
-    @Id
-    private String email;
-
-    private String hashedPassword;
-
     private Integer id;
 
     private String nickname;
 
-    private String role;
+    @Id
+    private String email;
 
+    private String passwd;
+
+    private Integer role;
+
+    private String name;
+
+    private String createdAt;
+
+    private String updatedAt;
+
+    private String accessedAt;
+
+    private Integer status;
 }

@@ -39,7 +39,6 @@ export default {
     async signin({ commit }, payload) {
 
       const response = await axios.post(config.AUTH_HOST + '/users/signin', payload);
-      console.log(response);
 
       if (!response.data.success) {
         alert(response.data.message);
@@ -62,7 +61,7 @@ export default {
     async signup(context, payload) {
       const response = await axios.post(config.AUTH_HOST + '/users/signup', payload);
       alert(response.data.message);
-      return (response.data.success === "true")? true : false;
+      return response.data.success;
     },
     async signout({ commit }) {
       const response = await axios.get(config.AUTH_HOST + '/users/signout', {
@@ -71,7 +70,9 @@ export default {
         }
       });
 
-      if (response.data.success) commit('signout');
+      if (response.data.success) alert(response.data.message);
+
+      commit('signout');
 
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
@@ -81,7 +82,6 @@ export default {
       sessionStorage.removeItem('role');
       sessionStorage.removeItem('id');
 
-      alert(response.data.message);
       router.push('/');
     },
     async refreshToken({ commit }) {
@@ -96,12 +96,19 @@ export default {
         localStorage.setItem('accessToken', response.data.data.accessToken);
         localStorage.setItem('refreshToken', response.data.data.refreshToken);
         commit('setUserInfo', response.data.data);
+        return true;
       } else {
         console.error(response.data.message);
         alert('세션이 만료되었습니다.');
 
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('accessToken');
+
+        sessionStorage.removeItem('nickname');
+        sessionStorage.removeItem('email');
+        sessionStorage.removeItem('role');
+        sessionStorage.removeItem('id');
+        return false;
       }
 
     }

@@ -9,7 +9,7 @@ public class Answer {
 
     private Integer id;
     private Integer resumeId;
-    private Integer order;
+    private Integer orderNum;
     private String questionContent;
     private String answerContent;
 

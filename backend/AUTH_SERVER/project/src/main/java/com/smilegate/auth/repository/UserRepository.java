@@ -12,14 +12,15 @@ public interface UserRepository {
 
     int registerUser(User user);
 
-    void updatePassword(User build);
-
     List<User> findUsers();
 
     String getNickname(int userId);
 
-    void updateNickname(int userId, String nickname);
+    int updatePassword(String email, String passwd, String updatedAt);
 
-    int updateRole(int id, String role);
+    int updateNickname(int userId, String nickname, String updatedAt);
 
+    int updateRole(int id, int role, String updatedAt);
+
+    int updateAccessedAt(Integer id, String accessedAt);
 }

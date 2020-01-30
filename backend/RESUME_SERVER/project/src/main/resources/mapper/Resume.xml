@@ -2,17 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="resume">
     <insert id="insertResume" useGeneratedKeys="true" keyProperty="id" parameterType="ResumeInfo">
-        INSERT INTO resume(`user_id`, `position_id`, `last_mod_date`, `title`, `index`)
-        VALUES (#{userId}, #{positionId}, #{lastModDate}, #{title}, #{index});
+        INSERT INTO resume(`user_id`, `position_id`, `last_mod_date`, `title`, `resume_col`, `resume_row`)
+        VALUES (#{userId}, #{positionId}, #{lastModDate}, #{title}, #{resumeCol}, #{resumeRow});
     </insert>
 
     <insert id="insertAnswer" useGeneratedKeys="true" keyProperty="id" parameterType="Answer">
-        INSERT INTO answer(`resume_id`, `order`, `question_content`, `answer_content`)
-        VALUES (#{resumeId}, #{order}, #{questionContent}, #{answerContent});
+        INSERT INTO answer(`resume_id`, `order_num`, `question_content`, `answer_content`)
+        VALUES (#{resumeId}, #{orderNum}, #{questionContent}, #{answerContent});
     </insert>
 
     <select id="selectResumes" parameterType="map" resultType="ResumeInfo">
-        SELECT res.id, res.user_id, res.position_id, res.last_mod_date, res.title, res.index
+        SELECT res.id, res.user_id, res.position_id, res.last_mod_date, res.title, res.resume_col, res.resume_row
         FROM resume res, position pos, recruit rec
         WHERE res.user_id = #{userId}
         AND res.position_id = pos.id

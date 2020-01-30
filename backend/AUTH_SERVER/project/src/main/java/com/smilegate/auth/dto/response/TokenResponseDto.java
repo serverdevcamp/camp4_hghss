@@ -11,6 +11,6 @@ public class TokenResponseDto {
     private Integer id;
     private String email;
     private String nickname;
-    private String role;
+    private Integer role;
 
 }

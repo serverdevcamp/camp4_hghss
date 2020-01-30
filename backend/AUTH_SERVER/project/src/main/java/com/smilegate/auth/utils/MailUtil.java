@@ -44,24 +44,20 @@ public class MailUtil {
         try {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(fromEmail));
-            //수신자메일주소
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
-            // Subject
-            message.setSubject("[합격하소서] 인증코드 전송"); //메일 제목을 입력
+            message.setSubject("[합격하소서] 인증코드 전송");
 
             message.setContent("<h1>[이메일 인증]</h1> <p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p> " +
-                    "<a href='http://localhost:8000/users/signup/confirm?key="
+                    "<a href='http://10.99.13.27:8000/users/signup/confirm?key="
                     +key +"' target='_blenk'>이메일 인증 확인</a>","text/html;charset=euc-kr");
 
-            // send the message
-            Transport.send(message); ////전송
-
-            return true;
-
+            Transport.send(message);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
+
+        return true;
     }
 
     public boolean sendPasswordMail(String key, String email) {

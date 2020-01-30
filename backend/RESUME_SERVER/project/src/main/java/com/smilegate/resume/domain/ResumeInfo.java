@@ -12,6 +12,7 @@ public class ResumeInfo {
     private Integer positionId;
     private String lastModDate;
     private String title;
-    private Integer index;
+    private Integer resumeCol;
+    private Integer resumeRow;
 
 }

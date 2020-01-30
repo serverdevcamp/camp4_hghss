@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 
 @Component
 public class JwtUtil {
@@ -25,13 +26,17 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
     private Key key;
+    private HashMap<Integer, String> roles;
 
     @PostConstruct
-    protected void init() {
+    protected void JwtUtil() {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        this.roles = new HashMap<>();
+        this.roles.put(1, "USER");
+        this.roles.put(99, "ADMIN");
     }
 
-    public String createToken(Integer userId, String email, String nickname, String role, String tokenType, int minutes) {
+    public String createToken(Integer userId, String email, String nickname, int role, String tokenType, int minutes) {
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("userId", userId);
         claims.put("email", email);
@@ -49,9 +54,9 @@ public class JwtUtil {
     public Authentication getAuthentication(String token) {
         Claims claims = getClaims(token);
         String email = claims.getSubject();
-        String role = (String) claims.get("role");
+        int role = (int) claims.get("role");
 
-        return new UsernamePasswordAuthenticationToken(email, null, Collections.singletonList(new SimpleGrantedAuthority(role)));
+        return new UsernamePasswordAuthenticationToken(email, null, Collections.singletonList(new SimpleGrantedAuthority(this.roles.get(role))));
     }
 
     public Claims getClaims(String token) {
@@ -67,10 +72,12 @@ public class JwtUtil {
     }
 
     public boolean isValidToken(String token) {
-        try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token);
+        Jws<Claims> claims = null;
+        try{
+            claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
-        } catch (Exception e) {
+        }catch (Exception e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }

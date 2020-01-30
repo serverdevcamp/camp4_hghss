@@ -25,7 +25,7 @@ def pushNickName() :
         for a in adjective :
             # 닉네임 삽입
             curs = conn.cursor()
-            sql = """INSERT INTO nickname(nickname)
+            sql = """INSERT INTO nickname_bible(nickname)
                 VALUES (%s)"""
             curs.execute(sql, a+" "+n)
             conn.commit()
@@ -133,5 +133,5 @@ conn = pymysql.connect(host=config.HOST, port=config.PORT, user=config.USER, pas
                         db=config.DATABASE, charset='utf8')
 
 pushNickName() 
-get_recruits()
+#get_recruits()
 conn.close()

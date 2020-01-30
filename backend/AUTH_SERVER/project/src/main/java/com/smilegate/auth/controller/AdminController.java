@@ -50,7 +50,7 @@ public class AdminController {
         if(!jwtUtil.isAccessToken(token)) throw new UnauthorizedException();
 
         int id = updateRoleRequestDto.getId();
-        String role = updateRoleRequestDto.getRole();
+        int role = updateRoleRequestDto.getRole();
 
         adminService.updateUserRole(id, role);
 

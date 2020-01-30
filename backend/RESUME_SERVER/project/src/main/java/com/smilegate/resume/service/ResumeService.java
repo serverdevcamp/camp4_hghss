@@ -25,7 +25,8 @@ public class ResumeService {
                                         .positionId(positionId)
                                         .lastModDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))
                                         .title(resume.getTitle())
-                                        .index(11)
+                                        .resumeCol(0)
+                                        .resumeRow(0)
                                         .build();
 
         int resumeId = resumeRepository.createResume(resumeInfo);
@@ -37,7 +38,7 @@ public class ResumeService {
 
             Answer answer = Answer.builder()
                                 .resumeId(resumeId)
-                                .order(i+1)
+                                .orderNum(i+1)
                                 .questionContent(answerRequestDto.getQuestionContent())
                                 .answerContent(answerRequestDto.getAnswerContent())
                                 .build();

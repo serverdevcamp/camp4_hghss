@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.security.SignatureException;
+
 @ControllerAdvice
 public class UserExceptionAdvice {
 
@@ -117,6 +119,16 @@ public class UserExceptionAdvice {
         return ResultResponse.builder()
                 .success(false)
                 .status(HttpStatus.REQUEST_TIMEOUT.value())
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(SignatureException.class)
+    public ResultResponse handleSignature(Exception e) {
+        return ResultResponse.builder()
+                .success(false)
+                .status(HttpStatus.BAD_REQUEST.value())
                 .message(e.getMessage())
                 .build();
     }
