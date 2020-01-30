@@ -51,9 +51,6 @@ public class ExceptionAdvice {
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity handleMissingParams(MissingServletRequestParameterException e) {
-        String name = e.getParameterName();
-        System.out.println(name + " parameter is missing");
-        // Actual exception handling
         return SimpleResponse.ok(ResultResponseWithoutData.builder()
                 .message("필요한 값이 잘못되었습니다.")
                 .status("400")
@@ -68,7 +65,6 @@ public class ExceptionAdvice {
                 .success("false").build());
     }
 
-
     @ExceptionHandler(GetCalendarException.class)
     public ResponseEntity handleGetCalendar(GetCalendarException e) {
         return SimpleResponse.ok(ResultResponseWithoutData.builder()
@@ -76,7 +72,6 @@ public class ExceptionAdvice {
                 .status("500")
                 .success("false").build());
     }
-
 
     @ExceptionHandler(GetDetailRecruitPageException.class)
     public ResponseEntity handleGetDetailRecruitPage(GetDetailRecruitPageException e) {

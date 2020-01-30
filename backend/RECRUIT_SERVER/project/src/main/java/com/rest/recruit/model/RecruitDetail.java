@@ -9,7 +9,6 @@ import java.util.List;
 @Setter
 public class RecruitDetail {
     private int recruitId;
-    //추가
     private int companyId;
     private String companyName;
     private String imageFileName;
@@ -20,6 +19,5 @@ public class RecruitDetail {
     private String content;
     private int viewCount;
     private int favoriteCount;
-    //추가
     private int favorite;
 }

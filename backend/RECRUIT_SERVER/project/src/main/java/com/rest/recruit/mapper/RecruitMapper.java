@@ -5,6 +5,7 @@ import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
 import com.rest.recruit.dto.response.GetRecruitCalendarSimpleResponseDTO;
 import com.rest.recruit.model.Position;
 import com.rest.recruit.model.RecruitDetail;
+import com.rest.recruit.model.RecruitLike;
 import com.rest.recruit.model.SimpleRecruit;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -27,5 +28,10 @@ public interface RecruitMapper {
 
     public int updateViewCountWithDB(int recruitIdx);
 
-    public int GetFavorite(int userIdx, int recruitIdx);
+    public RecruitLike GetFavorite(int userIdx, int recruitIdx);
+
+    public int PostUnlikeRecruit(DataWithToken dataWithToken);
+
+    public int PostLikeRecruit(DataWithToken dataWithToken);
+
 }

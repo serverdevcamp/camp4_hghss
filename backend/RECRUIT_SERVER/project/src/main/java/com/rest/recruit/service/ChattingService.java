@@ -39,7 +39,6 @@ public class ChattingService {
     }
 
     public ResponseEntity GetFavoriteChattingList(int userIdx) {
-////    즐겨찾기Or 작성한기업(마감전) 채팅 리스트 - 자소서를 작성한 기업과 즐겨찾기한 기업의 채팅방이 추가됩니다. (recruit_like or resume쓴 기업 idx)
         List<Chatting> chattingResponseDTOList = chattingMapper.getFavoriteChattingList(userIdx);
 
         HashMap<Integer,tmpChatting> map = new HashMap<Integer,tmpChatting>();
@@ -55,7 +54,6 @@ public class ChattingService {
     }
 
     public ResponseEntity GetHotChattingList() {
-        ////인기  채팅 리스트 기준????-  채팅 참여자수
         List<Chatting> chattingResponseDTOList = chattingMapper.getHotChattingList();
 
         HashMap<Integer,tmpChatting> map = new HashMap<Integer,tmpChatting>();

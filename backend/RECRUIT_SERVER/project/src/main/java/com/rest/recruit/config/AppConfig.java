@@ -24,7 +24,7 @@ import javax.sql.DataSource;
 @MapperScan(value = "com.rest.recruit.mapper")
 public class AppConfig {
     @Bean
-    public DataSource getDataSource(){
+    public DataSource getDataSource() {
         SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriverClass(com.mysql.cj.jdbc.Driver.class);
         dataSource.setUsername("root");

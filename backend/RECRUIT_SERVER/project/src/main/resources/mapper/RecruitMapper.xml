@@ -66,7 +66,7 @@
     </select>
 
 
-    <select id = "GetFavorite" resultType="int">
+    <select id = "GetFavorite" resultType="com.rest.recruit.model.RecruitLike" >
         SELECT * FROM recruit_like WHERE user_id = #{userIdx} AND recruit_id = #{recruitIdx};
     </select>
 
@@ -118,6 +118,16 @@
     <update id="updateViewCount" useGeneratedKeys="true" parameterType="int">
         UPDATE recruit SET  recruit.view_count = #{viewCount}
         WHERE recruit.id = #{recruitIdx};
+    </update>
+
+    <update id="PostLikeRecruit" useGeneratedKeys="true" parameterType="int">
+        INSERT INTO recruit_like
+        VALUES (#{userIdx},#{recruitIdx});
+    </update>
+
+
+    <update id="PostUnlikeRecruit" useGeneratedKeys="true" parameterType="int">
+        DELETE FROM recruit_like WHERE user_id = #{userIdx} AND recruit_id = #{recruitIdx};
     </update>
 
 </mapper>
