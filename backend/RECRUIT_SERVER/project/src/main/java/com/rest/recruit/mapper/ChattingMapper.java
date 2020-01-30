@@ -13,4 +13,10 @@ public interface ChattingMapper {
     public List<Chatting> getFavoriteChattingList(int userIdx);
 
     public List<Chatting> getHotChattingList();
+
+    public Chatting getChatting(int userIdx, int companyIdx);
+
+    public int postEnterChatting(int userIdx, int companyIdx);
+
+    public int postEscapeChatting(int userIdx, int companyIdx);
 }

@@ -15,7 +15,6 @@ public class DateValidation {
             return  true;
 
         }catch (ParseException e){
-
             return  false;
         }
 

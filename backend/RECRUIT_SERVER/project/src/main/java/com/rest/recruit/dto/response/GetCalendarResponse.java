@@ -40,7 +40,6 @@ public class GetCalendarResponse {
     public static GetCalendarResponse of(GetRecruitCalendarSimpleResponseDTO getRecruitCalendarSimpleResponseDTO) {
         //convert string to array
 
-
         return GetCalendarResponse.builder()
                 .companyId(getRecruitCalendarSimpleResponseDTO.getCompanyId())
                 .recruitId(getRecruitCalendarSimpleResponseDTO.getRecruitId())
@@ -62,5 +61,4 @@ public class GetCalendarResponse {
                 .collect(Collectors.toList());
 
     }
-
 }

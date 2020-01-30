@@ -19,6 +19,5 @@ public class GetRecruitCalendarSimpleResponseDTO {
     private String endTime;
     private int favorite;
 
-
 }
 

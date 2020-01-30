@@ -33,4 +33,22 @@
         GROUP BY chatting_like.user_id
         ORDER BY company_id DESC LIMIT 5;
     </select>
+
+    <select id = "getChatting" resultType="com.rest.recruit.model.Chatting" >
+        SELECT company_id AS 'companyIdx',name AS 'company', logo_url AS 'logoUrl'
+        FROM chatting_like
+        INNER JOIN company ON chatting_like. company_id = company.id
+        WHERE chatting_like.user_id = #{userIdx} AND chatting_like.company_id = #{companyIdx};
+    </select>
+
+
+    <update id="postEnterChatting" useGeneratedKeys="true" parameterType="int">
+        INSERT INTO chatting_like
+        VALUES (#{userIdx},#{companyIdx});
+    </update>
+
+    <update id="postEscapeChatting" useGeneratedKeys="true" parameterType="int">
+        DELETE FROM chatting_like WHERE user_id = #{userIdx} AND company_id = #{companyIdx};
+    </update>
+
 </mapper>

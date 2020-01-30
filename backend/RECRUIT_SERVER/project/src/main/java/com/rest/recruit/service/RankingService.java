@@ -34,17 +34,15 @@ public class RankingService {
 
         ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
 
-        for(SimpleRecruit tmp : recruitDetail){
+        for (SimpleRecruit tmp : recruitDetail) {
             String tmpString =  tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
                     tmp.getCompanyId() + ":" + tmp.getCompanyName();
             Long visitRank = zsetOperations.reverseRank("ranking-visit",tmpString);
             Long likeRank = zsetOperations.reverseRank("ranking-like",tmpString);
             Long applyRank = zsetOperations.reverseRank("ranking-apply",tmpString);
 
-            if(visitRank != null || likeRank != null || applyRank != null){
-               //이미 존재한다면
-               continue;
-           }
+            //이미 존재한다면
+            if (visitRank != null || likeRank != null || applyRank != null) { continue; }
 
             zsetOperations.add("ranking-apply", tmpString, tmp.getApplyCount());
             zsetOperations.add("ranking-visit", tmpString, tmp.getViewCount());
@@ -123,16 +121,12 @@ public class RankingService {
             Date endDate = transFormat.parse(endTime);
 
             //7일 이후마감이면 제외
-            if(endDate.compareTo(time) <0  || endDate.compareTo(cal.getTime()) > 0) {
-                continue;
-            }
+            if (endDate.compareTo(time) <0  || endDate.compareTo(cal.getTime()) > 0) { continue; }
 
             getRankingResponseDTOList
                         .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
 
-            if(i > 5){
-                break;
-            }
+            if (i > 5) { break; }
         }
 
         return SimpleResponse.ok(ResultResponse.builder()
@@ -165,22 +159,12 @@ public class RankingService {
             Date endDate = transFormat.parse(endTime);
 
             //7일 이후마감이면 제외
-            if(endDate.compareTo(time) <0  || endDate.compareTo(cal.getTime()) > 0) {
-                continue;
-            }
-
-            System.out.print("\ntest\n");
-            System.out.print(rank.getValue());
-
-            System.out.print("\ntest\n");
-            System.out.print(array);
+            if (endDate.compareTo(time) <0  || endDate.compareTo(cal.getTime()) > 0) { continue; }
 
             getRankingResponseDTOList
                     .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
 
-            if(i > 5){
-                break;
-            }
+            if (i > 5) { break;}
         }
 
         return SimpleResponse.ok(ResultResponse.builder()
@@ -212,16 +196,12 @@ public class RankingService {
             Date endDate = transFormat.parse(endTime);
 
             //7일 이후마감이면 제외
-            if(endDate.compareTo(time) <0  || endDate.compareTo(cal.getTime()) > 0) {
-                continue;
-            }
+            if (endDate.compareTo(time) <0  || endDate.compareTo(cal.getTime()) > 0) { continue; }
 
             getRankingResponseDTOList
                     .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
 
-            if(i > 5){
-                break;
-            }
+            if (i > 5) { break; }
         }
 
         return SimpleResponse.ok(ResultResponse.builder()
