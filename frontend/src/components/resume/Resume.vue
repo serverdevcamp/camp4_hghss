@@ -17,8 +17,8 @@
               class="resume-card"
               draggable="true"
               v-on:dragstart="drag($event)"
-              v-for="resume in getResume['1']['1']"
-              :key="resume"
+              v-for="(resume, index) in getResume['1']['1']"
+              :key="index"
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
@@ -43,8 +43,8 @@
               class="resume-card"
               draggable="true"
               v-on:dragstart="drag($event)"
-              v-for="resume in getResume['1']['2']"
-              :key="resume"
+              v-for="(resume, index) in getResume['1']['2']"
+              :key="index"
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
@@ -66,8 +66,8 @@
               class="resume-card"
               draggable="true"
               v-on:dragstart="drag($event)"
-              v-for="resume in getResume['1']['3']"
-              :key="resume"
+              v-for="(resume, index) in getResume['1']['3']"
+              :key="index"
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
@@ -97,8 +97,8 @@
                   class="resume-card"
                   draggable="true"
                   v-on:dragstart="drag($event)"
-                  v-for="resume in getResume['2']['1']"
-                  :key="resume"
+                  v-for="(resume, index) in getResume['2']['1']"
+                  :key="index"
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
@@ -120,8 +120,8 @@
                   class="resume-card"
                   draggable="true"
                   v-on:dragstart="drag($event)"
-                  v-for="resume in getResume['2']['2']"
-                  :key="resume"
+                  v-for="(resume, index) in getResume['2']['2']"
+                  :key="index"
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
@@ -148,8 +148,8 @@
                   class="resume-card"
                   draggable="true"
                   v-on:dragstart="drag($event)"
-                  v-for="resume in getResume['3']['1']"
-                  :key="resume"
+                  v-for="(resume, index) in getResume['3']['1']"
+                  :key="index"
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
@@ -171,8 +171,8 @@
                   class="resume-card"
                   draggable="true"
                   v-on:dragstart="drag($event)"
-                  v-for="resume in getResume['3']['2']"
-                  :key="resume"
+                  v-for="(resume, index) in getResume['3']['2']"
+                  :key="index"
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
@@ -199,8 +199,8 @@
                   class="resume-card"
                   draggable="true"
                   v-on:dragstart="drag($event)"
-                  v-for="resume in getResume['4']['1']"
-                  :key="resume"
+                  v-for="(resume, index) in getResume['4']['1']"
+                  :key="index"
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
@@ -222,8 +222,8 @@
                   class="resume-card"
                   draggable="true"
                   v-on:dragstart="drag($event)"
-                  v-for="resume in getResume['4']['2']"
-                  :key="resume"
+                  v-for="(resume, index) in getResume['4']['2']"
+                  :key="index"
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
@@ -248,8 +248,8 @@
               class="resume-card"
               draggable="true"
               v-on:dragstart="drag($event)"
-              v-for="resume in getResume['5']['1']"
-              :key="resume"
+              v-for="(resume, index) in getResume['5']['1']"
+              :key="index"
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
@@ -266,8 +266,8 @@
               class="resume-card"
               draggable="true"
               v-on:dragstart="drag($event)"
-              v-for="resume in getResume['5']['1']"
-              :key="resume"
+              v-for="(resume, index) in getResume['5']['2']"
+              :key="index"
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
@@ -292,9 +292,7 @@ export default {
     today: new Date()
   }),
   computed: {
-    ...mapGetters([
-      "getResume",
-    ])
+    ...mapGetters(["getResume"])
   },
   methods: {
     drag(e) {

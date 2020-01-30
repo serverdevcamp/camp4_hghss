@@ -8,7 +8,7 @@
       >({{getChatList(company_id).user_cnt}}명)</span>
     </v-row>
     <v-row class="chat-room" id="chat-room">
-      <div class="chat" v-for="chat in getChatList(company_id).chat" :key="chat">
+      <div class="chat" v-for="(chat, index) in getChatList(company_id).chat" :key="index">
         <div v-if="getUser.nickname != chat.nickname" class="nickname point-font">{{chat.nickname}}</div>
         <div class="content" :class="{right: getUser.nickname == chat.nickname}">
           <div class="message">
@@ -39,6 +39,7 @@
   </div>
 </template>
 <script>
+import store from '../../store'
 import moment from "moment";
 import { mapGetters, mapMutations } from "vuex";
 export default {
@@ -47,10 +48,16 @@ export default {
     message: ""
   }),
   computed: {
-    ...mapGetters(["getMyChat", "getChatList", "getUser", "getSocket"])
+    ...mapGetters(["getMyChat", "getChatList", "getUser", "getSocket"]),
   },
   methods: {
     ...mapMutations(["setRoomState"]),
+    watchChat(){
+      // 채팅변화를 감지하여, 스크롤 조절
+      this.$store.watch(() => store.getters.getChatList(this.company_id), chatList =>{
+        console.log(chatList)
+      })
+    },
     // 메시지 보내기
     sendMessage() {
       this.message = this.message.replace(/(^\s*)|(\s*$)/g, "");
@@ -77,6 +84,7 @@ export default {
     },
   },
   mounted(){
+    this.watchChat()
     var scorll = document.getElementById('chat-room')
     scorll.scrollTop = scorll.scrollHeight
   }

@@ -34,12 +34,19 @@
               class="company"
               v-for="company in recruit[getCalendarDate(7*(week-1)+day-1)].start"
               :key="company.recruitId"
-              @click="showCompanyModal(company)"
             >
-              <span class="info-start-icon point-font">시</span>
-              <span class="company-name">{{ company.companyName}}</span>
+              <div @click="showCompanyModal(company)" class="infos">
+                <span class="info-start-icon point-font">시</span>
+                <span class="company-name">{{ company.companyName}}</span>
+              </div>
               <span class="star-btn">
-                <font-awesome-icon icon="star" />
+                <font-awesome-icon
+                  icon="star"
+                  v-if="company.favorite"
+                  class="fav"
+                  @click="likeOrUnlike(1, company)"
+                />
+                <font-awesome-icon icon="star" v-else @click="likeOrUnlike(0, company)" />
               </span>
             </v-row>
             <v-row
@@ -47,13 +54,20 @@
               class="company"
               v-for="company in recruit[getCalendarDate(7*(week-1)+day-1)].end"
               :key="company.recruitId"
-              @click="showCompanyModal(company)"
             >
-              <span class="info-end-icon point-font">끝</span>
-              <span class="company-name">{{ company.companyName}}</span>
-              <div class="star-btn">
-                <font-awesome-icon icon="star" />
+              <div @click="showCompanyModal(company)" class="infos">
+                <span class="info-start-icon point-font">시</span>
+                <span class="company-name">{{ company.companyName}}</span>
               </div>
+              <span class="star-btn">
+                <font-awesome-icon
+                  icon="star"
+                  v-if="company.favorite"
+                  class="fav"
+                  @click="likeOrUnlike(1, company)"
+                />
+                <font-awesome-icon icon="star" v-else @click="likeOrUnlike(0, company)" />
+              </span>
             </v-row>
           </div>
         </v-col>
@@ -63,12 +77,12 @@
   </section>
 </template>
 <script>
-import Detail from './Detail'
+import Detail from "./Detail";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
   components: {
-    Detail,
+    Detail
   },
   data: () => ({
     months: [
@@ -101,9 +115,16 @@ export default {
     ...mapGetters(["getCalendar"])
   },
   methods: {
-    ...mapActions(["calendarAPI"]),
-    showCompanyModal(company){
-      this.$modal.show("company-modal", { company:  company})
+    ...mapActions(["calendarAPI", "likeToggle"]),
+    async likeOrUnlike(action, company) {
+      var favorite = await this.likeToggle({
+        recruit_id: company.recruitId,
+        action: action
+      });
+      company.favorite = favorite;
+    },
+    showCompanyModal(company) {
+      this.$modal.show("company-modal", { company: company });
     },
     // 해당 년, 월의 캘린더 시작일, 끝일 구하기
     createCalendar(year, month) {
@@ -167,7 +188,7 @@ export default {
       } else {
         this.month -= 1;
       }
-      this.makeCalendarPage()
+      this.makeCalendarPage();
     },
     afterMonth() {
       if (this.month == 11) {
@@ -176,7 +197,7 @@ export default {
       } else {
         this.month += 1;
       }
-      this.makeCalendarPage()
+      this.makeCalendarPage();
     },
     makeCalendarPage() {
       if (this.getCalendar.length == 0) {
@@ -207,7 +228,7 @@ export default {
     this.month = this.today.getMonth();
     this.date = this.today.getDate();
 
-    this.makeCalendarPage()
+    this.makeCalendarPage();
   }
 };
 </script>
@@ -307,6 +328,10 @@ $end: #3f4b5e;
         }
         padding: 3px 5px;
         width: 100%;
+        .infos {
+          display: inline-block;
+          width: calc(100% - 18px);
+        }
         span {
           display: inline-block;
         }
@@ -325,10 +350,14 @@ $end: #3f4b5e;
           color: #ffffff;
         }
         .company-name {
+          width:calc(100% - 28px);
           margin: 0 3px;
           padding-top: 3px;
           line-height: 1rem;
           font-size: 0.85rem;
+          overflow: hidden;
+          white-space: nowrap;
+          // text-overflow: ellipsis;
         }
         .star-btn {
           cursor: pointer;
@@ -337,6 +366,9 @@ $end: #3f4b5e;
           font-size: 0.85rem;
           path {
             color: $star1;
+          }
+          .fav path {
+            color: $star2;
           }
         }
       }
