@@ -1,6 +1,7 @@
 package com.rest.recruit.util;
 
 import io.jsonwebtoken.Jws;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -11,22 +12,34 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.stereotype.*;
+
 import io.jsonwebtoken.security.Keys;
+
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 
 @Component
 public class JwtUtil {
 
+//    final String secret = "12345678901234567890123456789012";
 
-    final String secret = "12345678901234567890123456789012";
+    @Value("${jwt.secret}")
+    private String secret;
     private Key key;
+
+    @PostConstruct
+    public void init(){
+        System.out.print("secret\n");
+        System.out.print(secret);
+    }
 
 
     public Claims getClaims(String token) {
 
-
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
+
 
         return Jwts.parser()
                 .setSigningKey(key)
@@ -59,4 +72,13 @@ public class JwtUtil {
     }
 
 
+    public String getToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        return (token==null)? null : token.substring("Bearer ".length());
+    }
+
+
+    public boolean isAccessToken(String token) {
+        return getClaims(token).get("tokenType").equals("ACCESS_TOKEN");
+    }
 }

@@ -3,16 +3,16 @@ package com.rest.recruit.controller.advice;
 
 import com.rest.recruit.dto.ResultResponseWithoutData;
 import com.rest.recruit.dto.SimpleResponse;
-import com.rest.recruit.exception.GetCalendarException;
-import com.rest.recruit.exception.GetDetailRecruitPageException;
-import com.rest.recruit.exception.RedisToDbException;
-import com.rest.recruit.exception.UnValidatedDateTypeException;
+import com.rest.recruit.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
+
+import java.text.ParseException;
 
 
 @ControllerAdvice
@@ -57,6 +57,19 @@ public class ExceptionAdvice {
                 .success("false").build());
     }
 
+    /**
+     *  ParseException
+     *  ranking API 시 사용되는 Date ParseException
+     *
+     */
+    @ExceptionHandler(ParseException.class)
+    public ResponseEntity handleParseException(ParseException e) {
+        return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                .message(e.getMessage())
+                .status("500")
+                .success("false").build());
+    }
+
     @ExceptionHandler(UnValidatedDateTypeException.class)
     public ResponseEntity handleDateType(UnValidatedDateTypeException e) {
         return SimpleResponse.ok(ResultResponseWithoutData.builder()
@@ -89,4 +102,34 @@ public class ExceptionAdvice {
                 .status("500")
                 .success("false").build());
     }
+
+    /**
+     *  unauthorized exception
+     *  유효하지않은 토큰인 경우
+     *
+     */
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity handleUnauthorizedException(UnauthorizedException e) {
+        return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                .message(e.getMessage())
+                .status("401")
+                .success("false").build());
+    }
+
+    /**
+     *  Expired Token exception
+     *  만료된 토큰인 경우
+     *
+     */
+    @ExceptionHandler(ExpiredTokenException.class)
+    public ResponseEntity handleExpiredTokenException(ExpiredTokenException e) {
+        return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                .message(e.getMessage())
+                .status("401")
+                .success("false").build());
+    }
+
+
+
 }

@@ -58,10 +58,7 @@ public class RecruitService {
     }
 
 
-
-
-    //채용공고 상세 페이지
-    public ResponseEntity GetDetailRecruitPage(DataWithToken dataWithToken) throws ParseException {
+    public ResponseEntity GetDetailRecruitPage(DataWithToken dataWithToken) {
 
         RecruitDetail tmpdetail = recruitMapper.GetDetailRecruitPage(dataWithToken);
 
@@ -83,8 +80,6 @@ public class RecruitService {
                 return SimpleResponse.ok();
             }
         }
-
-
 
         List<Position> tmpPosition = recruitMapper.getPosition(dataWithToken.getRecruitIdx());
         List<Question> tmpQuestionList = new ArrayList<>();
@@ -144,8 +139,9 @@ public class RecruitService {
 
         if(tmp != null){
             int  tmpdetail = recruitMapper.PostUnlikeRecruit(dataWithToken);
+            int updateCount = recruitMapper.PostUnlikeRecruitCount(dataWithToken.getRecruitIdx());
 
-            if(tmpdetail > 0){
+            if(tmpdetail > 0 && updateCount > 0) {
 
                 RecruitDetail tmpRedis = recruitMapper.GetDetailRecruitPage(dataWithToken);
 
@@ -184,10 +180,9 @@ public class RecruitService {
 
     public ResponseEntity PostLikeRecruit(DataWithToken dataWithToken) {
 
-//이미
         RecruitLike likeResult = recruitMapper.GetFavorite(dataWithToken.getUserIdx(),dataWithToken.getRecruitIdx());
 
-        if(likeResult != null){
+        if (likeResult != null) {
             return SimpleResponse.ok(ResultResponseWithoutData.builder()
                     .message("이미 즐겨찾기하였습니다")
                     .status("200")
@@ -196,8 +191,10 @@ public class RecruitService {
         }
 
         int tmpdetail = recruitMapper.PostLikeRecruit(dataWithToken);
+        int updateCount = recruitMapper.PostLikeRecruitCount(dataWithToken.getRecruitIdx());
 
-        if(tmpdetail > 0){
+
+        if(tmpdetail > 0 && updateCount > 0){
 
             RecruitDetail tmpRedis = recruitMapper.GetDetailRecruitPage(dataWithToken);
 

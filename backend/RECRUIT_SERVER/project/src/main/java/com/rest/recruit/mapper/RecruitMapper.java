@@ -34,4 +34,7 @@ public interface RecruitMapper {
 
     public int PostLikeRecruit(DataWithToken dataWithToken);
 
+    public int PostLikeRecruitCount(int recruitIdx);
+
+    public int PostUnlikeRecruitCount(int recruitIdx);
 }

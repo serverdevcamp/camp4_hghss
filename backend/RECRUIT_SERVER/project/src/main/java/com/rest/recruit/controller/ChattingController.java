@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.json.JSONException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,9 @@ import org.springframework.web.bind.annotation.*;
 public class ChattingController {
 
     private final ChattingService chattingService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     public ChattingController(ChattingService chattingService) {
         this.chattingService = chattingService;
@@ -32,7 +36,6 @@ public class ChattingController {
                                    @RequestHeader(value="Authorization") String token) {
 
         String tokenString = token.substring("Bearer ".length());
-        JwtUtil jwtUtil = new JwtUtil();
         return chattingService.GetUserChattingList(jwtUtil.getAuthentication(tokenString));
     }
 
@@ -44,7 +47,6 @@ public class ChattingController {
                                    @RequestHeader(value="Authorization") String token)  {
 
         String tokenString = token.substring("Bearer ".length());
-        JwtUtil jwtUtil = new JwtUtil();
         return chattingService.GetFavoriteChattingList(jwtUtil.getAuthentication(tokenString));
     }
 
@@ -64,8 +66,6 @@ public class ChattingController {
                                      @PathVariable(value = "companyIdx") int companyIdx) {
 
         String tokenString = token.substring("Bearer ".length());
-        JwtUtil jwtUtil = new JwtUtil();
-
         return chattingService.postEnterChatting(jwtUtil.getAuthentication(tokenString),companyIdx);
     }
 
@@ -76,7 +76,6 @@ public class ChattingController {
                                        @PathVariable(value = "companyIdx") int companyIdx) {
 
         String tokenString = token.substring("Bearer ".length());
-        JwtUtil jwtUtil = new JwtUtil();
         return chattingService.postEscapeChatting(jwtUtil.getAuthentication(tokenString),companyIdx);
     }
 

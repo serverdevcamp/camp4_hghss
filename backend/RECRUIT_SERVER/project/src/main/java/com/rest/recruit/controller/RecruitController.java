@@ -5,10 +5,13 @@ import com.rest.recruit.dto.request.DataWithToken;
 import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
 import com.rest.recruit.dto.response.GetCalendarResponse;
 import com.rest.recruit.dto.response.GetRecruitDetailResponseDTO;
+import com.rest.recruit.exception.ExpiredTokenException;
 import com.rest.recruit.exception.UnValidatedDateTypeException;
+import com.rest.recruit.exception.UnauthorizedException;
 import com.rest.recruit.service.RecruitService;
 import com.rest.recruit.util.DateValidation;
 import com.rest.recruit.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,17 +32,22 @@ public class RecruitController {
 
     private final RecruitService recruitService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     public RecruitController(RecruitService recruitService) {
         this.recruitService = recruitService;
     }
 
 
     @ApiOperation(value = "채용공고 캘린더 조회", httpMethod = "GET", notes = "채용공고 캘린더 조회" , response=GetCalendarResponse.class)
-    @GetMapping
+    @GetMapping("/calendar")
     public ResponseEntity calendar(@ApiParam(value = "startTime , endTime", required = true)
                                        @RequestHeader(value="Authorization", required=false) String token,
                                    @RequestParam(value = "startTime")  String startTime,
                                    @RequestParam(value = "endTime") String endTime) {
+
+
 
         if (!DateValidation.validationDate(startTime) || !DateValidation.validationDate(endTime)) {
             throw new UnValidatedDateTypeException();
@@ -50,8 +58,18 @@ public class RecruitController {
                     (GetRecruitCalendarRequestDTO.builder().startTime(startTime).endTime(endTime).build());
         }
 
+
+
         String tokenString = token.substring("Bearer ".length());
-        JwtUtil jwtUtil = new JwtUtil();
+
+        if(!jwtUtil.isAccessToken(tokenString)){
+            throw new UnauthorizedException();
+        }
+
+        if(!jwtUtil.isValidToken(token)){
+            throw new ExpiredTokenException();
+        }
+
         String userIdx = Integer.toString(jwtUtil.getAuthentication(tokenString));
 
         return recruitService.GetRecruitCalendarByDate(GetRecruitCalendarRequestDTO.builder()
@@ -71,34 +89,39 @@ public class RecruitController {
         }
 
         String tokenString = token.substring("Bearer ".length());
-        JwtUtil jwtUtil = new JwtUtil();
+
+        if(!jwtUtil.isAccessToken(tokenString)){
+            throw new UnauthorizedException();
+        }
+
+        if(!jwtUtil.isValidToken(token)){
+            throw new ExpiredTokenException();
+        }
+
 
         return recruitService.GetDetailRecruitPage(DataWithToken.builder()
                 .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
     }
 
     @ApiOperation(value = "채용공고 즐겨찾기", httpMethod = "POST", notes = "채용공고 즐겨찾기",response= ResultResponseWithoutData.class)
-    @PostMapping("/detail/{recruitIdx}/like")
+    @PostMapping("/like/{recruitIdx}")
     public ResponseEntity likeRecuit(@ApiParam(value = "recruitIdx, token", required = true)
                                            @RequestHeader(value="Authorization") String token,
                                            @PathVariable(value = "recruitIdx") int recruitIdx) {
 
         String tokenString = token.substring("Bearer ".length());
-        JwtUtil jwtUtil = new JwtUtil();
 
         return recruitService.PostLikeRecruit(DataWithToken.builder()
                 .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
     }
 
     @ApiOperation(value = "채용공고 즐겨찾기 취소", httpMethod = "DELETE", notes = "채용공고 즐겨찾기 취소",response= ResultResponseWithoutData.class)
-    @DeleteMapping("/detail/{recruitIdx}/unlike")
+    @DeleteMapping("/unlike/{recruitIdx}")
     public ResponseEntity unlikeRecuit(@ApiParam(value = "recruitIdx, token", required = true)
                                            @RequestHeader(value="Authorization") String token,
                                            @PathVariable(value = "recruitIdx") int recruitIdx) {
 
-
         String tokenString = token.substring("Bearer ".length());
-        JwtUtil jwtUtil = new JwtUtil();
 
         return recruitService.PostUnlikeRecruit(DataWithToken.builder()
                 .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
