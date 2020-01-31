@@ -71,7 +71,7 @@ public class ChattingController {
 
     @ApiOperation(value = "채팅 구독 취소", httpMethod = "DELETE", notes = "채팅 구독 취소",response= ResultResponseWithoutData.class)
     @DeleteMapping("/detail/{companyIdx}/unlike")
-    public ResponseEntity postEscapeChatting(@ApiParam(value = "recruitIdx, token", required = true)
+    public ResponseEntity postEscapeChatting(@ApiParam(value = "companyIdx, token", required = true)
                                        @RequestHeader(value="Authorization") String token,
                                        @PathVariable(value = "companyIdx") int companyIdx) {
 
