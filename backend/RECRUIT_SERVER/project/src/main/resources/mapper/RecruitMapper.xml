@@ -27,7 +27,7 @@
         recruit.content,
         recruit.recruit_type AS 'recruit_type',
         recruit.view_count,
-        COUNT(recruit_like.user_id) AS 'favorite_count',
+        recruit.like_count AS 'favorite_count',
         IFNULL(recruit_like.user_id,0) AS favorite
     </sql>
 
@@ -65,12 +65,16 @@
         <include refid = "detail"/>
         FROM recruit
         INNER JOIN company ON company.id = recruit.company_id
-        INNER JOIN recruit_like ON recruit_like.recruit_id = recruit.id
-        WHERE
-        <if test="userIdx != null and userIdx != ''">
-            recruit_like.user_id = #{userIdx} AND
-        </if>
-        recruit.id = #{recruitIdx};
+        LEFT JOIN recruit_like ON recruit_like.recruit_id = recruit.id
+        <choose>
+            <when test="userIdx != '0' or userIdx != null or userIdx != ''">
+                AND recruit_like.user_id = #{userIdx}
+            </when>
+            <otherwise>
+                AND recruit_like.user_id = 0
+            </otherwise>
+        </choose>
+        WHERE recruit.id = #{recruitIdx};
     </select>
 
 
@@ -80,7 +84,7 @@
 
     <select id = "getPosition" resultType="com.rest.recruit.model.Position">
         SELECT
-        position.id AS 'position_id', position.field , position.division,
+        position.id AS 'position_id', position.title AS 'field' , position.division,
         question.id AS 'question_id',question.question_content,
         question.question_limit
         FROM recruit
@@ -96,13 +100,10 @@
         DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS endTime,
         company.name AS companyName,
         recruit.view_count AS viewCount,
-        COUNT(recruit_like.user_id) AS 'favoriteCount',
-        COUNT(resume.user_id) AS 'applyCount'
+        recruit.like_count AS 'favoriteCount',
+        recruit.resume_count AS 'applyCount'
         FROM recruit
         INNER JOIN company ON company.id = recruit.company_id
-        LEFT JOIN recruit_like ON recruit_like.recruit_id = recruit.id
-        INNER JOIN position ON position.recruit_id = recruit.id
-        LEFT JOIN resume ON position.id = resume.position_id
         WHERE recruit.id IN (SELECT recruit.id FROM recruit)
         GROUP BY recruit.id;
     </select>
@@ -132,10 +133,19 @@
         INSERT INTO recruit_like
         VALUES (#{userIdx},#{recruitIdx});
     </update>
-
+    
+    <update id="PostLikeRecruitCount" useGeneratedKeys="true" parameterType="int">
+       UPDATE recruit SET  recruit.like_count = recruit.like_count+1
+        WHERE recruit.id = #{recruitIdx};
+    </update>
 
     <update id="PostUnlikeRecruit" useGeneratedKeys="true" parameterType="int">
         DELETE FROM recruit_like WHERE user_id = #{userIdx} AND recruit_id = #{recruitIdx};
+    </update>
+
+    <update id="PostUnlikeRecruitCount" useGeneratedKeys="true" parameterType="int">
+       UPDATE recruit SET  recruit.like_count = recruit.like_count-1
+        WHERE recruit.id = #{recruitIdx};
     </update>
 
 </mapper>

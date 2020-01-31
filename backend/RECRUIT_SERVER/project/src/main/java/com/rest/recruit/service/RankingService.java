@@ -101,7 +101,7 @@ public class RankingService {
 
     public ResponseEntity getRankingByVisitCnt() throws ParseException {
         ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
-        Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations.reverseRangeWithScores("ranking-visit", 0, 9);
+        Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations.reverseRangeWithScores("ranking-visit", 0, 20);
 
         List<GetRankingResponseDTO> getRankingResponseDTOList = new ArrayList<>();
         int i = 1;
@@ -120,13 +120,19 @@ public class RankingService {
             String endTime = array[0];
             Date endDate = transFormat.parse(endTime);
 
-            //7일 이후마감이면 제외
-            if (endDate.compareTo(time) <0  || endDate.compareTo(cal.getTime()) > 0) { continue; }
+            //오늘+7 이전에 마감해야함 = 마감일.compareTo(오늘+7) < 0
+            //오늘이후에 마감해야함 = 오늘compareTo(마감일) < 0
 
-            getRankingResponseDTOList
+//            if (endDate.compareTo(time) <0  || cal.getTime().compareTo(endDate) < 0) { continue; }
+
+
+            if(time.compareTo(endDate) <= 0 && endDate.compareTo(cal.getTime()) <= 0){
+                getRankingResponseDTOList
                         .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
+            }
 
             if (i > 5) { break; }
+
         }
 
         return SimpleResponse.ok(ResultResponse.builder()
@@ -139,7 +145,7 @@ public class RankingService {
 
     public ResponseEntity getRankingByLikeCnt() throws ParseException {
         ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
-        Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations.reverseRangeWithScores("ranking-like", 0, 9);
+        Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations.reverseRangeWithScores("ranking-like", 0, 20);
 
         List<GetRankingResponseDTO> getRankingResponseDTOList = new ArrayList<>();
         int i = 1;
@@ -159,10 +165,11 @@ public class RankingService {
             Date endDate = transFormat.parse(endTime);
 
             //7일 이후마감이면 제외
-            if (endDate.compareTo(time) <0  || endDate.compareTo(cal.getTime()) > 0) { continue; }
 
-            getRankingResponseDTOList
-                    .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
+            if(time.compareTo(endDate) <= 0 && endDate.compareTo(cal.getTime()) <= 0){
+                getRankingResponseDTOList
+                        .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
+            }
 
             if (i > 5) { break;}
         }
@@ -176,7 +183,7 @@ public class RankingService {
 
     public ResponseEntity getRankingByApplyCnt() throws ParseException {
         ZSetOperations<String, String> zsetOperations = redisTemplate.opsForZSet();
-        Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations.reverseRangeWithScores("ranking-apply", 0, 9);
+        Set<ZSetOperations.TypedTuple<String>> rankingSet = zsetOperations.reverseRangeWithScores("ranking-apply", 0, 20);
 
         List<GetRankingResponseDTO> getRankingResponseDTOList = new ArrayList<>();
         int i = 1;
@@ -195,11 +202,11 @@ public class RankingService {
             String endTime = array[0];
             Date endDate = transFormat.parse(endTime);
 
-            //7일 이후마감이면 제외
-            if (endDate.compareTo(time) <0  || endDate.compareTo(cal.getTime()) > 0) { continue; }
-
-            getRankingResponseDTOList
-                    .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
+            //이미 마감 or 오 늘+ 7일 이전에 끝나지않을때
+            if(time.compareTo(endDate) <= 0 && endDate.compareTo(cal.getTime()) <= 0){
+                getRankingResponseDTOList
+                        .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
+            }
 
             if (i > 5) { break; }
         }
