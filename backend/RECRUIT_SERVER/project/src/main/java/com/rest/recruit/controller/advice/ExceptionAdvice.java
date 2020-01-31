@@ -14,6 +14,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.text.ParseException;
+
 
 @ControllerAdvice
 public class ExceptionAdvice {
@@ -54,6 +56,19 @@ public class ExceptionAdvice {
         return SimpleResponse.ok(ResultResponseWithoutData.builder()
                 .message("필요한 값이 잘못되었습니다.")
                 .status("400")
+                .success("false").build());
+    }
+
+    /**
+     *  ParseException
+     *  ranking API 시 사용되는 Date ParseException
+     *
+     */
+    @ExceptionHandler(ParseException.class)
+    public ResponseEntity handleParseException(ParseException e) {
+        return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                .message(e.getMessage())
+                .status("500")
                 .success("false").build());
     }
 

@@ -22,10 +22,8 @@ public class RankingController {
     public RankingController(RankingService rankingService) {
         this.rankingService = rankingService;
     }
-    //먼저해야함
-    //스케쥴링
-    //일요일 정각//    @Scheduled(cron="0 0 0 * * 0")
 
+    //먼저해야함
     //매일오후 11시 50분
     @Scheduled(cron="0 50 23 * * ?")
     @ApiOperation(value = "채용공고 db to redis", httpMethod = "POST", notes ="채용공고 DB를 REDIS에 업로드")

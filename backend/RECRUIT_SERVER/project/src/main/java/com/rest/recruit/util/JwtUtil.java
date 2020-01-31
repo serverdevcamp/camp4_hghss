@@ -22,7 +22,6 @@ import javax.annotation.PostConstruct;
 @Component
 public class JwtUtil {
 
-
 //    final String secret = "12345678901234567890123456789012";
 
     @Value("${jwt.secret}")
@@ -38,8 +37,8 @@ public class JwtUtil {
 
     public Claims getClaims(String token) {
 
-
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
+
 
         return Jwts.parser()
                 .setSigningKey(key)
