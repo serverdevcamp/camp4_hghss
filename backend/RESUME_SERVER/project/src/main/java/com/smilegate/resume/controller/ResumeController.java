@@ -1,6 +1,6 @@
 package com.smilegate.resume.controller;
 
-import com.smilegate.resume.domain.ResumeInfo;
+import com.smilegate.resume.domain.Resume;
 import com.smilegate.resume.dto.ResultResponse;
 import com.smilegate.resume.dto.request.ResumeRequestDto;
 import com.smilegate.resume.dto.response.ResumeCreateResponseDto;
@@ -43,13 +43,9 @@ public class ResumeController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<ResultResponse> list(
-            @RequestParam("userId") int userId,
-            @RequestParam("start") String start,
-            @RequestParam("end") String end
-    ) {
+    public ResponseEntity<ResultResponse> list(@RequestParam("userId") int userId) {
 
-        List<ResumeInfo> resumes = resumeService.getList(userId, start, end);
+        List<Resume> resumes = resumeService.getResumes(userId);
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
@@ -57,6 +53,23 @@ public class ResumeController {
                         .status(HttpStatus.OK.value())
                         .message("자기소개서 목록입니다.")
                         .data(resumes)
+                        .build()
+        );
+    }
+
+    @PutMapping("/save/{id}")
+    public ResponseEntity<ResultResponse> save(
+            @PathVariable("id")int id,
+            @RequestBody ResumeRequestDto resumeRequestDto
+    ) {
+
+        boolean success = resumeService.saveResume(id, resumeRequestDto.getTitle(), resumeRequestDto.getAnswers());
+
+        return ResponseEntity.ok().body(
+                ResultResponse.builder()
+                        .success(true)
+                        .status(HttpStatus.OK.value())
+                        .message("자기소개서를 저장했습니다.")
                         .build()
         );
     }

@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="resume">
-    <insert id="insertResume" useGeneratedKeys="true" keyProperty="id" parameterType="ResumeInfo">
-        INSERT INTO resume(`user_id`, `position_id`, `last_mod_date`, `title`, `resume_col`, `resume_row`)
-        VALUES (#{userId}, #{positionId}, #{lastModDate}, #{title}, #{resumeCol}, #{resumeRow});
+    <select id="selectResume" parameterType="int" resultType="Resume">
+        SELECT id, user_id, position_id, created_at, updated_at, title, resume_col, resume_row
+        FROM resume
+        WHERE user_id = #{userId};
+    </select>
+
+    <select id="selectPosition" parameterType="int" resultType="Position">
+        SELECT id, recruit_id, title, division
+        FROM position
+        WHERE id = #{positionId};
+    </select>
+
+    <select id="selectEndDate" parameterType="int" resultType="String">
+        SELECT end_time FROM recruit WHERE id = #{recruitId};
+    </select>
+
+    <insert id="insertResume" useGeneratedKeys="true" keyProperty="id" parameterType="Resume">
+        INSERT INTO resume(`user_id`, `position_id`, `title`)
+        VALUES (#{userId}, #{positionId}, #{title});
     </insert>
 
     <insert id="insertAnswer" useGeneratedKeys="true" keyProperty="id" parameterType="Answer">
@@ -11,13 +27,15 @@
         VALUES (#{resumeId}, #{orderNum}, #{questionContent}, #{answerContent});
     </insert>
 
-    <select id="selectResumes" parameterType="map" resultType="ResumeInfo">
-        SELECT res.id, res.user_id, res.position_id, res.last_mod_date, res.title, res.resume_col, res.resume_row
-        FROM resume res, position pos, recruit rec
-        WHERE res.user_id = #{userId}
-        AND res.position_id = pos.id
-        AND pos.recruit_id = rec.id
-        AND rec.start_time &gt;= #{start}
-        AND rec.end_time &lt;= #{end};
-    </select>
+    <update id="updateAnswer" parameterType="Answer">
+        UPDATE answer
+        SET question_content = #{questionContent}, answer_content = #{answerContent}, order_num = #{orderNum}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateTitle" parameterType="map">
+        UPDATE resume
+        SET title = #{title}, updated_at = #{date}
+        WHERE id = #{id}
+    </update>
 </mapper>

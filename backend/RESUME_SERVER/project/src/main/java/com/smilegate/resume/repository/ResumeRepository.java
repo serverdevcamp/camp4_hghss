@@ -1,15 +1,24 @@
 package com.smilegate.resume.repository;
 
 import com.smilegate.resume.domain.Answer;
-import com.smilegate.resume.domain.ResumeInfo;
+import com.smilegate.resume.domain.Position;
+import com.smilegate.resume.domain.Resume;
 
 import java.util.List;
 
 public interface ResumeRepository {
 
-    int createResume(ResumeInfo resumeInfo);
+    int createResume(Resume resume);
 
     int createAnswer(Answer answer);
 
-    List<ResumeInfo> getList(int userId, String start, String end);
+    int updateAnswer(Answer answer);
+
+    int updateTitle(int id, String title);
+
+    List<Resume> findResumesByUserId(int userId);
+
+    Position findPositionById(Integer positionId);
+
+    String findEndDateById(Integer recruitId);
 }

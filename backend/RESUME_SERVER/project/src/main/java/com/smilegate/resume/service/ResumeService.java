@@ -1,15 +1,13 @@
 package com.smilegate.resume.service;
 
 import com.smilegate.resume.domain.Answer;
-import com.smilegate.resume.domain.ResumeInfo;
-import com.smilegate.resume.dto.request.AnswerRequestDto;
+import com.smilegate.resume.domain.Position;
+import com.smilegate.resume.domain.Resume;
 import com.smilegate.resume.dto.request.ResumeRequestDto;
 import com.smilegate.resume.repository.ResumeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -20,21 +18,18 @@ public class ResumeService {
 
     public int create(int userId, int positionId, ResumeRequestDto resume) {
 
-        ResumeInfo resumeInfo = ResumeInfo.builder()
+        Resume resumeInfo = Resume.builder()
                                         .userId(userId)
                                         .positionId(positionId)
-                                        .lastModDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))
                                         .title(resume.getTitle())
-                                        .resumeCol(0)
-                                        .resumeRow(0)
                                         .build();
 
         int resumeId = resumeRepository.createResume(resumeInfo);
 
-        List<AnswerRequestDto> answers = resume.getAnswers();
+        List<Answer> answers = resume.getAnswers();
 
         for(int i=0; i<answers.size(); ++i) {
-            AnswerRequestDto answerRequestDto = answers.get(i);
+            Answer answerRequestDto = answers.get(i);
 
             Answer answer = Answer.builder()
                                 .resumeId(resumeId)
@@ -49,7 +44,32 @@ public class ResumeService {
         return resumeId;
     }
 
-    public List<ResumeInfo> getList(int userId, String start, String end) {
-        return resumeRepository.getList(userId, start, end);
+    public List<Resume> getResumes(int userId) {
+
+        List<Resume> resumes = resumeRepository.findResumesByUserId(userId);
+
+        for(Resume resume : resumes) {
+            Position position = resumeRepository.findPositionById(resume.getPositionId());
+            String endDate = resumeRepository.findEndDateById(position.getRecruitId());
+            resume.setEndDate(endDate);
+        }
+
+        return resumes;
+    }
+
+    public boolean saveResume(int id, String title, List<Answer> answers) {
+
+        // TODO: resume가 존재하는지
+
+        // TODO: resume 저장
+        resumeRepository.updateTitle(id, title);
+
+        for(int i=0; i<answers.size(); ++i) {
+            Answer answer = answers.get(i);
+            answer.setOrderNum(i+1);
+            resumeRepository.updateAnswer(answer);
+        }
+
+        return true;
     }
 }
