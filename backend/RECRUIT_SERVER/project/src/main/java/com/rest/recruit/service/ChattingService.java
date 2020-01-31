@@ -104,17 +104,6 @@ public class ChattingService {
 
     public ResponseEntity postEscapeChatting(int userIdx, int companyIdx) {
 
-        //채팅방 구독 취소
-        //조회된결과 있는 경우만 delete
-
-        /*
-        chatting class
-
-        public int companyIdx;
-    public String company;
-    public String logoUrl;
-
-    */
         Chatting tmp = chattingMapper.getChatting(userIdx,companyIdx);
 
         if(tmp != null){

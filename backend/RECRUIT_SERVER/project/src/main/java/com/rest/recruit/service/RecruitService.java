@@ -38,7 +38,6 @@ public class RecruitService {
 
     public ResponseEntity GetRecruitCalendarByDate(GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO) {
 
-
         List<GetRecruitCalendarSimpleResponseDTO> tmp = recruitMapper.getRecruitCalendarByDate(getRecruitCalendarRequestDTO);
 
         if (tmp.size() == 0 ||tmp.isEmpty()) { throw new GetCalendarException(); }

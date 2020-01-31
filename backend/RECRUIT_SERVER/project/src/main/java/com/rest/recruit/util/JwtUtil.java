@@ -1,6 +1,7 @@
 package com.rest.recruit.util;
 
 import io.jsonwebtoken.Jws;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -11,16 +12,28 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.stereotype.*;
+
 import io.jsonwebtoken.security.Keys;
+
 import javax.annotation.PostConstruct;
 
 @Component
 public class JwtUtil {
 
 
-    final String secret = "12345678901234567890123456789012";
+//    final String secret = "12345678901234567890123456789012";
+
+    @Value("${jwt.secret}")
+    private String secret;
     private Key key;
+
+    @PostConstruct
+    public void init(){
+        System.out.print("sls\n");
+        System.out.print(secret);
+    }
 
 
     public Claims getClaims(String token) {

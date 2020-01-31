@@ -9,6 +9,7 @@ import com.rest.recruit.exception.UnValidatedDateTypeException;
 import com.rest.recruit.service.RecruitService;
 import com.rest.recruit.util.DateValidation;
 import com.rest.recruit.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,9 @@ import java.text.ParseException;
 public class RecruitController {
 
     private final RecruitService recruitService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     public RecruitController(RecruitService recruitService) {
         this.recruitService = recruitService;
@@ -51,7 +55,6 @@ public class RecruitController {
         }
 
         String tokenString = token.substring("Bearer ".length());
-        JwtUtil jwtUtil = new JwtUtil();
         String userIdx = Integer.toString(jwtUtil.getAuthentication(tokenString));
 
         return recruitService.GetRecruitCalendarByDate(GetRecruitCalendarRequestDTO.builder()
@@ -71,7 +74,6 @@ public class RecruitController {
         }
 
         String tokenString = token.substring("Bearer ".length());
-        JwtUtil jwtUtil = new JwtUtil();
 
         return recruitService.GetDetailRecruitPage(DataWithToken.builder()
                 .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
@@ -84,7 +86,6 @@ public class RecruitController {
                                            @PathVariable(value = "recruitIdx") int recruitIdx) {
 
         String tokenString = token.substring("Bearer ".length());
-        JwtUtil jwtUtil = new JwtUtil();
 
         return recruitService.PostLikeRecruit(DataWithToken.builder()
                 .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
@@ -96,9 +97,7 @@ public class RecruitController {
                                            @RequestHeader(value="Authorization") String token,
                                            @PathVariable(value = "recruitIdx") int recruitIdx) {
 
-
         String tokenString = token.substring("Bearer ".length());
-        JwtUtil jwtUtil = new JwtUtil();
 
         return recruitService.PostUnlikeRecruit(DataWithToken.builder()
                 .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
