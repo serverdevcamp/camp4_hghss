@@ -18,6 +18,7 @@ import org.springframework.stereotype.*;
 import io.jsonwebtoken.security.Keys;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 
 @Component
 public class JwtUtil {
@@ -30,7 +31,7 @@ public class JwtUtil {
 
     @PostConstruct
     public void init(){
-        System.out.print("sls\n");
+        System.out.print("secret\n");
         System.out.print(secret);
     }
 
@@ -71,4 +72,13 @@ public class JwtUtil {
     }
 
 
+    public String getToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        return (token==null)? null : token.substring("Bearer ".length());
+    }
+
+
+    public boolean isAccessToken(String token) {
+        return getClaims(token).get("tokenType").equals("ACCESS_TOKEN");
+    }
 }

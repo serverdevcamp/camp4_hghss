@@ -42,7 +42,6 @@ public class RankingService {
             Long likeRank = redisZsetUtil.reverseRank("ranking-like",tmpString);
             Long applyRank = redisZsetUtil.reverseRank("ranking-apply",tmpString);
 
-            //이미 존재한다면
             if (visitRank != null || likeRank != null || applyRank != null) { continue; }
 
             redisZsetUtil.add("ranking-apply", tmpString, tmp.getApplyCount());
