@@ -39,6 +39,7 @@ export default {
     async signin({ commit }, payload) {
 
       const response = await axios.post(config.AUTH_HOST + '/users/signin', payload);
+      console.log(response);
 
       if (!response.data.success) {
         alert(response.data.message);

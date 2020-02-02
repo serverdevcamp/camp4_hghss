@@ -1,35 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="resume">
-    <select id="selectResume" parameterType="int" resultType="Resume">
-        SELECT id, user_id, position_id, created_at, updated_at, title, resume_col, resume_row
+    <select id="selectResumeByUserId" parameterType="int" resultType="Resume">
+        SELECT id, user_id, position_id, created_at, updated_at, title, resume_col, resume_row, end_time
         FROM resume
         WHERE user_id = #{userId};
     </select>
 
-    <select id="selectPosition" parameterType="int" resultType="Position">
-        SELECT id, recruit_id, title, division
-        FROM position
-        WHERE id = #{positionId};
+    <select id="selectResumeById" parameterType="int" resultType="Resume">
+        SELECT id, user_id, position_id, created_at, updated_at, title, resume_col, resume_row, end_time
+        FROM resume
+        WHERE id = #{resumeId};
     </select>
 
-    <select id="selectEndDate" parameterType="int" resultType="String">
-        SELECT end_time FROM recruit WHERE id = #{recruitId};
+    <select id="selectAnswerByResumeId" parameterType="int" resultType="Answer">
+        SELECT id, resume_id, order_num, question_content, answer_content, question_limit
+        FROM answer
+        WHERE resume_id = #{resumeId};
+    </select>
+
+    <select id="selectCntAnswerByResumeId" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM answer
+        WHERE resume_id = #{resumeId};
+    </select>
+
+    <select id="selectResumeIdByAnswerId" parameterType="int" resultType="int">
+        SELECT resume_id
+        FROM answer
+        WHERE id = #{answerId}
     </select>
 
     <insert id="insertResume" useGeneratedKeys="true" keyProperty="id" parameterType="Resume">
-        INSERT INTO resume(`user_id`, `position_id`, `title`)
-        VALUES (#{userId}, #{positionId}, #{title});
+        INSERT INTO resume(`user_id`, `position_id`, `title`, `end_time`)
+        VALUES (#{userId}, #{positionId}, #{title}, #{endTime});
     </insert>
 
     <insert id="insertAnswer" useGeneratedKeys="true" keyProperty="id" parameterType="Answer">
-        INSERT INTO answer(`resume_id`, `order_num`, `question_content`, `answer_content`)
-        VALUES (#{resumeId}, #{orderNum}, #{questionContent}, #{answerContent});
+        INSERT INTO answer(`resume_id`, `order_num`, `question_content`, `answer_content`, `question_limit`)
+        VALUES (#{resumeId}, #{orderNum}, #{questionContent}, #{answerContent}, #{questionLimit});
     </insert>
 
     <update id="updateAnswer" parameterType="Answer">
         UPDATE answer
-        SET question_content = #{questionContent}, answer_content = #{answerContent}, order_num = #{orderNum}
+        SET question_content = #{questionContent}, answer_content = #{answerContent}, order_num = #{orderNum}, question_limit = #{questionLimit}
         WHERE id = #{id}
     </update>
 
@@ -38,4 +52,22 @@
         SET title = #{title}, updated_at = #{date}
         WHERE id = #{id}
     </update>
+
+    <update id="updateResumePosition" parameterType="map">
+        UPDATE resume
+        SET resume_col = #{col}, resume_row = #{row}
+        WHERE id = #{resumeId};
+    </update>
+
+    <delete id="deleteAnswers" parameterType="int">
+        DELETE FROM answer WHERE resume_id = #{resumeId};
+    </delete>
+
+    <delete id="deleteResume" parameterType="int">
+        DELETE FROM resume WHERE id = #{resumeId};
+    </delete>
+
+    <delete id="deleteAnswer" parameterType="int">
+        DELETE FROM answer WHERE id = #{answerId};
+    </delete>
 </mapper>

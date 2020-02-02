@@ -19,6 +19,6 @@ public class Resume {
     private String title;
     private Integer resumeCol;
     private Integer resumeRow;
-    private String endDate;
+    private String endTime;
 
 }

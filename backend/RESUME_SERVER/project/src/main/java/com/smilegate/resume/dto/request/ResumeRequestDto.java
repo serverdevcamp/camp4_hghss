@@ -8,5 +8,6 @@ import java.util.List;
 @Data
 public class ResumeRequestDto {
     private String title;
+    private String endTime;
     private List<Answer> answers;
 }

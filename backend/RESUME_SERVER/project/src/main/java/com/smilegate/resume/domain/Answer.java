@@ -16,5 +16,6 @@ public class Answer {
     private Integer orderNum;
     private String questionContent;
     private String answerContent;
+    private Integer questionLimit;
 
 }

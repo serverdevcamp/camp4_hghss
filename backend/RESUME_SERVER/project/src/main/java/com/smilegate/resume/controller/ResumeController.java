@@ -1,9 +1,11 @@
 package com.smilegate.resume.controller;
 
+import com.smilegate.resume.domain.Answer;
 import com.smilegate.resume.domain.Resume;
 import com.smilegate.resume.dto.ResultResponse;
 import com.smilegate.resume.dto.request.ResumeRequestDto;
 import com.smilegate.resume.dto.response.ResumeCreateResponseDto;
+import com.smilegate.resume.dto.response.ResumeDetailResponseDto;
 import com.smilegate.resume.service.ResumeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,18 +21,13 @@ public class ResumeController {
 
     private final ResumeService resumeService;
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "hello";
-    }
-
-    @PostMapping("/create")
+    @PostMapping("/create/{positionId}")
     public ResponseEntity<ResultResponse> create(
-            @RequestParam("userId") int userId,
-            @RequestParam("positionId") int positionId,
-            @RequestBody ResumeRequestDto resume
+            @RequestHeader("Authorization") String token,
+            @PathVariable("positionId") int positionId,
+            @RequestBody ResumeRequestDto resumeRequestDto
     ) {
-        int resumeId = resumeService.create(userId, positionId, resume);
+        int resumeId = resumeService.createResume(token, positionId, resumeRequestDto);
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
@@ -43,9 +40,9 @@ public class ResumeController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<ResultResponse> list(@RequestParam("userId") int userId) {
+    public ResponseEntity<ResultResponse> list(@RequestHeader("Authorization") String token) {
 
-        List<Resume> resumes = resumeService.getResumes(userId);
+        List<Resume> resumes = resumeService.getResumes(token);
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
@@ -57,19 +54,109 @@ public class ResumeController {
         );
     }
 
-    @PutMapping("/save/{id}")
+    @PutMapping("/save/{resumeId}")
     public ResponseEntity<ResultResponse> save(
-            @PathVariable("id")int id,
+            @RequestHeader("Authorization") String token,
+            @PathVariable("resumeId") int resumeId,
             @RequestBody ResumeRequestDto resumeRequestDto
     ) {
 
-        boolean success = resumeService.saveResume(id, resumeRequestDto.getTitle(), resumeRequestDto.getAnswers());
+        boolean success = resumeService.saveResume(resumeId, token, resumeRequestDto.getTitle(), resumeRequestDto.getAnswers());
+
+        return ResponseEntity.ok().body(
+                ResultResponse.builder()
+                        .success(success)
+                        .status(HttpStatus.OK.value())
+                        .message("자기소개서를 저장했습니다.")
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/delete/{resumeId}")
+    public ResponseEntity<ResultResponse> deleteResume(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("resumeId") int resumeId
+    ) {
+
+        boolean success = resumeService.deleteResume(resumeId, token);
+
+        return ResponseEntity.ok().body(
+                ResultResponse.builder()
+                        .success(success)
+                        .status(HttpStatus.OK.value())
+                        .message("자기소개서를 삭제했습니다.")
+                        .build()
+        );
+    }
+
+    @PutMapping("/{resumeId}")
+    public ResponseEntity<ResultResponse> moveResume(
+            @RequestHeader("Authorization") String token,
+            @PathVariable int resumeId,
+            @RequestParam("col") int col,
+            @RequestParam("row") int row
+    ) {
+
+        boolean success = resumeService.moveResume(resumeId, token, col, row);
+
+        return ResponseEntity.ok().body(
+                ResultResponse.builder()
+                        .success(success)
+                        .status(HttpStatus.OK.value())
+                        .message("자기소개서를 이동했습니다.")
+                        .build()
+        );
+    }
+
+    @GetMapping("/{resumeId}")
+    public ResponseEntity<ResultResponse> detail(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("resumeId") int resumeId
+    ) {
+
+        ResumeDetailResponseDto resumeDetailResponseDto = resumeService.getResume(token, resumeId);
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
                         .success(true)
                         .status(HttpStatus.OK.value())
-                        .message("자기소개서를 저장했습니다.")
+                        .message("자기소개서입니다. : resume_id = " + resumeId)
+                        .data(resumeDetailResponseDto)
+                        .build()
+        );
+    }
+
+    @PostMapping("/answer/add/{resumeId}")
+    public ResponseEntity<ResultResponse> createAnswer(
+            @RequestHeader("Authorization") String token,
+            @PathVariable int resumeId
+    ) {
+
+        Answer answer = resumeService.createAnswer(token, resumeId);
+
+        return ResponseEntity.ok().body(
+                ResultResponse.builder()
+                        .success(true)
+                        .status(HttpStatus.OK.value())
+                        .message("문항을 추가했습니다.")
+                        .data(answer)
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/answer/delete/{answerId}")
+    public ResponseEntity<ResultResponse> deleteAnswer(
+            @RequestHeader("Authorization") String token,
+            @PathVariable int answerId
+    ) {
+
+        resumeService.deleteAnswer(token, answerId);
+
+        return ResponseEntity.ok().body(
+                ResultResponse.builder()
+                        .success(true)
+                        .status(HttpStatus.OK.value())
+                        .message("문항을 삭제했습니다.")
                         .build()
         );
     }

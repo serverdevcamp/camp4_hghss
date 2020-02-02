@@ -14,11 +14,23 @@ public interface ResumeRepository {
 
     int updateAnswer(Answer answer);
 
-    int updateTitle(int id, String title);
+    int updateTitle(int id, String title, String date);
 
     List<Resume> findResumesByUserId(int userId);
 
-    Position findPositionById(Integer positionId);
+    Resume findResumeById(int resumeId);
 
-    String findEndDateById(Integer recruitId);
+    int deleteAnswers(int resumeId);
+
+    int deleteResume(int resumeId);
+
+    int updateResumePosition(int resumeId, int col, int row);
+
+    List<Answer> findAnswersByResumeId(int resumeId);
+
+    int countAnswer(int resumeId);
+
+    int findResumeIdByAnswerId(int answerId);
+
+    int deleteAnswer(int answerId);
 }
