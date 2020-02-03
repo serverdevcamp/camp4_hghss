@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HghssPage from '../views/HghssPage.vue'
-import RecruitPage from '../views/RecruitPage'
+import HghssPage from '../views/HghssPage'
+import CommonPage from '../views/CommonPage'
 import ResetPasswd from '../components/template/ResetPasswd'
 import ChangePasswd from '../components/template/ChangePasswd'
 import AdminPage from '../views/AdminPage.vue'
@@ -17,12 +17,17 @@ const routes = [
   {
     path: '/recruit',
     name: 'RecruitPage',
-    component: RecruitPage
+    component: CommonPage
   },
   {
     path: '/resume',
     name: 'ResumePage',
-    component: RecruitPage
+    component: CommonPage
+  },
+  {
+    path: '/resume/write/:id',
+    name: 'ResumeWrite',
+    component: CommonPage
   },
   {
     path: '/password/reset',
@@ -39,14 +44,6 @@ const routes = [
     name: 'Admin',
     component: AdminPage
   }
-  // {
-  //   path: '/about',
-  //   name: 'about',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  // }
 ]
 
 const router = new VueRouter({
