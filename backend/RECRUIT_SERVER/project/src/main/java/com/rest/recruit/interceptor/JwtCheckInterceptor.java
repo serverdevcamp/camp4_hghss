@@ -19,10 +19,7 @@ public class JwtCheckInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
         String token = jwtUtil.getToken(request);
-        System.out.print("jwtCheckinterceptor\n");
-        System.out.print(token);
 
         if (token == null || !jwtUtil.isAccessToken(token)) {
             throw new UnauthorizedException();

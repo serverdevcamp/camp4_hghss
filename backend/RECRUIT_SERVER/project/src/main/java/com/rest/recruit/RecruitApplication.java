@@ -15,11 +15,6 @@ import java.util.TimeZone;
 public class RecruitApplication {
 
     public static void main(String[] args){
-
-        /*user.timezone=
-Mon Feb 03 20:24:00 KST 2020
-user.timezone=Asia/Seoul
-Mon Feb 03 20:24:01 KST 2020*/
         SpringApplication.run(RecruitApplication.class, args);
     }
 

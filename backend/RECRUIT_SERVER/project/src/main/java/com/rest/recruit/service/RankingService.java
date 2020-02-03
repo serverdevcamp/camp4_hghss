@@ -38,9 +38,6 @@ public class RankingService {
             String tmpString =  tmp.getEndTime()+":"+tmp.getRecruitId() + ":" +
                     tmp.getCompanyId() + ":" + tmp.getCompanyName();
 
-            System.out.print("testcompany\n");
-            System.out.print(tmp.getCompanyName());
-
             Long visitRank = redisZsetUtil.reverseRank("ranking-visit",tmpString);
             Long likeRank = redisZsetUtil.reverseRank("ranking-like",tmpString);
             Long applyRank = redisZsetUtil.reverseRank("ranking-apply",tmpString);

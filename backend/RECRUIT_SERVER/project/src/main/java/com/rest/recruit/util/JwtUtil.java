@@ -1,21 +1,21 @@
 package com.rest.recruit.util;
-import io.jsonwebtoken.io.Decoders;
+
+import io.jsonwebtoken.Jws;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import io.jsonwebtoken.security.Keys;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
 import org.springframework.beans.factory.annotation.*;
-import java.util.Base64;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import org.springframework.stereotype.*;
+
+import io.jsonwebtoken.security.Keys;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -33,18 +33,19 @@ public class JwtUtil {
     public void init(){
         System.out.print("secret\n");
         System.out.print(secret);
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
 
     public Claims getClaims(String token) {
+
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+
+
         return Jwts.parser()
                 .setSigningKey(key)
-                .base64UrlDecodeWith(Decoders.BASE64)
                 .parseClaimsJws(token)
                 .getBody();
     }
-
 
 
     public int getAuthentication(String token) {
@@ -52,7 +53,7 @@ public class JwtUtil {
         Claims claims = getClaims(token);
 
 //        System.out.print("\nroletest\n");꿈
-  //      System.out.print(claims.get("tokenType")); //대문자로 access_token / refresh_token check!!!!!! // role index로 바꿈!!!!!!!!
+        //      System.out.print(claims.get("tokenType")); //대문자로 access_token / refresh_token check!!!!!! // role index로 바꿈!!!!!!!!
 /*
         String email = claims.getSubject();
         String grade = (String) ((List) claims.get("roles")).get(0);
@@ -62,7 +63,6 @@ public class JwtUtil {
     }
 
     public boolean isValidToken(String token) {
-
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
@@ -78,7 +78,7 @@ public class JwtUtil {
     }
 
 
-    public boolean isAccessToken(String token) {//ok
+    public boolean isAccessToken(String token) {
         return getClaims(token).get("tokenType").equals("ACCESS_TOKEN");
     }
 }
