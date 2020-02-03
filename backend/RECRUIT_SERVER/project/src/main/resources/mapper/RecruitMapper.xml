@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rest.recruit.mapper.RecruitMapper">
+
+
+    <sql id = "field">
+        recruit.id AS recruitId,
+        company.id AS companyId,
+        company.name AS companyName,
+        recruit.recruit_type AS recruitType,
+        company.logo_url AS imageFileName,
+        GROUP_CONCAT(position.division) AS employType,
+        recruit.start_time AS startTime,
+        recruit.end_time AS endTime,
+        IFNULL(recruit_like.recruit_id,0) AS favorite
+    </sql>
+
+    <sql id = "detail">
+        recruit.id AS 'recruit_id',
+        company.id AS 'company_id',
+        company.name AS 'company_name',
+        company.logo_url AS 'image_file_name',
+        recruit.employment_page_url,
+        DATE_FORMAT(recruit.start_time,'%Y-%m-%d-%h-%i') AS 'start_time',
+        DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS 'end_time',
+        recruit.content,
+        recruit.recruit_type AS 'recruit_type',
+        recruit.view_count,
+        recruit.like_count AS 'favorite_count',
+        IFNULL(recruit_like.user_id,0) AS favorite
+    </sql>
+
+
+    <select id = "getRecruitCalendarByDate" parameterType="String" resultType="com.rest.recruit.dto.response.GetRecruitCalendarSimpleResponseDTO">
+
+        SELECT
+        <include refid="field"/>
+        FROM company
+        INNER JOIN recruit ON company.id= recruit.company_id
+        INNER JOIN position ON recruit.id = position.recruit_id
+        LEFT JOIN recruit_like ON recruit_like.recruit_id = recruit.id
+        <choose>
+            <when test="userIdx != '0' or userIdx != null or userIdx != ''">
+                AND recruit_like.user_id = #{userIdx}
+            </when>
+            <otherwise>
+                AND recruit_like.user_id = 0
+            </otherwise>
+        </choose>
+        WHERE (DATE(recruit.start_time) <![CDATA[>=]]> DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i')
+        AND DATE(recruit.start_time) <![CDATA[<=]]>  DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
+        OR (DATE(recruit.end_time) <![CDATA[>=]]>  DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i')
+        AND DATE(recruit.end_time) <![CDATA[<=]]> DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
+        <if test="userIdx != '0' or userIdx != null or userIdx != ''">
+            AND recruit_like.user_id = #{userIdx}
+        </if>
+        GROUP BY recruit.id
+        ORDER BY recruit.start_time ASC;
+    </select>
+
+
+    <select id = "GetDetailRecruitPage" resultType="com.rest.recruit.model.RecruitDetail">
+        SELECT
+        <include refid = "detail"/>
+        FROM recruit
+        INNER JOIN company ON company.id = recruit.company_id
+        LEFT JOIN recruit_like ON recruit_like.recruit_id = recruit.id
+        <choose>
+            <when test="userIdx != '0' or userIdx != null or userIdx != ''">
+                AND recruit_like.user_id = #{userIdx}
+            </when>
+            <otherwise>
+                AND recruit_like.user_id = 0
+            </otherwise>
+        </choose>
+        WHERE recruit.id = #{recruitIdx};
+    </select>
+
+
+    <select id = "GetFavorite" resultType="com.rest.recruit.model.RecruitLike" >
+        SELECT * FROM recruit_like WHERE user_id = #{userIdx} AND recruit_id = #{recruitIdx};
+    </select>
+
+    <select id = "getPosition" resultType="com.rest.recruit.model.Position">
+        SELECT
+        position.id AS 'position_id', position.title AS 'field' , position.division,
+        question.id AS 'question_id',question.question_content,
+        question.question_limit
+        FROM recruit
+        INNER JOIN position ON position.recruit_id = recruit.id
+        INNER JOIN question ON question.position_id = position.id
+        WHERE recruit.id = #{recruitIdx};
+    </select>
+
+    <select id="getSimpleRecruit" resultType="com.rest.recruit.model.SimpleRecruit">
+        SELECT
+        recruit.id AS recruitId,
+        recruit.company_id AS companyId,
+        DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS endTime,
+        company.name AS companyName,
+        recruit.view_count AS viewCount,
+        recruit.like_count AS 'favoriteCount',
+        recruit.resume_count AS 'applyCount'
+        FROM recruit
+        INNER JOIN company ON company.id = recruit.company_id
+        WHERE recruit.id IN (SELECT recruit.id FROM recruit)
+        GROUP BY recruit.id;
+    </select>
+
+    <select id="getSimpleRecruitById" resultType="com.rest.recruit.model.SimpleRecruit">
+        SELECT
+        recruit.id AS recruitId,
+        recruit.company_id AS companyId,
+        DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS endTime,
+        company.name AS companyName
+        FROM recruit
+        INNER JOIN company ON company.id = recruit.company_id
+        WHERE recruit.id = #{recruitIdx};
+    </select>
+
+    <update id="updateViewCountWithDB" useGeneratedKeys="true" parameterType="int">
+        UPDATE recruit SET  recruit.view_count = recruit.view_count+1
+        WHERE recruit.id = #{recruitIdx};
+    </update>
+
+    <update id="updateViewCount" useGeneratedKeys="true" parameterType="int">
+        UPDATE recruit SET  recruit.view_count = #{viewCount}
+        WHERE recruit.id = #{recruitIdx};
+    </update>
+
+    <update id="PostLikeRecruit" useGeneratedKeys="true" parameterType="int">
+        INSERT INTO recruit_like
+        VALUES (#{userIdx},#{recruitIdx});
+    </update>
+    
+    <update id="PostLikeRecruitCount" useGeneratedKeys="true" parameterType="int">
+       UPDATE recruit SET  recruit.like_count = recruit.like_count+1
+        WHERE recruit.id = #{recruitIdx};
+    </update>
+
+    <update id="PostUnlikeRecruit" useGeneratedKeys="true" parameterType="int">
+        DELETE FROM recruit_like WHERE user_id = #{userIdx} AND recruit_id = #{recruitIdx};
+    </update>
+
+    <update id="PostUnlikeRecruitCount" useGeneratedKeys="true" parameterType="int">
+       UPDATE recruit SET  recruit.like_count = recruit.like_count-1
+        WHERE recruit.id = #{recruitIdx};
+    </update>
+
+</mapper>
