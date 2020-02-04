@@ -10,4 +10,5 @@ import lombok.Setter;
 public class DataWithToken {
     private int recruitIdx;
     private int userIdx;
+    private int statusCode;
 }

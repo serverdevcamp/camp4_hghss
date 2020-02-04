@@ -11,6 +11,7 @@ import com.rest.recruit.exception.UnauthorizedException;
 import com.rest.recruit.service.RecruitService;
 import com.rest.recruit.util.DateValidation;
 import com.rest.recruit.util.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +20,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
-import java.text.ParseException;
-
 //또한, 특정 도메인만 접속을 허용할 수도 있습니다.
 //      - @CrossOrigin(origins = "허용주소:포트")
 
@@ -28,7 +27,7 @@ import java.text.ParseException;
 @Api(tags={"채용공고"})
 @RestController
 @RequestMapping("/recruits")
-public class RecruitController {
+public class RecruitController<token> {
 
     private final RecruitService recruitService;
 
@@ -40,6 +39,8 @@ public class RecruitController {
     }
 
 
+
+
     @ApiOperation(value = "채용공고 캘린더 조회", httpMethod = "GET", notes = "채용공고 캘린더 조회" , response=GetCalendarResponse.class)
     @GetMapping("/calendar")
     public ResponseEntity calendar(@ApiParam(value = "startTime , endTime", required = true)
@@ -47,28 +48,30 @@ public class RecruitController {
                                    @RequestParam(value = "startTime")  String startTime,
                                    @RequestParam(value = "endTime") String endTime) {
 
-
-
         if (!DateValidation.validationDate(startTime) || !DateValidation.validationDate(endTime)) {
             throw new UnValidatedDateTypeException();
         }
 
-        if (token== null || token.isEmpty()) {
+        if (token== null || token.isEmpty() ) {
+            System.out.print("no token\n");
             return recruitService.GetRecruitCalendarByDate
                     (GetRecruitCalendarRequestDTO.builder().startTime(startTime).endTime(endTime).build());
         }
 
 
-
         String tokenString = token.substring("Bearer ".length());
+        if (!jwtUtil.isValidToken(tokenString)) {//expiration, 꺼내기
+            System.out.print("no validtoken\n");
+            return recruitService.GetRecruitCalendarByDate
+                    (GetRecruitCalendarRequestDTO.builder().startTime(startTime).endTime(endTime).statusCode(402).build());
+        }
 
-        if(!jwtUtil.isAccessToken(tokenString)){
+        if(!jwtUtil.isAccessToken(tokenString)){//refresh vs access
+            System.out.print("no accesstoken\n");
             throw new UnauthorizedException();
         }
 
-        if(!jwtUtil.isValidToken(tokenString)){
-            throw new ExpiredTokenException();
-        }
+
 
         String userIdx = Integer.toString(jwtUtil.getAuthentication(tokenString));
 
@@ -79,24 +82,32 @@ public class RecruitController {
 
     }
 
+
     @ApiOperation(value = "상세 채용공고 페이지 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회",response= GetRecruitDetailResponseDTO.class)
     @GetMapping("/detail/{recruitIdx}")
     public ResponseEntity detailRecuitPage(@ApiParam(value = "recruitIdx", required = true)
                                            @RequestHeader(value="Authorization", required=false) String token,
-                                           @PathVariable(value = "recruitIdx") int recruitIdx) throws ParseException {
+                                           @PathVariable(value = "recruitIdx") int recruitIdx) {
+        System.out.print("recruit api\n");
         if (token== null || token.isEmpty()) {
             return recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).build());
         }
 
         String tokenString = token.substring("Bearer ".length());
 
-        if(!jwtUtil.isAccessToken(tokenString)){
-            throw new UnauthorizedException();
+        if(!jwtUtil.isValidToken(tokenString)){
+            System.out.print("no valid token\n");
+            //throw new ExpiredTokenException();
+            return recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).statusCode(402).build());
         }
 
-        if(!jwtUtil.isValidToken(tokenString)){
-            throw new ExpiredTokenException();
+        if(!jwtUtil.isAccessToken(tokenString)){
+            System.out.print("no accesstoken\n");
+            throw new UnauthorizedException();
+            //return recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).statusCode(401).build());
         }
+
+
 
 
         return recruitService.GetDetailRecruitPage(DataWithToken.builder()

@@ -49,11 +49,28 @@ public class RecruitService {
             results.add(GetCalendarResponse.of(tmp.get(i)));
         }
 
-        return SimpleResponse.ok(ResultResponse.builder()
-                .message("캘린더 조회 성공")
-                .status("200")
-                .success("true")
-                .data(results).build());
+        if(getRecruitCalendarRequestDTO.getStatusCode() == 401){
+            return SimpleResponse.ok(ResultResponse.builder()
+                    .message("401 Unauthorized")
+                    .status("401")
+                    .success("false")
+                    .data(results).build());
+
+        }else if(getRecruitCalendarRequestDTO.getStatusCode() == 402){
+            return SimpleResponse.ok(ResultResponse.builder()
+                    .message("만료된 토큰입니다.")
+                    .status("402")
+                    .success("false")
+                    .data(results).build());
+        }else {
+            return SimpleResponse.ok(ResultResponse.builder()
+                    .message("캘린더 조회 성공")
+                    .status("200")
+                    .success("true")
+                    .data(results).build());
+        }
+
+
 
     }
 
@@ -125,6 +142,24 @@ public class RecruitService {
         }
 
         if (getRecruitDetailResponseDTO == null ) { throw new GetDetailRecruitPageException(); }
+
+
+        if (dataWithToken.getStatusCode() == 401) {
+            return SimpleResponse.ok(ResultResponse.builder()
+                    .message("401 Unauthorized")
+                    .status("401")
+                    .success("false")
+                    .data(getRecruitDetailResponseDTO).build());
+
+        }
+
+        if (dataWithToken.getStatusCode() == 402) {
+            return SimpleResponse.ok(ResultResponse.builder()
+                    .message("만료된 토큰입니다.")
+                    .status("402")
+                    .success("false")
+                    .data(getRecruitDetailResponseDTO).build());
+        }
 
         return SimpleResponse.ok(ResultResponse.builder()
                 .message("상세 조회 성공")
