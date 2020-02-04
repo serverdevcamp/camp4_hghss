@@ -56,7 +56,7 @@
               :key="company.recruitId"
             >
               <div @click="showCompanyModal(company)" class="infos">
-                <span class="info-start-icon point-font">시</span>
+                <span class="info-end-icon point-font">끝</span>
                 <span class="company-name">{{ company.companyName}}</span>
               </div>
               <span class="star-btn">
@@ -305,6 +305,7 @@ $end: #3f4b5e;
       border-top: 1px solid $calendar-border;
     }
     .day-wrapper {
+      width:calc(100% / 7);
       border-left: 1px solid $calendar-border;
       .title-wrapper {
         padding: 5px 0;

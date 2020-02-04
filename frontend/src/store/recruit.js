@@ -12,20 +12,26 @@ export default {
   },
   actions: {
     calendarAPI(context, payload) {
+      // var access_token = localStorage.getItem('accessToken')
+      var access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhdXRoLkhHSFNTQGdtYWlsLmNvbSIsInVzZXJJZCI6MSwiZW1haWwiOiJhdXRoLkhHSFNTQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoi6rCA64OY7ZSIIOqwgOqwnOu5hCIsInJvbGUiOjEsInRva2VuVHlwZSI6IkFDQ0VTU19UT0tFTiIsImV4cCI6MTU4MTkzODk5OX0=.PswxsPdt2c4tZCBQotlkVvXtdDOLYQBWmNxwzh8dJhs='
+      
       return axios({
         method: 'get',
-        url: config.RECRUIT_HOST + '/recruits',
+        url: config.RECRUIT_HOST + '/recruits/calendar',
         params: payload,
         headers: {
           "Content-Type": "application/json",
           'Access-Control-Allow-Origin': '*',
+          'Authorization': 'Bearer '+ access_token,
         }
       }).then(response => {
-        if (response.data.status == 200) {
+        let status = response.data.status
+        if (status == 200 || status == 401 || status == 402) {
+          // TODO : 402 코드 발생시 로그아웃
           context.commit('setCalendar', response.data.data);
           return true
         }
-        return false
+        return []
       }).catch(() =>{
         // 연결이 안되있는 경우
         return []
@@ -33,13 +39,13 @@ export default {
     },
     likeToggle(context, payload){     
       // var access_token = localStorage.getItem('accessToken')
-      var access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ5YmNoYWUwODAxQGdtYWlsLmNvbSIsInVzZXJJZCI6MSwiZW1haWwiOiJ5YmNoYWUwODAxQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoidGVzdCIsInJvbGVzIjpbIlVTRVIiXSwidG9rZW5UeXBlIjoiUkVGUkVTSF9UT0tFTiIsImV4cCI6MTU4MTM5NjYzMX0.l5whELZ4WcE3tAqPPLoQAJfzr4HmdRj6d0bUOUqTkNw'
+      var access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhdXRoLkhHSFNTQGdtYWlsLmNvbSIsInVzZXJJZCI6MSwiZW1haWwiOiJhdXRoLkhHSFNTQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoi6rCA64OY7ZSIIOqwgOqwnOu5hCIsInJvbGUiOjEsInRva2VuVHlwZSI6IkFDQ0VTU19UT0tFTiIsImV4cCI6MTU4MTkzODk5OX0=.PswxsPdt2c4tZCBQotlkVvXtdDOLYQBWmNxwzh8dJhs='
       var method = ['post', 'delete']
       var path = ['like', 'unlike']
       
       return axios({
         method: method[payload.action],
-        url: config.RECRUIT_HOST + '/recruits/detail/'+payload.recruit_id+'/'+ path[payload.action],
+        url: config.RECRUIT_HOST + '/recruits/'+path[payload.action]+'/'+ payload.recruit_id,
         headers: {
           "Content-Type": "application/json",
           'Access-Control-Allow-Origin': '*',
