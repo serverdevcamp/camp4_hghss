@@ -40,13 +40,10 @@ public class JwtUtil {
         Jws<Claims> claims = null;
         try{
             claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token);
-            return !claims.getBody().getExpiration().before(new Date());
         }catch (Exception e) {
-//            System.out.println("JWT Util ==============================");
-//            System.out.println(e.getClass());
-//            System.out.println(e.getMessage());
             return false;
         }
+        return !claims.getBody().getExpiration().before(new Date());
     }
 
     public boolean isAccessToken(String token) {

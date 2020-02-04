@@ -22,7 +22,7 @@ public class ResumeService {
     private final JwtUtil jwtUtil;
     private final DateUtil dateUtil;
 
-    public int createResume(String token, int positionId, ResumeRequestDto resumeRequestDto) {
+    public ResumeDetailResponseDto createResume(String token, int positionId, ResumeRequestDto resumeRequestDto) {
 
         int userId = getUserId(token);
         Resume resume = Resume.builder()
@@ -33,6 +33,7 @@ public class ResumeService {
                             .build();
 
         int resumeId = resumeRepository.createResume(resume);
+        resume = resumeRepository.findResumeById(resumeId);
 
         List<Answer> answers = resumeRequestDto.getAnswers();
 
@@ -40,10 +41,14 @@ public class ResumeService {
             Answer answer = answers.get(i);
             answer.setResumeId(resumeId);
             answer.setOrderNum(i+1);
+
             resumeRepository.createAnswer(answer);
         }
 
-        return resumeId;
+        return ResumeDetailResponseDto.builder()
+                .resume(resume)
+                .answers(answers)
+                .build();
     }
 
     public List<Resume> getResumes(String token) {

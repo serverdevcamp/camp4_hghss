@@ -4,7 +4,6 @@ import com.smilegate.resume.domain.Answer;
 import com.smilegate.resume.domain.Resume;
 import com.smilegate.resume.dto.ResultResponse;
 import com.smilegate.resume.dto.request.ResumeRequestDto;
-import com.smilegate.resume.dto.response.ResumeCreateResponseDto;
 import com.smilegate.resume.dto.response.ResumeDetailResponseDto;
 import com.smilegate.resume.service.ResumeService;
 import lombok.RequiredArgsConstructor;
@@ -27,14 +26,14 @@ public class ResumeController {
             @PathVariable("positionId") int positionId,
             @RequestBody ResumeRequestDto resumeRequestDto
     ) {
-        int resumeId = resumeService.createResume(token, positionId, resumeRequestDto);
+        ResumeDetailResponseDto resumeDetailResponseDto = resumeService.createResume(token, positionId, resumeRequestDto);
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
                         .success(true)
                         .status(HttpStatus.CREATED.value())
                         .message("자기소개서를 생성했습니다.")
-                        .data(ResumeCreateResponseDto.builder().resumeId(resumeId).build())
+                        .data(resumeDetailResponseDto)
                         .build()
         );
     }
@@ -61,11 +60,11 @@ public class ResumeController {
             @RequestBody ResumeRequestDto resumeRequestDto
     ) {
 
-        boolean success = resumeService.saveResume(resumeId, token, resumeRequestDto.getTitle(), resumeRequestDto.getAnswers());
+        resumeService.saveResume(resumeId, token, resumeRequestDto.getTitle(), resumeRequestDto.getAnswers());
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
-                        .success(success)
+                        .success(true)
                         .status(HttpStatus.OK.value())
                         .message("자기소개서를 저장했습니다.")
                         .build()
@@ -78,11 +77,11 @@ public class ResumeController {
             @PathVariable("resumeId") int resumeId
     ) {
 
-        boolean success = resumeService.deleteResume(resumeId, token);
+        resumeService.deleteResume(resumeId, token);
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
-                        .success(success)
+                        .success(true)
                         .status(HttpStatus.OK.value())
                         .message("자기소개서를 삭제했습니다.")
                         .build()
@@ -97,11 +96,11 @@ public class ResumeController {
             @RequestParam("row") int row
     ) {
 
-        boolean success = resumeService.moveResume(resumeId, token, col, row);
+        resumeService.moveResume(resumeId, token, col, row);
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
-                        .success(success)
+                        .success(true)
                         .status(HttpStatus.OK.value())
                         .message("자기소개서를 이동했습니다.")
                         .build()

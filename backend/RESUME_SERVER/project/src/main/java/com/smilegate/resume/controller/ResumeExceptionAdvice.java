@@ -15,7 +15,7 @@ public class ResumeExceptionAdvice {
     public ResultResponse handleInvalidToken(Exception e) {
         return ResultResponse.builder()
                 .success(false)
-                .status(400)
+                .status(401)
                 .message(e.getMessage())
                 .build();
     }
@@ -25,7 +25,7 @@ public class ResumeExceptionAdvice {
     public ResultResponse handleUnauthorized(Exception e) {
         return ResultResponse.builder()
                 .success(false)
-                .status(400)
+                .status(403)
                 .message(e.getMessage())
                 .build();
     }
