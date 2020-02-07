@@ -6,6 +6,7 @@
     >
       <Calendar v-if="$route.name == 'RecruitPage'"/>
       <Resume v-if="$route.name == 'ResumePage'"/>
+      <ResumeWrite v-if="$route.name =='ResumeWrite'"/>
     </div>
     <div class="chat-section" :class="{'chat-open':$store.state.template.ChatState}">
       <Chat />
@@ -17,12 +18,14 @@
 import Calendar from "@/components/recruit/Calendar";
 import Resume from "@/components/resume/Resume";
 import Chat from "@/components/chat/Chat";
+import ResumeWrite from '@/components/resume/ResumeWrite'
 export default {
-  name: "HghssPage",
+  name: "CommonTemplate",
   components: {
     Calendar,
     Resume,
-    Chat
+    Chat,
+    ResumeWrite,
   },
   data: () => ({})
 };
