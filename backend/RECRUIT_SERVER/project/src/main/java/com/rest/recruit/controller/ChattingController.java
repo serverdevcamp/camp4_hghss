@@ -31,7 +31,7 @@ public class ChattingController {
 
     @ApiOperation(value = "유저의 채팅 리스트 조회", httpMethod = "GET",
             notes = "유저의 채팅 리스트 조회" , response= Chatting.class)
-    @GetMapping
+    @GetMapping("/my")
     public ResponseEntity getUserChatting(@ApiParam(value = "Authorization", required = true)
                                    @RequestHeader(value="Authorization") String token) {
 
