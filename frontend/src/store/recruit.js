@@ -12,9 +12,8 @@ export default {
   },
   actions: {
     calendarAPI(context, payload) {
-      // var access_token = localStorage.getItem('accessToken')
-      var access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhdXRoLkhHSFNTQGdtYWlsLmNvbSIsInVzZXJJZCI6MSwiZW1haWwiOiJhdXRoLkhHSFNTQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoi6rCA64OY7ZSIIOqwgOqwnOu5hCIsInJvbGUiOjEsInRva2VuVHlwZSI6IkFDQ0VTU19UT0tFTiIsImV4cCI6MTU4MTkzODk5OX0=.PswxsPdt2c4tZCBQotlkVvXtdDOLYQBWmNxwzh8dJhs='
-      
+      var access_token = localStorage.getItem('accessToken')
+
       return axios({
         method: 'get',
         url: config.RECRUIT_HOST + '/recruits/calendar',
@@ -38,8 +37,7 @@ export default {
       })
     },
     likeToggle(context, payload){     
-      // var access_token = localStorage.getItem('accessToken')
-      var access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhdXRoLkhHSFNTQGdtYWlsLmNvbSIsInVzZXJJZCI6MSwiZW1haWwiOiJhdXRoLkhHSFNTQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoi6rCA64OY7ZSIIOqwgOqwnOu5hCIsInJvbGUiOjEsInRva2VuVHlwZSI6IkFDQ0VTU19UT0tFTiIsImV4cCI6MTU4MTkzODk5OX0=.PswxsPdt2c4tZCBQotlkVvXtdDOLYQBWmNxwzh8dJhs='
+      var access_token = localStorage.getItem('accessToken')
       var method = ['post', 'delete']
       var path = ['like', 'unlike']
       
@@ -53,11 +51,18 @@ export default {
         }
       }).then(response => {
         if (response.data.status == 200) {
-          if(payload.action == 0) return true
+          if(payload.action == 0) {
+            // 즐찾이 완료되면? 채팅리스트에 넣어두기
+            return true
+          }
           return false
         }
         // 실패시, 변화 없음
-        if(payload.action == 0) return false
+        if(payload.action == 0){
+          console.log(response.data)
+          return false
+        }
+        console.log(response.data)
         return true
       }).catch(() =>{
         if(payload.action == 0) return false

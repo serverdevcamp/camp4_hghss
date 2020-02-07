@@ -30,7 +30,7 @@
           <v-row>
             <button class="link-btn" @click="moveUrl(recruit.employmentPageUrl)">홈페이지</button>
             <button class="link-btn">채용 공고 공유</button>
-            <button class="add-chat">+ 채팅 더보기</button>
+            <button class="add-chat" @click="openChatRoom()">+ 채팅 구독</button>
           </v-row>
           <v-row class="view-point">
             <span>공고 조회 {{ recruit.viewCount }}회</span>
@@ -80,7 +80,7 @@ export default {
     recruit: {}
   }),
   methods: {
-    ...mapActions(["likeToggle"]),
+    ...mapActions(["likeToggle","addChat"]),
     async likeOrUnlike(action){
       var favorite = await this.likeToggle({
         recruit_id :this.company.recruitId,
@@ -89,7 +89,6 @@ export default {
       this.recruit.favorite = favorite 
       this.company.favorite = favorite 
     },
-
     beforeOpen(event) {
       this.company = event.params.company;
       this.getRecruit();
@@ -113,6 +112,14 @@ export default {
     },
     moveUrl(url) {
       window.open(url, "_blank");
+    },
+    openChatRoom(){
+      this.addChat({
+        company_id: this.company.companyId,
+        company: this.company.companyName,
+        logo_url : this.company.imageFileName
+        })
+      this.$modal.hide("company-modal")
     }
   }
 };

@@ -1,27 +1,30 @@
 <template>
   <div id="write">
     <v-row class="menu-section">
-      <v-col>
+      <div class="icon-btn">
+        <font-awesome-icon icon="list" />
         <p>자소설 목록</p>
-      </v-col>
-      <v-col>
+      </div>
+      <div class="icon-btn">
+        <font-awesome-icon :icon="['far', 'save']" />
         <p>저장하기</p>
-      </v-col>
-      <v-col>
+      </div>
+      <div class="icon-btn">
+        <font-awesome-icon icon="download" />
         <p>내보내기</p>
-      </v-col>
-      <v-col>
+      </div>
+      <div class="round-btn">
         <p>맞춤법 검사</p>
-      </v-col>
-      <v-col>
+      </div>
+      <div class="round-btn">
         <p>저장기록</p>
-      </v-col>
+      </div>
     </v-row>
     <v-row class="write-section">
       <v-row class="write-form">
         <v-col class="write-item">
           <v-row class="title">
-            <p class="point-font">회사이름 직무</p>
+            <p class="point-font">스마일게이트</p>
           </v-row>
           <v-row class="content">
             <div class="content-num">
@@ -29,8 +32,8 @@
               <p class="point-font num">2</p>
             </div>
             <div class="text-section">
-              <textarea class="question">질문</textarea>
-              <textarea class="answer">내용</textarea>
+              <textarea class="question">스마일게이트에 지원한 동기와 장단점을 서술하시오.(1000자)</textarea>
+              <textarea class="answer">사랑합니다...</textarea>
             </div>
             <div class="check-letter">
               <p>7/3000 (글자수, 공백포함)</p>
@@ -45,8 +48,8 @@
 export default {
   data: () => ({
     // 이거 분리하자!!
-    answer : '',
-  }),
+    answer: ""
+  })
 };
 </script>
 <style lang="scss">
@@ -59,8 +62,56 @@ $point-color: #ff6813;
   overflow: hidden;
   background: $calendar-border;
   .menu-section {
+    background: #fafafa;
+    padding: 15px 30px !important;
+    border-bottom: 1px solid #d8d8d8;
+    .icon-btn {
+      cursor: pointer;
+      display: inline-block;
+      padding-right: 15px;
+      text-align: center;
+      &:nth-child(3) {
+        margin-right: 30px;
+        padding-right: 40px;
+        border-right: 1px solid #d8d8d8;
+      }
+      path {
+        color: #999;
+        font-size: 1.1rem;
+      }
+      p {
+        color: #999;
+        margin-top: 3px;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+      &:hover {
+        path, p{
+          color: $point-color;
+        }
+      }
+    }
+    .round-btn {
+      margin-left: 15px;
+      text-align: center;
+      p {
+        cursor: pointer;
+        margin-top: 3px;
+        padding: 7px 15px;
+        font-size: 0.8rem;
+        border: 1px solid #d8d8d8;
+        border-radius: 30px;
+        color: #999;
+        font-weight: 600;
+        &:hover {
+          color: #ffffff;
+          background: $point-color;
+          border: 1px solid $point-color;
+      
+        }
+      }
+    }
   }
-
   .write-section {
     .row.write-form {
       position: relative;
@@ -131,7 +182,7 @@ $point-color: #ff6813;
             width: 100%;
             padding: 10px;
             border-top: 1px solid $drop-border;
-            p{
+            p {
               font-size: 0.85rem;
             }
           }

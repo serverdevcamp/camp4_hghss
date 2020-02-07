@@ -10,6 +10,9 @@ export default {
   mutations: {
     setRank(state, payload){
       Vue.set(state.Rank, payload.target, payload.data)
+    },
+    setChatState(state, payload){
+      state.ChatState = payload
     }
   },
   actions: {

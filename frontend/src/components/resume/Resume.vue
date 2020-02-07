@@ -22,7 +22,7 @@
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                <div class="company">{{resume.companyName}}</div>
+                <div class="company">{{resume.title}}</div>
                 <div class="date" v-if="new Date(resume.endTime) > today">
                   <span class="d-day">{{ getDDay(resume.endTime) }}</span>
                   {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
@@ -48,7 +48,7 @@
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                <div class="company">{{resume.companyName}}</div>
+                <div class="company">{{resume.title}}</div>
                 <div class="date" v-if="new Date(resume.endTime) > today">
                   <span class="d-day">{{ getDDay(resume.endTime) }}</span>
                   {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
@@ -71,7 +71,7 @@
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                <div class="company">{{resume.companyName}}</div>
+                <div class="company">{{resume.title}}</div>
               </div>
             </div>
           </div>
@@ -102,7 +102,7 @@
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                    <div class="company">{{resume.companyName}}</div>
+                    <div class="company">{{resume.title}}</div>
                   </div>
                 </div>
               </div>
@@ -125,7 +125,7 @@
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                    <div class="company">{{resume.companyName}}</div>
+                    <div class="company">{{resume.title}}</div>
                   </div>
                 </div>
               </div>
@@ -153,7 +153,7 @@
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                    <div class="company">{{resume.companyName}}</div>
+                    <div class="company">{{resume.title}}</div>
                   </div>
                 </div>
               </div>
@@ -176,7 +176,7 @@
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                    <div class="company">{{resume.companyName}}</div>
+                    <div class="company">{{resume.title}}</div>
                   </div>
                 </div>
               </div>
@@ -204,7 +204,7 @@
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                    <div class="company">{{resume.companyName}}</div>
+                    <div class="company">{{resume.title}}</div>
                   </div>
                 </div>
               </div>
@@ -227,7 +227,7 @@
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                    <div class="company">{{resume.companyName}}</div>
+                    <div class="company">{{resume.title}}</div>
                   </div>
                 </div>
               </div>
@@ -253,7 +253,7 @@
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                <div class="company">{{resume.companyName}}</div>
+                <div class="company">{{resume.title}}</div>
               </div>
             </div>
           </div>
@@ -271,7 +271,7 @@
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                <div class="company">{{resume.companyName}}</div>
+                <div class="company">{{resume.title}}</div>
               </div>
             </div>
           </div>
@@ -283,7 +283,7 @@
 </template>
 <script>
 import ResumeModal from "./ResumeModal";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 export default {
   components: {
     ResumeModal
@@ -295,6 +295,7 @@ export default {
     ...mapGetters(["getResume"])
   },
   methods: {
+    ...mapActions(["resumeListAPI"]),
     drag(e) {
       e.dataTransfer.setData("text", e.target.id);
     },
@@ -317,7 +318,7 @@ export default {
     getDDay(endDate) {
       var end_date = new Date(endDate);
       var between = end_date - this.today;
-      if (between < 0) return "기간이 지났습니다.";
+      if (between < 0) return " 기간이 지났습니다.";
 
       var d_day = between / (24 * 3600 * 1000);
       if (d_day < 1) {
@@ -325,6 +326,9 @@ export default {
       }
       return "D-" + parseInt(d_day) + "일";
     }
+  },
+  mounted(){
+    this.resumeListAPI()
   }
 };
 </script>
