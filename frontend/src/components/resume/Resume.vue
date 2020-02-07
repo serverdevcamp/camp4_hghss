@@ -17,12 +17,12 @@
               class="resume-card"
               draggable="true"
               v-on:dragstart="drag($event)"
-              v-for="resume in getResume['1']['1']"
-              :key="resume"
+              v-for="(resume, index) in getResume['1']['1']"
+              :key="index"
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                <div class="company">{{resume.companyName}}</div>
+                <div class="company">{{resume.title}}</div>
                 <div class="date" v-if="new Date(resume.endTime) > today">
                   <span class="d-day">{{ getDDay(resume.endTime) }}</span>
                   {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
@@ -43,12 +43,12 @@
               class="resume-card"
               draggable="true"
               v-on:dragstart="drag($event)"
-              v-for="resume in getResume['1']['2']"
-              :key="resume"
+              v-for="(resume, index) in getResume['1']['2']"
+              :key="index"
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                <div class="company">{{resume.companyName}}</div>
+                <div class="company">{{resume.title}}</div>
                 <div class="date" v-if="new Date(resume.endTime) > today">
                   <span class="d-day">{{ getDDay(resume.endTime) }}</span>
                   {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
@@ -66,12 +66,12 @@
               class="resume-card"
               draggable="true"
               v-on:dragstart="drag($event)"
-              v-for="resume in getResume['1']['3']"
-              :key="resume"
+              v-for="(resume, index) in getResume['1']['3']"
+              :key="index"
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                <div class="company">{{resume.companyName}}</div>
+                <div class="company">{{resume.title}}</div>
               </div>
             </div>
           </div>
@@ -97,12 +97,12 @@
                   class="resume-card"
                   draggable="true"
                   v-on:dragstart="drag($event)"
-                  v-for="resume in getResume['2']['1']"
-                  :key="resume"
+                  v-for="(resume, index) in getResume['2']['1']"
+                  :key="index"
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                    <div class="company">{{resume.companyName}}</div>
+                    <div class="company">{{resume.title}}</div>
                   </div>
                 </div>
               </div>
@@ -120,12 +120,12 @@
                   class="resume-card"
                   draggable="true"
                   v-on:dragstart="drag($event)"
-                  v-for="resume in getResume['2']['2']"
-                  :key="resume"
+                  v-for="(resume, index) in getResume['2']['2']"
+                  :key="index"
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                    <div class="company">{{resume.companyName}}</div>
+                    <div class="company">{{resume.title}}</div>
                   </div>
                 </div>
               </div>
@@ -148,12 +148,12 @@
                   class="resume-card"
                   draggable="true"
                   v-on:dragstart="drag($event)"
-                  v-for="resume in getResume['3']['1']"
-                  :key="resume"
+                  v-for="(resume, index) in getResume['3']['1']"
+                  :key="index"
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                    <div class="company">{{resume.companyName}}</div>
+                    <div class="company">{{resume.title}}</div>
                   </div>
                 </div>
               </div>
@@ -171,12 +171,12 @@
                   class="resume-card"
                   draggable="true"
                   v-on:dragstart="drag($event)"
-                  v-for="resume in getResume['3']['2']"
-                  :key="resume"
+                  v-for="(resume, index) in getResume['3']['2']"
+                  :key="index"
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                    <div class="company">{{resume.companyName}}</div>
+                    <div class="company">{{resume.title}}</div>
                   </div>
                 </div>
               </div>
@@ -199,12 +199,12 @@
                   class="resume-card"
                   draggable="true"
                   v-on:dragstart="drag($event)"
-                  v-for="resume in getResume['4']['1']"
-                  :key="resume"
+                  v-for="(resume, index) in getResume['4']['1']"
+                  :key="index"
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                    <div class="company">{{resume.companyName}}</div>
+                    <div class="company">{{resume.title}}</div>
                   </div>
                 </div>
               </div>
@@ -222,12 +222,12 @@
                   class="resume-card"
                   draggable="true"
                   v-on:dragstart="drag($event)"
-                  v-for="resume in getResume['4']['2']"
-                  :key="resume"
+                  v-for="(resume, index) in getResume['4']['2']"
+                  :key="index"
                   :id="resume.recruitId"
                 >
                   <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                    <div class="company">{{resume.companyName}}</div>
+                    <div class="company">{{resume.title}}</div>
                   </div>
                 </div>
               </div>
@@ -248,12 +248,12 @@
               class="resume-card"
               draggable="true"
               v-on:dragstart="drag($event)"
-              v-for="resume in getResume['5']['1']"
-              :key="resume"
+              v-for="(resume, index) in getResume['5']['1']"
+              :key="index"
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                <div class="company">{{resume.companyName}}</div>
+                <div class="company">{{resume.title}}</div>
               </div>
             </div>
           </div>
@@ -266,12 +266,12 @@
               class="resume-card"
               draggable="true"
               v-on:dragstart="drag($event)"
-              v-for="resume in getResume['5']['1']"
-              :key="resume"
+              v-for="(resume, index) in getResume['5']['2']"
+              :key="index"
               :id="resume.recruitId"
             >
               <div class="card" v-on:click="showModal('여기에 회사 아이디')">
-                <div class="company">{{resume.companyName}}</div>
+                <div class="company">{{resume.title}}</div>
               </div>
             </div>
           </div>
@@ -283,7 +283,7 @@
 </template>
 <script>
 import ResumeModal from "./ResumeModal";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 export default {
   components: {
     ResumeModal
@@ -292,11 +292,10 @@ export default {
     today: new Date()
   }),
   computed: {
-    ...mapGetters([
-      "getResume",
-    ])
+    ...mapGetters(["getResume"])
   },
   methods: {
+    ...mapActions(["resumeListAPI"]),
     drag(e) {
       e.dataTransfer.setData("text", e.target.id);
     },
@@ -319,7 +318,7 @@ export default {
     getDDay(endDate) {
       var end_date = new Date(endDate);
       var between = end_date - this.today;
-      if (between < 0) return "기간이 지났습니다.";
+      if (between < 0) return " 기간이 지났습니다.";
 
       var d_day = between / (24 * 3600 * 1000);
       if (d_day < 1) {
@@ -327,6 +326,9 @@ export default {
       }
       return "D-" + parseInt(d_day) + "일";
     }
+  },
+  mounted(){
+    this.resumeListAPI()
   }
 };
 </script>

@@ -12,20 +12,25 @@
           <p class="subtitle point-font">내 채팅</p>
         </v-row>
         <v-row class="chat-room">
-          <!-- 여기에 채팅방 내용 보이기 -->
-          <div class="chat-item" v-for="(chat, company_id) in getMyChat" v-bind:key="company_id" @click="setRoomState(true)">
+          <div
+            class="chat-item"
+            v-for="(chat, company_id) in getMyChat"
+            v-bind:key="company_id"
+            @click="openRoom(company_id, chat.company)"
+          >
             <div class="company-logo">
-              <img
-                :src="chat.logo_url"
-                :alt="chat.company"
-              />
+              <img :src="chat.logo_url" :alt="chat.company" />
             </div>
             <div class="company-info">
               <p class="company-name">
                 {{ chat.company }}
                 <span class="user_cnt">({{getChatList(company_id).user_cnt}}명)</span>
               </p>
-              <p class="last-chat">{{ getChatList(company_id).chat[getChatList(company_id).chat.length-1].message}}}</p>
+              <p
+                class="last-chat"
+                v-if="getChatList(company_id).chat && getChatList(company_id).chat.length >= 1"
+              >{{ getChatList(company_id).chat[getChatList(company_id).chat.length-1].message }}</p>
+              <p class="last-chat" v-else>이전 채팅이 없습니다.</p>
             </div>
           </div>
         </v-row>
@@ -36,7 +41,29 @@
         <v-row>
           <p class="subtitle point-font">즐겨찾기/작성한 기업</p>
         </v-row>
-        <v-row class="chat-room"></v-row>
+        <v-row class="chat-room">
+          <div
+            class="chat-item"
+            v-for="(chat, company_id) in getFavChat"
+            v-bind:key="company_id"
+            @click="openRoom(company_id, chat.company)"
+          >
+            <div class="company-logo">
+              <img :src="chat.logo_url" :alt="chat.company" />
+            </div>
+            <div class="company-info">
+              <p class="company-name">
+                {{ chat.company }}
+                <span class="user_cnt">({{getChatList(company_id).user_cnt}}명)</span>
+              </p>
+              <p
+                class="last-chat"
+                v-if="getChatList(company_id).chat && getChatList(company_id).chat.length >= 1"
+              >{{ getChatList(company_id).chat[getChatList(company_id).chat.length-1].message }}</p>
+              <p class="last-chat" v-else>이전 채팅이 없습니다.</p>
+            </div>
+          </div>
+        </v-row>
       </v-col>
     </v-row>
     <v-row class="hot-chat">
@@ -44,40 +71,70 @@
         <v-row>
           <p class="subtitle point-font">인기 채팅</p>
         </v-row>
-        <v-row class="chat-room"></v-row>
+        <v-row class="chat-room">
+          <div
+            class="chat-item"
+            v-for="(chat, company_id) in getHotChat"
+            v-bind:key="company_id"
+            @click="openRoom(company_id, chat.company)"
+          >
+            <div class="company-logo">
+              <img :src="chat.logo_url" :alt="chat.company" />
+            </div>
+            <div class="company-info">
+              <p class="company-name">
+                {{ chat.company }}
+                <span class="user_cnt">({{getChatList(company_id).user_cnt || 0}}명)</span>
+              </p>
+              <p
+                class="last-chat"
+                v-if="getChatList(company_id).chat && getChatList(company_id).chat.length >= 1"
+              >{{ getChatList(company_id).chat[getChatList(company_id).chat.length-1].message }}</p>
+              <p class="last-chat" v-else>이전 채팅이 없습니다.</p>
+            </div>
+          </div>
+        </v-row>
       </v-col>
     </v-row>
     <!-- 이거슨 채팅방 -->
-    <Room v-if="getRoomState" :company_id="0"/>
+    <Room v-if="getRoomCompanyInfo.is_open"/>
   </div>
 </template>
+
 <script>
-import Room from './Room'
+import Room from "./Room";
 import { mapGetters, mapActions, mapMutations } from "vuex";
 export default {
-  components:{
-    Room,
+  components: {
+    Room
   },
-  data: () => ({}),
+  data: () => ({
+    company_id : 0,
+  }),
   computed: {
-    ...mapGetters([ 
-      "getChatList", 
-      "getSocket", 
-      "getMyChat", 
-      "getFavChat", 
+    ...mapGetters([
+      "getChatList",
+      "getSocket",
+      "getMyChat",
+      "getFavChat",
       "getHotChat",
-      "getRoomState",
-    ]),
+      "getRoomCompanyInfo"
+    ])
   },
   methods: {
-    ...mapActions(["openSocket"]),
+    ...mapActions(["openSocket","userChatAPI"]),
     ...mapMutations(["setRoomState"]),
+    openRoom(company_id, company){
+      this.company_id = company_id
+      this.setRoomState({is_open : true, company_id : company_id, company: company})
+    }
   },
   created() {
-    this.openSocket("0");
-  },
-}
+    this.userChatAPI()
+  }
+};
 </script>
+
 <style lang="scss">
 $calendar-border: #f0f0f0;
 $calendar-day: #bbbbbb;
@@ -117,7 +174,9 @@ $calendar-title: #fafafa;
     font-size: 1rem;
   }
   .chat-room {
+    display: inline-block;
     overflow: scroll;
+    width: 100%;
     .chat-item {
       cursor: pointer;
       width: 100%;
@@ -164,7 +223,7 @@ $calendar-title: #fafafa;
           font-size: 0.8rem;
           font-weight: 600;
           letter-spacing: 0.03rem;
-          .user_cnt{
+          .user_cnt {
             font-size: 0.75rem;
             font-weight: 500;
           }
@@ -177,7 +236,6 @@ $calendar-title: #fafafa;
           text-overflow: ellipsis;
           white-space: nowrap;
         }
-
         &::after {
           content: "";
           display: block;

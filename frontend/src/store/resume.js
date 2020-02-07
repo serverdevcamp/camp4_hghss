@@ -1,56 +1,51 @@
+import config from "./config";
+import axios from 'axios'
+
 export default {
   state: {
     resume: {
-      1: {
-        1: [
-          {
-            "companyId": 1,
-            "recruitId": 13,
-            "companyName": "스마일 게이트",
-            "startTime": "2019-12-29 15:00:00",
-            "endTime": "2019-12-30 15:00:00",
-            "recruitType": 1,
-            "employType": [
-              1,
-              3
-            ]
-          },
-          {
-            "companyId": 1,
-            "recruitId": 12,
-            "companyName": "네이버",
-            "startTime": "2019-12-29 15:00:00",
-            "endTime": "2020-01-27 10:00:00",
-            "recruitType": 1,
-            "employType": [
-              1,
-              3
-            ]
-          },
-        ],
-        2: [],
-        3: [{
-          "companyId": 1,
-          "recruitId": 22,
-          "companyName": "카카오",
-          "startTime": "2019-12-29 15:00:00",
-          "endTime": "2020-01-28 10:00:00",
-          "recruitType": 1,
-          "employType": [
-            1,
-            3
-          ]
-        },
-        ],
-      },
+      1: { 1: [], 2: [], 3: []},
       2: { 1: [], 2: [] },
       3: { 1: [], 2: [] },
       4: { 1: [], 2: [] },
       5: { 1: [], 2: [] },
     }
   },
-  mutations: {},
-  actions: {},
+  mutations: {
+    setResume(state, payload){
+      payload.forEach( el => {
+        state.resume[el.resumeCol][el.resumeRow].push(el)
+      });
+    }
+  },
+  actions: {
+    resumeListAPI(context){
+      var access_token = localStorage.getItem('accessToken')
+      context.state.resume = {
+        1: { 1: [], 2: [], 3: []},
+        2: { 1: [], 2: [] },
+        3: { 1: [], 2: [] },
+        4: { 1: [], 2: [] },
+        5: { 1: [], 2: [] },
+      }
+      axios({
+        method: 'get',
+        url: config.RESUME_HOST  + '/resumes/list',
+        headers: {
+          "Content-Type": "application/json",
+          'Access-Control-Allow-Origin': '*',
+          'Authorization': 'Bearer '+ access_token,
+        }
+      }).then(response => {
+        if(response.data.status == 200){
+          context.commit('setResume', response.data.data)
+        }
+        else if(response.data.status == 402){
+          context.dispatch('refreshToken',{funcName: 'resumeListAPI', param: ''})
+        }
+      })
+    }
+  },
   getters: {
     getResume(state){
       return state.resume

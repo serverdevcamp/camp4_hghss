@@ -1,14 +1,14 @@
 <template>
   <div id="room">
-    <v-row @click="setRoomState(false)" class="room-close point-font">
+    <v-row @click="setRoomState({is_open:false})" class="room-close point-font">    
       <font-awesome-icon icon="arrow-left" />
-      {{getMyChat[company_id].company}}
+      {{company}}
       <span
         class="user_cnt"
       >({{getChatList(company_id).user_cnt}}명)</span>
     </v-row>
     <v-row class="chat-room" id="chat-room">
-      <div class="chat" v-for="chat in getChatList(company_id).chat" :key="chat">
+      <div class="chat" v-for="(chat, index) in getChatList(company_id).chat" :key="index">
         <div v-if="getUser.nickname != chat.nickname" class="nickname point-font">{{chat.nickname}}</div>
         <div class="content" :class="{right: getUser.nickname == chat.nickname}">
           <div class="message">
@@ -30,27 +30,35 @@
       </div>
       <div v-else class="send-box">
         <div class="nickname point-font">비회원</div>
-        <textarea
-          class="message"
-          placeholder="채팅에 참여하려면 로그인을 해주세요."
-        ></textarea>
+        <textarea class="message" placeholder="채팅에 참여하려면 로그인을 해주세요."></textarea>
       </div>
     </v-row>
   </div>
 </template>
 <script>
+import store from "../../store";
 import moment from "moment";
 import { mapGetters, mapMutations } from "vuex";
 export default {
-  props: ["company_id"],
   data: () => ({
-    message: ""
+    message: "",
+    company_id : 0,
+    company: "전체",
   }),
   computed: {
-    ...mapGetters(["getMyChat", "getChatList", "getUser", "getSocket"])
+    ...mapGetters(["getMyChat", "getChatList", "getUser", "getSocket", "getRoomCompanyInfo"])
   },
   methods: {
     ...mapMutations(["setRoomState"]),
+    watchChat() {
+      // 채팅변화를 감지하여, 스크롤 조절
+      this.$store.watch(
+        () => store.getters.getChatList(this.company_id),
+        chatList => {
+          console.log(chatList);
+        }
+      );
+    },
     // 메시지 보내기
     sendMessage() {
       this.message = this.message.replace(/(^\s*)|(\s*$)/g, "");
@@ -70,16 +78,21 @@ export default {
         this.message = "";
       }
     },
-    showLoginModal(){
-      if(!this.getUser.nickname){
+    showLoginModal() {
+      if (!this.getUser.nickname) {
         this.$modal.show("account-modal", { target: 0 });
       }
-    },
+    }
   },
-  mounted(){
-    var scorll = document.getElementById('chat-room')
-    scorll.scrollTop = scorll.scrollHeight
-  }
+  created(){
+    this.company_id = this.getRoomCompanyInfo.company_id
+    this.company = this.getRoomCompanyInfo.company
+  },
+  mounted() {
+    this.watchChat();
+    var scorll = document.getElementById("chat-room");
+    scorll.scrollTop = scorll.scrollHeight;
+  },
 };
 </script>
 <style lang="scss">
@@ -145,9 +158,9 @@ $calendar-title: #fafafa;
             font-size: 0.7rem;
           }
         }
-        &.right{
-          .message{
-            background:#ffe58ac7;
+        &.right {
+          .message {
+            background: #ffe58ac7;
             float: right;
           }
           .time {
@@ -158,19 +171,19 @@ $calendar-title: #fafafa;
     }
   }
   .row.send-section {
-    position:relative;
+    position: relative;
     height: 150px;
     padding: 20px 12px;
     background: #fafafa;
-    &.anonymous::after{
+    &.anonymous::after {
       content: "";
       position: absolute;
       width: auto;
       height: auto;
       top: 0;
-      bottom:0;
-      left:0;
-      right:0;
+      bottom: 0;
+      left: 0;
+      right: 0;
     }
     .send-box {
       width: 100%;

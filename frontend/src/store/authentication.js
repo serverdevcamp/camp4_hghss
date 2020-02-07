@@ -36,10 +36,9 @@ export default {
     }
   },
   actions: {
-    async signin({ commit }, payload) {
+    async signin({ commit}, payload) {
 
       const response = await axios.post(config.AUTH_HOST + '/users/signin', payload);
-      console.log(response);
 
       if (!response.data.success) {
         alert(response.data.message);
@@ -55,6 +54,9 @@ export default {
       }
 
       commit('setUserInfo', response.data.data);
+      //  로그인 후, 리다이렉트
+      router.go()
+
       alert(response.data.message);
 
       return true;
@@ -82,20 +84,23 @@ export default {
       sessionStorage.removeItem('id');
 
       alert(response.data.message);
-      router.push('/');
+      // 현재페이지 리다이렉트, 유저 맞춤 정보 삭제
+      router.go()
     },
-    async refreshToken({ commit }) {
+    async refreshToken({ commit, dispatch }, payload) {
       let refreshToken = localStorage.getItem('refreshToken');
       const response = await axios.get(config.AUTH_HOST + '/users/refresh', {
         headers: {
           Authorization: 'Bearer ' + refreshToken
         }
       });
-
       if (response.data.success) {
         localStorage.setItem('accessToken', response.data.data.accessToken);
         localStorage.setItem('refreshToken', response.data.data.refreshToken);
         commit('setUserInfo', response.data.data);
+        /**** 함수 재실행 ****/
+        //context.dispatch('refreshToken',{funcName: '실행시키고싶은 함수이름', param: '인자'})
+        dispatch(payload.funcName, payload.param)
       } else {
         console.error(response.data.message);
         alert('세션이 만료되었습니다.');
@@ -103,6 +108,7 @@ export default {
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('accessToken');
       }
+      
 
     }
   }
