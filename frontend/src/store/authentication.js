@@ -38,7 +38,11 @@ export default {
   actions: {
     async signin({ commit }, payload) {
 
-      const response = await axios.post(config.AUTH_HOST + '/users/signin', payload);
+      const response = await axios.post(config.AUTH_HOST + '/users/signin', payload, {
+        headers: {
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
       console.log(response);
 
       if (!response.data.success) {

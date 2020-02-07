@@ -83,6 +83,7 @@
     data() {
       return {
         auth_server: config.AUTH_HOST,
+        resume_server: config.RESUME_HOST,
         dialog: false,
         headers: [
           {text: 'id', value: 'id'},
