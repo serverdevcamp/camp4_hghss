@@ -58,7 +58,7 @@ public class UserExceptionAdvice {
     public ResultResponse handleExpiredRefreshToken(Exception e) {
         return ResultResponse.builder()
                 .success(false)
-                .status(HttpStatus.UNAUTHORIZED.value())
+                .status(402)
                 .message(e.getMessage())
                 .build();
     }
@@ -68,7 +68,7 @@ public class UserExceptionAdvice {
     public ResultResponse handleInvalidToken(Exception e) {
         return ResultResponse.builder()
                 .success(false)
-                .status(HttpStatus.UNAUTHORIZED.value())
+                .status(402)
                 .message(e.getMessage())
                 .build();
     }
@@ -98,7 +98,7 @@ public class UserExceptionAdvice {
     public ResultResponse handleAuthenticationEntryPoint(Exception e) {
         return ResultResponse.builder()
                 .success(false)
-                .status(HttpStatus.UNAUTHORIZED.value())
+                .status(402)
                 .message(e.getMessage())
                 .build();
     }

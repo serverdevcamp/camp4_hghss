@@ -33,7 +33,9 @@ public class JwtUtil {
 
     public String getToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
-        return (token==null)? null : token.substring("Bearer ".length());
+        if(token == null) return null;
+        if(token.length()>"Bearer".length()) return token.substring("Bearer ".length());
+        return token;
     }
 
     public boolean isValidToken(String token) {
