@@ -16,6 +16,8 @@ import com.rest.recruit.model.*;
 import com.rest.recruit.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +31,14 @@ import java.util.*;
 @Service
 public class RecruitService {
 
-
+//
     @Autowired
     RecruitMapper recruitMapper;
 
     @Autowired
     RedisTemplate<String, String> redisTemplate;
 
+   @Cacheable(cacheNames="calendarRecruitCache" , key = "#getRecruitCalendarRequestDTO.startTime+#getRecruitCalendarRequestDTO.endTime")
     public ResponseEntity GetRecruitCalendarByDate(GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO) {
 
         List<GetRecruitCalendarSimpleResponseDTO> tmp = recruitMapper.getRecruitCalendarByDate(getRecruitCalendarRequestDTO);
@@ -43,7 +46,6 @@ public class RecruitService {
         if (tmp.size() == 0 ||tmp.isEmpty()) { throw new GetCalendarException(); }
 
         List<GetCalendarResponse> results = new ArrayList<>();
-
 
         for (int i = 0; i < tmp.size(); i++) {
             results.add(GetCalendarResponse.of(tmp.get(i)));
@@ -74,7 +76,7 @@ public class RecruitService {
 
     }
 
-
+    @Cacheable(cacheNames="detailRecruitCache", key = "#dataWithToken.recruitIdx")
     public ResponseEntity GetDetailRecruitPage(DataWithToken dataWithToken) {
 
         RecruitDetail tmpdetail = recruitMapper.GetDetailRecruitPage(dataWithToken);

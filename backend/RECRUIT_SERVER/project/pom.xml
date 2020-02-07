@@ -45,15 +45,7 @@
             <artifactId>javax.inject</artifactId>
             <version>1</version>
         </dependency>
-<<<<<<< HEAD
-=======
-        <!-- JWT -->
-        <dependency>
-            <groupId>com.auth0</groupId>
-            <artifactId>java-jwt</artifactId>
-            <version>3.4.0</version>
-        </dependency>
->>>>>>> fa442eaf6017174f78f395913ea85642b61caa55
+
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
@@ -142,23 +134,15 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
-<<<<<<< HEAD
             <version>0.10.7</version>
             <scope>compile</scope>
-=======
-            <version>0.10.5</version>
->>>>>>> fa442eaf6017174f78f395913ea85642b61caa55
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
-<<<<<<< HEAD
             <version>0.10.7</version>
-=======
-            <version>0.10.5</version>
->>>>>>> fa442eaf6017174f78f395913ea85642b61caa55
             <scope>runtime</scope>
         </dependency>
 
@@ -166,12 +150,20 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
-<<<<<<< HEAD
             <version>0.10.7</version>
-=======
-            <version>0.10.5</version>
->>>>>>> fa442eaf6017174f78f395913ea85642b61caa55
             <scope>runtime</scope>
+        </dependency>
+
+        <!-- encache-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>2.10.3</version>
         </dependency>
 
 
