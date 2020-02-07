@@ -5,6 +5,8 @@ import com.smilegate.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -17,8 +19,8 @@ public class AdminService {
         return userRepository.findUsers();
     }
 
-    public boolean updateUserRole(int id, String role) {
-        userRepository.updateRole(id, role);
+    public boolean updateUserRole(int id, int role) {
+        userRepository.updateRole(id, role, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         return true;
     }
 }

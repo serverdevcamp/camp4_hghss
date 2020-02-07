@@ -31,8 +31,6 @@ new Vue({
       let role = sessionStorage.getItem('role');
 
       this.$store.commit('setUserInfo', {email: email, nickname: nickname, role: role});
-    }else if(localStorage.hasOwnProperty('refreshToken')){
-      await this.$store.dispatch('refreshToken');
     }
   },
   render: h => h(App),

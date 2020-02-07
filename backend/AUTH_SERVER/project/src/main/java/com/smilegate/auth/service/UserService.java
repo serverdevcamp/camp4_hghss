@@ -15,7 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -33,14 +34,13 @@ public class UserService {
         String email = signinRequestDto.getEmail();
         String password = signinRequestDto.getPassword();
 
-        // email 체크
-        User user = (User) userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);
         if(user==null) throw new EmailNotExistException(email);
 
-        // password 체크
-        if(!passwordEncoder.matches(password, user.getHashedPassword())) throw new PasswordWrongException();
+        userRepository.updateAccessedAt(user.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 
-        // token 발급
+        if(!passwordEncoder.matches(password, user.getPasswd())) throw new PasswordWrongException();
+
         String accessToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "ACCESS_TOKEN", 30);
         String refreshToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "REFRESH_TOKEN", 60*24*14);
 
@@ -63,14 +63,14 @@ public class UserService {
     public TokenResponseDto refreshToken(String refreshToken) throws ExpiredJwtException {
 
         // 로그아웃 상태에서 refresh 요청
-        if(!redisUtil.hasKey(refreshToken)) throw new SignoutException();
+        if(!redisUtil.hasKey(refreshToken)) throw new UnauthorizedException();
 
         Claims claims = jwtUtil.getClaims(refreshToken);
 
         int userId = (int) claims.get("userId");
         String email = claims.getSubject();
         String nickname  = (String) claims.get("nickname");
-        String role = (String) ((List) claims.get("roles")).get(0);
+        int role = (int) claims.get("role");
 
         String accessToken = jwtUtil.createToken(userId, email, nickname, role, "ACCESS_TOKEN", 30);
 
@@ -87,7 +87,7 @@ public class UserService {
     public void sendSignupMail(SignupRequestDto signupRequestDto) {
 
         String email = signupRequestDto.getEmail();
-        String hashedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
+        String passwd = passwordEncoder.encode(signupRequestDto.getPassword());
 
         if(userRepository.countUser(email) > 0) throw new ExistEmailException(email);
 
@@ -95,8 +95,8 @@ public class UserService {
         User user = User.builder()
                         .email(email)
                         .nickname("temp")
-                        .hashedPassword(hashedPassword)
-                        .role("USER")
+                        .passwd(passwd)
+                        .role(1)
                         .build();
 
         if(mailUtil.sendSignupMail(key, user)) redisUtil.set(key, user, 10);
@@ -108,12 +108,21 @@ public class UserService {
 
         if(user==null) throw new TimeoutException();
 
+        String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
+        user.setAccessedAt(now);
+
         int userId = userRepository.registerUser(user);
         if(userId > 0) redisUtil.delete(key);
 
         String nickname = userRepository.getNickname(userId);
-        userRepository.updateNickname(userId, nickname);
 
+        System.out.println(userId);
+        System.out.println(nickname);
+
+        userRepository.updateNickname(userId, nickname, now);
     }
 
     public void sendPasswordMail(String email) {
@@ -125,22 +134,18 @@ public class UserService {
         if(mailUtil.sendPasswordMail(key, email)) redisUtil.set(key, email, 10);
     }
 
-    public void updatePassword(String key, String password) {
+    public void updatePassword(String key, String passwd) {
 
         String email = (String) redisUtil.get(key);
 
+        // key가 잘못된 경우
         if(email == null) throw new UnauthorizedException();
 
         if(userRepository.countUser(email) == 0) throw new EmailNotExistException(email);
 
-        String hashedPassword = passwordEncoder.encode(password);
+        passwd = passwordEncoder.encode(passwd);
 
-        userRepository.updatePassword(
-                User.builder()
-                .email(email)
-                .hashedPassword(hashedPassword)
-                .build()
-        );
+        userRepository.updatePassword(email, passwd, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 
         redisUtil.delete(key);
     }

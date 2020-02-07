@@ -14,29 +14,35 @@
     </select>
 
     <update id="signup" useGeneratedKeys="true" keyProperty="id" parameterType="User">
-        INSERT INTO user(email, hashed_password, nickname)
-        VALUES(#{email}, #{hashedPassword}, #{nickname})
+        INSERT INTO user(email, passwd, nickname, created_at, updated_at, accessed_at)
+        VALUES(#{email}, #{passwd}, #{nickname}, #{createdAt}, #{updatedAt}, #{accessedAt})
     </update>
 
-    <update id="updatePassword" parameterType="User" >
+    <update id="updatePassword" parameterType="map" >
         UPDATE user
-        SET hashed_password = #{hashedPassword}
+        SET passwd = #{passwd}, updated_at = #{updatedAt}
         WHERE email = #{email}
     </update>
 
     <select id="getNickname" parameterType="int" resultType="String">
-        SELECT nickname FROM nickname WHERE id = #{id}
+        SELECT nickname FROM nickname_bible WHERE id = #{id}
     </select>
 
     <update id="updateNickname" parameterType="map">
         UPDATE user
-        SET nickname = #{nickname}
+        SET nickname = #{nickname}, updated_at = #{updatedAt}
         WHERE id = #{id}
     </update>
 
     <update id="updateRole" parameterType="map">
         UPDATE user
-        SET role = #{role}
+        SET role = #{role}, updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateAccessedAt" parameterType="map">
+        UPDATE user
+        SET accessed_at = #{accessedAt}
         WHERE id = #{id}
     </update>
 </mapper>

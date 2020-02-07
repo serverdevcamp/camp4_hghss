@@ -5,13 +5,9 @@ import lombok.Data;
 
 @Builder
 @Data
-public class ResumeInfo {
-
+public class Position {
     private Integer id;
-    private Integer userId;
-    private Integer positionId;
-    private String lastModDate;
+    private Integer recruitId;
     private String title;
-    private Integer index;
-
+    private Integer division;
 }

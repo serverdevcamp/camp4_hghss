@@ -6,6 +6,6 @@ import lombok.Data;
 public class UpdateRoleRequestDto {
 
     private int id;
-    private String role;
+    private int role;
 
 }

@@ -4,7 +4,7 @@
       <v-data-table
               :headers="headers"
               :items="users"
-              sort-by="role"
+              sort-by="role desc"
               class="elevation-1"
       >
         <template v-slot:top>
@@ -21,16 +21,17 @@
                   large
                   @save="save(props.item)"
           >
-            <div>{{ props.item.role }}</div>
+            <div v-if="props.item.role<50">USER</div>
+            <div v-else>ADMIN</div>
             <template v-slot:input>
               <v-radio-group v-model="props.item.role">
                 <v-radio
                         label="ADMIN"
-                        value="ADMIN"
+                        value= 99
                 ></v-radio>
                 <v-radio
                         label="USER"
-                        value="USER"
+                        value= 1
                 ></v-radio>
               </v-radio-group>
             </template>
@@ -54,21 +55,35 @@
     },
     async mounted() {
       let user = this.getUser;
-      if (user.role !== 'ADMIN') {
+      if (user.role < 50) {
         alert('해당 페이지에 접근 할 수 없습니다.');
         this.$router.push('/');
       }
 
-      let response = await axios.get(config.AUTH_HOST + '/admin/users', {
+      let response = await axios.get(this.auth_server + '/admin/users', {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('accessToken')
         }
       });
 
+      if(!response.data.success) {
+        if(!await this.$store.dispatch('refreshToken')){
+          this.$router.push('/');
+          return;
+        }
+
+        response = await axios.get(this.auth_server + '/admin/users', {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('accessToken')
+          }
+        });
+      }
       this.users = response.data.data;
     },
     data() {
       return {
+        auth_server: config.AUTH_HOST,
+        resume_server: config.RESUME_HOST,
         dialog: false,
         headers: [
           {text: 'id', value: 'id'},
@@ -82,8 +97,25 @@
     methods: {
       async save (item) {
         let payload = { id: item.id, role: item.role };
-        let config = {headers: { Authorization: 'Bearer ' + localStorage.getItem('accessToken') }};
-        let response = await axios.put(config.AUTH_HOST + '/admin/users/update/role', payload, config);
+
+        let response = await axios.put(this.auth_server + '/admin/users/update/role', payload, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('accessToken')
+          }
+        });
+
+        if(!response.data.success) {
+          if(!await this.$store.dispatch('refreshToken')){
+            this.$router.push('/');
+            return;
+          }
+
+          response = await axios.put(this.auth_server + '/admin/users/update/role', payload, {
+            headers: {
+              Authorization: 'Bearer ' + localStorage.getItem('accessToken')
+            }
+          });
+        }
 
         alert(response.data.message);
       }

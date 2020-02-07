@@ -33,11 +33,6 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void updatePassword(User user) {
-        session.update("user.updatePassword", user);
-    }
-
-    @Override
     public List<User> findUsers() {
         return session.selectList("user.findUsers");
     }
@@ -48,19 +43,38 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void updateNickname(int userId, String nickname) {
+    public int updatePassword(String email, String passwd, String updatedAt) {
         HashMap<String, String> map = new HashMap<>();
-        map.put("id", String.valueOf(userId));
-        map.put("nickname", nickname);
-        session.update("user.updateNickname", map);
+        map.put("email", email);
+        map.put("passwd", passwd);
+        map.put("updatedAt", updatedAt);
+        return session.update("user.updatePassword", map);
     }
 
     @Override
-    public int updateRole(int id, String role) {
+    public int updateNickname(int userId, String nickname, String updatedAt) {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("id", String.valueOf(userId));
+        map.put("nickname", nickname);
+        map.put("updatedAt", updatedAt);
+        return session.update("user.updateNickname", map);
+    }
+
+    @Override
+    public int updateRole(int id, int role, String updatedAt) {
         HashMap<String, String> map = new HashMap<>();
         map.put("id", String.valueOf(id));
-        map.put("role", role);
+        map.put("role", String.valueOf(role));
+        map.put("updatedAt", updatedAt);
         return session.update("user.updateRole",map);
+    }
+
+    @Override
+    public int updateAccessedAt(Integer id, String accessedAt) {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("id", String.valueOf(id));
+        map.put("accessedAt", accessedAt);
+        return session.update("user.updateAccessedAt", map);
     }
 
 }
