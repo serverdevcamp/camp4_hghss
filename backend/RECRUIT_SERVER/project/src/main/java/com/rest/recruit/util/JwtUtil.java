@@ -53,7 +53,7 @@ public class JwtUtil {
         Claims claims = getClaims(token);
 
 //        System.out.print("\nroletest\n");꿈
-  //      System.out.print(claims.get("tokenType")); //대문자로 access_token / refresh_token check!!!!!! // role index로 바꿈!!!!!!!!
+        //      System.out.print(claims.get("tokenType")); //대문자로 access_token / refresh_token check!!!!!! // role index로 바꿈!!!!!!!!
 /*
         String email = claims.getSubject();
         String grade = (String) ((List) claims.get("roles")).get(0);

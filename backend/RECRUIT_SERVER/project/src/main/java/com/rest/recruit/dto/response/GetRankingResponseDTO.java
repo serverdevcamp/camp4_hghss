@@ -12,6 +12,7 @@ public class GetRankingResponseDTO {
     private int companyId;
     private double count;
     private String companyName;
+    private String endTime;
 
     public GetRankingResponseDTO(String[] array, double count, int rank) {
 
@@ -20,5 +21,6 @@ public class GetRankingResponseDTO {
         this.companyName = array[3];
         this.count = count;
         this.rank  = rank;
+        this.endTime = array[0];
     }
 }

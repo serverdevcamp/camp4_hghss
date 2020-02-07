@@ -1,11 +1,11 @@
 package com.rest.recruit.interceptor;
 
+import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
 import com.rest.recruit.exception.ExpiredTokenException;
 import com.rest.recruit.exception.UnauthorizedException;
 import com.rest.recruit.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;

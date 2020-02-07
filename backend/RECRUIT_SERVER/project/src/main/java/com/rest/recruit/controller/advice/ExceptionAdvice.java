@@ -1,9 +1,11 @@
 package com.rest.recruit.controller.advice;
 
 
+import com.rest.recruit.dto.ResultResponse;
 import com.rest.recruit.dto.ResultResponseWithoutData;
 import com.rest.recruit.dto.SimpleResponse;
 import com.rest.recruit.exception.*;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -56,6 +58,7 @@ public class ExceptionAdvice {
                 .status("400")
                 .success("false").build());
     }
+
 
     /**
      *  ParseException
@@ -122,14 +125,29 @@ public class ExceptionAdvice {
      *  만료된 토큰인 경우
      *
      */
+
     @ExceptionHandler(ExpiredTokenException.class)
+//    @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity handleExpiredTokenException(ExpiredTokenException e) {
-        return SimpleResponse.ok(ResultResponseWithoutData.builder()
+        return SimpleResponse.ok(ResultResponse.builder()
                 .message(e.getMessage())
-                .status("401")
+                .status("402")
                 .success("false").build());
     }
 
+    //token eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhdXRoLkhHSFNTQGdtYWlsLmNvbSIsInVzZXJJZCI6MSwiZW1haWwiOiJhdXRoLkhHSFNTQGdtYWlsLmNvbSIsIm5pY2tuYW1lIjoi6rCA64OY7ZSIIOqwgOqwnOu5hCIsInJvbGUiOjEsInRva2VuVHlwZSI6IkFDQ0VTU19UT0tFTiIsImV4cCI6MTU4MTkzODk5OX0=.PswxsPdt2c4tZCBQotlkVvXtdDOLYQBWmNxwzh8dJhs=
 
+    /**
+     *  Expired Jwt exception
+     *  jwtException 이용한 global 레벨의 만료된 토큰인 경우
+     *
+     */
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity handleExpiredJwtException(ExpiredJwtException e) {
+        return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                .message("만료된 토큰입니다.")
+                .status("402")
+                .success("false").build());
+    }
 
 }
