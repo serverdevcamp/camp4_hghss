@@ -97,7 +97,6 @@ export default {
     // 채팅 구독
     addChat(context, payload){
       // 구독체크
-      console.log("시작이 두번나와야겎ㅆ지?")
       var access_token = localStorage.getItem('accessToken')
       if(!context.state.myChat.hasOwnProperty(payload.company_id)){
         // 구독!

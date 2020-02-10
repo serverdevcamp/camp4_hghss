@@ -2,7 +2,9 @@
   <section id="resume">
     <v-row class="resume-header">
       <v-col class="title point-font">2020 상반기 자기소개서 🌸</v-col>
-      <v-col>여기는 버튼 넣을 거야 ㅇㅇ</v-col>
+      <v-col>
+        <!-- 버튼 넣을 곳 -->
+      </v-col>
     </v-row>
     <v-row class="drag-drop-section">
       <v-col class="resume-items-1">
@@ -11,7 +13,12 @@
         </v-row>
         <v-row>
           <p class="subtitle point-font">작성 중</p>
-          <div id="1-1" class="drop-box" v-on:drop="drop($event)" v-on:dragover="allowDrop($event)">
+          <div
+            id="box1-1"
+            class="drop-box"
+            v-on:drop="drop($event)"
+            v-on:dragover="allowDrop($event)"
+          >
             <!-- CARD -->
             <div
               class="resume-card"
@@ -19,9 +26,9 @@
               v-on:dragstart="drag($event)"
               v-for="(resume, index) in getResume['1']['1']"
               :key="index"
-              :id="resume.recruitId"
+              :id="resume.recruitId+'_'+resume.id"
             >
-              <div class="card" v-on:click="showModal('여기에 회사 아이디')">
+              <div class="card" v-on:click="showModal(resume)">
                 <div class="company">{{resume.title}}</div>
                 <div class="date" v-if="new Date(resume.endTime) > today">
                   <span class="d-day">{{ getDDay(resume.endTime) }}</span>
@@ -29,7 +36,7 @@
                   {{ resume.endTime.substring(11,16)}}
                 </div>
                 <div class="date-alert" v-else>
-                  <font-awesome-icon icon="bell" />기간이 지났습니다.
+                  <font-awesome-icon icon="bell" /> 기간이 지났습니다.
                 </div>
               </div>
             </div>
@@ -37,7 +44,12 @@
         </v-row>
         <v-row>
           <p class="subtitle point-font">제출완료</p>
-          <div id="1-2" class="drop-box" v-on:drop="drop($event)" v-on:dragover="allowDrop($event)">
+          <div
+            id="box1-2"
+            class="drop-box"
+            v-on:drop="drop($event)"
+            v-on:dragover="allowDrop($event)"
+          >
             <!-- CARD -->
             <div
               class="resume-card"
@@ -45,14 +57,17 @@
               v-on:dragstart="drag($event)"
               v-for="(resume, index) in getResume['1']['2']"
               :key="index"
-              :id="resume.recruitId"
+              :id="resume.recruitId+'_'+resume.id"
             >
-              <div class="card" v-on:click="showModal('여기에 회사 아이디')">
+              <div class="card" v-on:click="showModal(resume)">
                 <div class="company">{{resume.title}}</div>
                 <div class="date" v-if="new Date(resume.endTime) > today">
                   <span class="d-day">{{ getDDay(resume.endTime) }}</span>
                   {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
                   {{ resume.endTime.substring(11,16)}}
+                </div>
+                <div class="date-alert" v-else>
+                  <font-awesome-icon icon="bell" /> 기간이 지났습니다.
                 </div>
               </div>
             </div>
@@ -60,7 +75,12 @@
         </v-row>
         <v-row>
           <p class="subtitle point-font">미제출</p>
-          <div id="1-3" class="drop-box" v-on:drop="drop($event)" v-on:dragover="allowDrop($event)">
+          <div
+            id="box1-3"
+            class="drop-box"
+            v-on:drop="drop($event)"
+            v-on:dragover="allowDrop($event)"
+          >
             <!-- CARD -->
             <div
               class="resume-card"
@@ -68,10 +88,18 @@
               v-on:dragstart="drag($event)"
               v-for="(resume, index) in getResume['1']['3']"
               :key="index"
-              :id="resume.recruitId"
+              :id="resume.recruitId+'_'+resume.id"
             >
-              <div class="card" v-on:click="showModal('여기에 회사 아이디')">
+              <div class="card" v-on:click="showModal(resume)">
                 <div class="company">{{resume.title}}</div>
+                <div class="date" v-if="new Date(resume.endTime) > today">
+                  <span class="d-day">{{ getDDay(resume.endTime) }}</span>
+                  {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
+                  {{ resume.endTime.substring(11,16)}}
+                </div>
+                <div class="date-alert" v-else>
+                  <font-awesome-icon icon="bell" /> 기간이 지났습니다.
+                </div>
               </div>
             </div>
           </div>
@@ -87,7 +115,7 @@
             <v-row>
               <p class="subtitle point-font">합격</p>
               <div
-                id="2-1"
+                id="box2-1"
                 class="drop-box"
                 v-on:drop="drop($event)"
                 v-on:dragover="allowDrop($event)"
@@ -99,10 +127,18 @@
                   v-on:dragstart="drag($event)"
                   v-for="(resume, index) in getResume['2']['1']"
                   :key="index"
-                  :id="resume.recruitId"
+                  :id="resume.recruitId+'_'+resume.id"
                 >
-                  <div class="card" v-on:click="showModal('여기에 회사 아이디')">
+                  <div class="card" v-on:click="showModal(resume)">
                     <div class="company">{{resume.title}}</div>
+                    <div class="date" v-if="new Date(resume.endTime) > today">
+                      <span class="d-day">{{ getDDay(resume.endTime) }}</span>
+                      {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
+                      {{ resume.endTime.substring(11,16)}}
+                    </div>
+                    <div class="date-alert" v-else>
+                      <font-awesome-icon icon="bell" /> 기간이 지났습니다.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -110,7 +146,7 @@
             <v-row>
               <p class="subtitle point-font">불합격</p>
               <div
-                id="2-2"
+                id="box2-2"
                 class="drop-box"
                 v-on:drop="drop($event)"
                 v-on:dragover="allowDrop($event)"
@@ -122,10 +158,18 @@
                   v-on:dragstart="drag($event)"
                   v-for="(resume, index) in getResume['2']['2']"
                   :key="index"
-                  :id="resume.recruitId"
+                  :id="resume.recruitId+'_'+resume.id"
                 >
-                  <div class="card" v-on:click="showModal('여기에 회사 아이디')">
+                  <div class="card" v-on:click="showModal(resume)">
                     <div class="company">{{resume.title}}</div>
+                    <div class="date" v-if="new Date(resume.endTime) > today">
+                      <span class="d-day">{{ getDDay(resume.endTime) }}</span>
+                      {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
+                      {{ resume.endTime.substring(11,16)}}
+                    </div>
+                    <div class="date-alert" v-else>
+                      <font-awesome-icon icon="bell" /> 기간이 지났습니다.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -138,7 +182,7 @@
             <v-row>
               <p class="subtitle point-font">합격</p>
               <div
-                id="3-1"
+                id="box3-1"
                 class="drop-box"
                 v-on:drop="drop($event)"
                 v-on:dragover="allowDrop($event)"
@@ -150,10 +194,18 @@
                   v-on:dragstart="drag($event)"
                   v-for="(resume, index) in getResume['3']['1']"
                   :key="index"
-                  :id="resume.recruitId"
+                  :id="resume.recruitId+'_'+resume.id"
                 >
-                  <div class="card" v-on:click="showModal('여기에 회사 아이디')">
+                  <div class="card" v-on:click="showModal(resume)">
                     <div class="company">{{resume.title}}</div>
+                    <div class="date" v-if="new Date(resume.endTime) > today">
+                      <span class="d-day">{{ getDDay(resume.endTime) }}</span>
+                      {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
+                      {{ resume.endTime.substring(11,16)}}
+                    </div>
+                    <div class="date-alert" v-else>
+                      <font-awesome-icon icon="bell" /> 기간이 지났습니다.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -161,7 +213,7 @@
             <v-row>
               <p class="subtitle point-font">불합격</p>
               <div
-                id="3-2"
+                id="box3-2"
                 class="drop-box"
                 v-on:drop="drop($event)"
                 v-on:dragover="allowDrop($event)"
@@ -173,10 +225,18 @@
                   v-on:dragstart="drag($event)"
                   v-for="(resume, index) in getResume['3']['2']"
                   :key="index"
-                  :id="resume.recruitId"
+                  :id="resume.recruitId+'_'+resume.id"
                 >
-                  <div class="card" v-on:click="showModal('여기에 회사 아이디')">
+                  <div class="card" v-on:click="showModal(resume)">
                     <div class="company">{{resume.title}}</div>
+                    <div class="date" v-if="new Date(resume.endTime) > today">
+                      <span class="d-day">{{ getDDay(resume.endTime) }}</span>
+                      {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
+                      {{ resume.endTime.substring(11,16)}}
+                    </div>
+                    <div class="date-alert" v-else>
+                      <font-awesome-icon icon="bell" /> 기간이 지났습니다.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -189,7 +249,7 @@
             <v-row>
               <p class="subtitle point-font">합격</p>
               <div
-                id="4-1"
+                id="box4-1"
                 class="drop-box"
                 v-on:drop="drop($event)"
                 v-on:dragover="allowDrop($event)"
@@ -201,10 +261,18 @@
                   v-on:dragstart="drag($event)"
                   v-for="(resume, index) in getResume['4']['1']"
                   :key="index"
-                  :id="resume.recruitId"
+                  :id="resume.recruitId+'_'+resume.id"
                 >
-                  <div class="card" v-on:click="showModal('여기에 회사 아이디')">
+                  <div class="card" v-on:click="showModal(resume)">
                     <div class="company">{{resume.title}}</div>
+                    <div class="date" v-if="new Date(resume.endTime) > today">
+                      <span class="d-day">{{ getDDay(resume.endTime) }}</span>
+                      {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
+                      {{ resume.endTime.substring(11,16)}}
+                    </div>
+                    <div class="date-alert" v-else>
+                      <font-awesome-icon icon="bell" /> 기간이 지났습니다.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -212,7 +280,7 @@
             <v-row>
               <p class="subtitle point-font">불합격</p>
               <div
-                id="4-2"
+                id="box4-2"
                 class="drop-box"
                 v-on:drop="drop($event)"
                 v-on:dragover="allowDrop($event)"
@@ -224,10 +292,18 @@
                   v-on:dragstart="drag($event)"
                   v-for="(resume, index) in getResume['4']['2']"
                   :key="index"
-                  :id="resume.recruitId"
+                  :id="resume.recruitId+'_'+resume.id"
                 >
-                  <div class="card" v-on:click="showModal('여기에 회사 아이디')">
+                  <div class="card" v-on:click="showModal(resume)">
                     <div class="company">{{resume.title}}</div>
+                    <div class="date" v-if="new Date(resume.endTime) > today">
+                      <span class="d-day">{{ getDDay(resume.endTime) }}</span>
+                      {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
+                      {{ resume.endTime.substring(11,16)}}
+                    </div>
+                    <div class="date-alert" v-else>
+                      <font-awesome-icon icon="bell" /> 기간이 지났습니다.
+                    </div>
                   </div>
                 </div>
               </div>
@@ -242,7 +318,12 @@
         </v-row>
         <v-row>
           <p class="subtitle point-font">합격</p>
-          <div id="5-1" class="drop-box" v-on:drop="drop($event)" v-on:dragover="allowDrop($event)">
+          <div
+            id="box5-1"
+            class="drop-box"
+            v-on:drop="drop($event)"
+            v-on:dragover="allowDrop($event)"
+          >
             <!-- CARD -->
             <div
               class="resume-card"
@@ -250,17 +331,30 @@
               v-on:dragstart="drag($event)"
               v-for="(resume, index) in getResume['5']['1']"
               :key="index"
-              :id="resume.recruitId"
+              :id="resume.recruitId+'_'+resume.id"
             >
-              <div class="card" v-on:click="showModal('여기에 회사 아이디')">
+              <div class="card" v-on:click="showModal(resume)">
                 <div class="company">{{resume.title}}</div>
+                <div class="date" v-if="new Date(resume.endTime) > today">
+                  <span class="d-day">{{ getDDay(resume.endTime) }}</span>
+                  {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
+                  {{ resume.endTime.substring(11,16)}}
+                </div>
+                <div class="date-alert" v-else>
+                  <font-awesome-icon icon="bell" /> 기간이 지났습니다.
+                </div>
               </div>
             </div>
           </div>
         </v-row>
         <v-row>
           <p class="subtitle point-font">불합격</p>
-          <div id="5-2" class="drop-box" v-on:drop="drop($event)" v-on:dragover="allowDrop($event)">
+          <div
+            id="box5-2"
+            class="drop-box"
+            v-on:drop="drop($event)"
+            v-on:dragover="allowDrop($event)"
+          >
             <!-- CARD -->
             <div
               class="resume-card"
@@ -268,10 +362,18 @@
               v-on:dragstart="drag($event)"
               v-for="(resume, index) in getResume['5']['2']"
               :key="index"
-              :id="resume.recruitId"
+              :id="resume.recruitId+'_'+resume.id"
             >
-              <div class="card" v-on:click="showModal('여기에 회사 아이디')">
+              <div class="card" v-on:click="showModal(resume)">
                 <div class="company">{{resume.title}}</div>
+                <div class="date" v-if="new Date(resume.endTime) > today">
+                  <span class="d-day">{{ getDDay(resume.endTime) }}</span>
+                  {{ resume.endTime.substring(0,10).replace(/-/gi,'.') }}
+                  {{ resume.endTime.substring(11,16)}}
+                </div>
+                <div class="date-alert" v-else>
+                  <font-awesome-icon icon="bell" /> 기간이 지났습니다.
+                </div>
               </div>
             </div>
           </div>
@@ -289,21 +391,43 @@ export default {
     ResumeModal
   },
   data: () => ({
-    today: new Date()
+    today: new Date(),
+    // before_col: "",
+    // before_row: ""
   }),
   computed: {
     ...mapGetters(["getResume"])
   },
   methods: {
-    ...mapActions(["resumeListAPI"]),
+    ...mapActions(["resumeListAPI", "moveResume"]),
     drag(e) {
       e.dataTransfer.setData("text", e.target.id);
+      // for (var i in e.path) {
+      //   if (e.path[i].classList.contains("drop-box")) {
+      //     var col_row = (e.path[i].id + "").substring(3).split("-");
+      //     this.before_col = col_row[0];
+      //     this.before_row = col_row[1];
+      //   }
+      // }
     },
     drop(e) {
       e.preventDefault();
       for (var i in e.path) {
         if (e.path[i].classList.contains("drop-box")) {
           var data = e.dataTransfer.getData("text");
+          // 움직임 표시
+          var resume_id = data.split("_")[1];
+          var col_row = (e.path[i].id + "").substring(3).split("-");
+
+          this.moveResume({
+            resume_id: resume_id,
+            col: col_row[0],
+            row: col_row[1],
+            // before_col: this.before_col,
+            // before_row: this.before_row
+          });
+
+          // resumeid를 row, col
           e.path[i].appendChild(document.getElementById(data));
           break;
         }
@@ -318,7 +442,7 @@ export default {
     getDDay(endDate) {
       var end_date = new Date(endDate);
       var between = end_date - this.today;
-      if (between < 0) return " 기간이 지났습니다.";
+      if (between < 0) return "기간이 지났습니다.";
 
       var d_day = between / (24 * 3600 * 1000);
       if (d_day < 1) {
@@ -327,8 +451,8 @@ export default {
       return "D-" + parseInt(d_day) + "일";
     }
   },
-  mounted(){
-    this.resumeListAPI()
+  mounted() {
+    this.resumeListAPI();
   }
 };
 </script>
@@ -398,6 +522,25 @@ $drop-box: #dddee0;
       padding-left: 10px;
       font-size: 0.95rem;
       color: #777777;
+    }
+    // drop-box
+    #box2-1,
+    #box2-2,
+    #box3-1,
+    #box3-2,
+    #box4-1,
+    #box4-2,
+    #box5-1,
+    #box5-2 {
+      .date,
+      .date-alert {
+        display: none;
+      }
+    }
+    #box1-2, #box1-3{
+      .date-alert {
+        display: none;
+      }
     }
     .drop-box {
       width: 100%;

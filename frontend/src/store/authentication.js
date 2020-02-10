@@ -14,6 +14,9 @@ export default {
   getters: {
     getUser(state) {
       return state.user;
+    },
+    is_user_login(state){
+      return state.user.email ? true : false 
     }
   },
   mutations: {
