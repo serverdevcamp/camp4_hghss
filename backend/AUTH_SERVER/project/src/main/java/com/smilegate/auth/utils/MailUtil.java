@@ -47,10 +47,11 @@ public class MailUtil {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
             message.setSubject("[합격하소서] 인증코드 전송");
 
-            message.setContent("<h1>[이메일 인증]</h1> <p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p> " +
-//                    "<a href='http://localhost:8000/users/signup/confirm?key="
-                    "<a href='http://10.99.13.27:8000/users/signup/confirm?key="
-                    +key +"' target='_blenk'>이메일 인증 확인</a>","text/html;charset=euc-kr");
+            message.setContent(
+                    "<h1>[이메일 인증]</h1> <p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p> " +
+                    "<a href='http://10.99.13.27:8000/users/signup/confirm?key=" + key + "' target='_blenk'>이메일 인증 확인</a>"
+                    , "text/html;charset=euc-kr"
+            );
 
             Transport.send(message);
         } catch (Exception e) {
