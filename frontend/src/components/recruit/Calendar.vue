@@ -112,11 +112,15 @@ export default {
   methods: {
     ...mapActions(["calendarAPI", "likeToggle"]),
     async likeOrUnlike(action, company) {
-      var favorite = await this.likeToggle({
-        recruit_id: company.recruitId,
-        action: action
-      });
-      company.favorite = favorite;
+      if (sessionStorage.getItem("email")) {
+        var favorite = await this.likeToggle({
+          recruit_id: company.recruitId,
+          action: action
+        });
+        company.favorite = favorite;
+      }else{
+        alert("로그인 후 사용해주세요.")
+      }
     },
     showCompanyModal(company) {
       this.$modal.show("company-modal", { company: company });
@@ -225,12 +229,6 @@ export default {
 
     this.makeCalendarPage();
   },
-  // mounted() {
-  //   let company = {
-  //     recruitId: 35868,
-  //   };
-  //   this.$modal.show("company-modal", { company: company });
-  // }
 };
 </script>
 <style lang="scss">

@@ -12,8 +12,6 @@ export default {
   },
   actions: {
     calendarAPI(context, payload) {
-      var access_token = localStorage.getItem('accessToken')
-
       return axios({
         method: 'get',
         url: config.RECRUIT_HOST + '/recruits/calendar',
@@ -21,7 +19,7 @@ export default {
         headers: {
           "Content-Type": "application/json",
           'Access-Control-Allow-Origin': '*',
-          'Authorization': 'Bearer '+ access_token,
+          'Authorization': 'Bearer '+ config.access_token,
         }
       }).then(response => {
         let status = response.data.status
@@ -37,7 +35,6 @@ export default {
       })
     },
     likeToggle(context, payload){     
-      var access_token = localStorage.getItem('accessToken')
       var method = ['post', 'delete']
       var path = ['like', 'unlike']
       
@@ -47,7 +44,7 @@ export default {
         headers: {
           "Content-Type": "application/json",
           'Access-Control-Allow-Origin': '*',
-          'Authorization': 'Bearer '+ access_token,
+          'Authorization': 'Bearer '+ config.access_token,
         }
       }).then(response => {
         if (response.data.status == 200) {

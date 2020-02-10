@@ -97,7 +97,6 @@ export default {
     // 채팅 구독
     addChat(context, payload){
       // 구독체크
-      var access_token = localStorage.getItem('accessToken')
       if(!context.state.myChat.hasOwnProperty(payload.company_id)){
         // 구독!
         context.state.myChat[payload.company_id] = {
@@ -110,7 +109,7 @@ export default {
           headers: {
             "Content-Type": "application/json",
             'Access-Control-Allow-Origin': '*',
-            'Authorization': 'Bearer ' + access_token,
+            'Authorization': 'Bearer ' + config.access_token,
           }
         }).then(response => {
           if(response.data.status == 402){
@@ -135,7 +134,6 @@ export default {
       return true
     },
     async userChatAPI(context) {
-      var access_token = localStorage.getItem('accessToken')
       var chatURL = ['/my', '/favorite', '/hot']
       for (let i = 0; i < 3; i++) {
         await axios({
@@ -144,7 +142,7 @@ export default {
           headers: {
             "Content-Type": "application/json",
             'Access-Control-Allow-Origin': '*',
-            'Authorization': 'Bearer ' + access_token,
+            'Authorization': 'Bearer ' + config.access_token,
           }
         }).then(response => {
           if (response.data.status == 200) {

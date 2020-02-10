@@ -28,7 +28,7 @@
           </v-row>
           <v-row class="recruit-date">
             <p>
-              {{ startTime}} 
+              {{ startTime}}
               ~ {{ endTime }}
               <!-- TODO : 날짜 계산 -->
             </p>
@@ -84,18 +84,23 @@ export default {
     ],
     company: {},
     recruit: {},
-    startTime : '',
-    endTime: '',
+    startTime: "",
+    endTime: ""
   }),
   methods: {
     ...mapActions(["likeToggle", "addChat", "createResume"]),
     async likeOrUnlike(action) {
-      var favorite = await this.likeToggle({
-        recruit_id: this.company.recruitId,
-        action: action
-      });
-      this.recruit.favorite = favorite;
-      this.company.favorite = favorite;
+      if (sessionStorage.getItem("email")) {
+        // 로그인된 사용자만 좋아요 가능
+        var favorite = await this.likeToggle({
+          recruit_id: this.company.recruitId,
+          action: action
+        });
+        this.recruit.favorite = favorite;
+        this.company.favorite = favorite;
+      }else{
+        alert("로그인 후 사용해주세요.")
+      }
     },
     beforeOpen(event) {
       this.company = event.params.company;
@@ -112,12 +117,14 @@ export default {
       }).then(response => {
         if (response.data.status == 200) {
           this.recruit = response.data.data;
-          var s_date = this.recruit.startTime.split("-")
-          var e_date = this.recruit.endTime.split("-")
+          var s_date = this.recruit.startTime.split("-");
+          var e_date = this.recruit.endTime.split("-");
 
-          this.startTime = s_date.slice(0,3).join("-") + " " + s_date.slice(3).join(":")
-          this.endTime = e_date.slice(0,3).join("-") + " " + e_date.slice(3).join(":")
-          
+          this.startTime =
+            s_date.slice(0, 3).join("-") + " " + s_date.slice(3).join(":");
+          this.endTime =
+            e_date.slice(0, 3).join("-") + " " + e_date.slice(3).join(":");
+
           return true;
         }
         console.log(response.data.message);
@@ -137,28 +144,32 @@ export default {
       this.$modal.hide("company-modal");
     },
     writeResume(recruit, employment) {
-      if(confirm("자기소개서를 작성하시겠습니까?")){
+      if (confirm("자기소개서를 작성하시겠습니까?")) {
         var answers = [];
         employment.resumeQuestion.forEach(q => {
-          answers.push({
-            question_content: q.question_content,
-            answer_content: "",
-            question_limit: q.question_limit
+          answers.push({        
+            questionContent: q.questionContent,
+            answerContent: "",
+            questionLimit: q.questionLimit
           });
         });
-        var date_split = recruit.endTime.split("-")
+        var date_split = recruit.endTime.split("-");
         var body = {
           title: recruit.companyName + " " + employment.field,
-          endTime: date_split.slice(0,3).join("-") + " " + date_split.slice(3).join(":")+":00",
-          answers: answers,
+          endTime:
+            date_split.slice(0, 3).join("-") +
+            " " +
+            date_split.slice(3).join(":") +
+            ":00",
+          answers: answers
         };
         this.createResume({
           position_id: employment.positionId,
-          body: body,
+          body: body
         });
       }
     }
-  },
+  }
 };
 </script>
 <style lang="scss">
@@ -285,7 +296,7 @@ $end: #3f4b5e;
           letter-spacing: 0.03rem;
           color: #707070;
         }
-        .d-content{
+        .d-content {
           padding-left: 15px;
           padding-right: 15px;
           text-align: left;
