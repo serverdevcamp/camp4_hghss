@@ -50,8 +50,8 @@ export default {
       }
 
       if (typeof (Storage) !== 'undefined') {
-        localStorage.setItem('accessToken', response.data.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.data.refreshToken);
+        sessionStorage.setItem('accessToken', response.data.data.accessToken);
+        sessionStorage.setItem('refreshToken', response.data.data.refreshToken);
       } else {
         console.error('로컬스토리지를 사용 할 수 없습니다.');
         return;
@@ -73,7 +73,7 @@ export default {
     async signout({ commit }) {
       const response = await axios.get(config.AUTH_HOST + '/users/signout', {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('refreshToken')
+          Authorization: 'Bearer ' + sessionStorage.getItem('refreshToken')
         }
       });
 
@@ -81,8 +81,8 @@ export default {
 
       commit('signout');
 
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
 
       sessionStorage.removeItem('nickname');
       sessionStorage.removeItem('email');
@@ -94,31 +94,35 @@ export default {
       router.go()
     },
     async refreshToken({ commit, dispatch }, payload) {
-      let refreshToken = localStorage.getItem('refreshToken');
+      let refreshToken = sessionStorage.getItem('refreshToken');
       const response = await axios.get(config.AUTH_HOST + '/users/refresh', {
         headers: {
           Authorization: 'Bearer ' + refreshToken
         }
       });
+
       if (response.data.success) {
-        localStorage.setItem('accessToken', response.data.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.data.refreshToken);
+        sessionStorage.setItem('accessToken', response.data.data.accessToken);
+        sessionStorage.setItem('refreshToken', response.data.data.refreshToken);
         commit('setUserInfo', response.data.data);
-        
+
         /**** 함수 재실행 ****/
         //context.dispatch('refreshToken',{funcName: '실행시키고싶은 함수이름', param: '인자'})
-        dispatch(payload.funcName, payload.param)
+        if(payload != null) dispatch(payload.funcName, payload.param);
 
+        return true;
       } else {
         alert('세션이 만료되었습니다.');
 
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('accessToken');
+        sessionStorage.removeItem('refreshToken');
+        sessionStorage.removeItem('accessToken');
 
         sessionStorage.removeItem('nickname');
         sessionStorage.removeItem('email');
         sessionStorage.removeItem('role');
         sessionStorage.removeItem('id');
+
+        return false;
       }
       
 
