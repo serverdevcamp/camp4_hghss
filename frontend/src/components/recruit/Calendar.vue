@@ -73,17 +73,12 @@
         </v-col>
       </v-row>
     </div>
-    <Detail />
   </section>
 </template>
 <script>
-import Detail from "./Detail";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-  components: {
-    Detail
-  },
   data: () => ({
     months: [
       "January",
@@ -229,7 +224,13 @@ export default {
     this.date = this.today.getDate();
 
     this.makeCalendarPage();
-  }
+  },
+  // mounted() {
+  //   let company = {
+  //     recruitId: 35868,
+  //   };
+  //   this.$modal.show("company-modal", { company: company });
+  // }
 };
 </script>
 <style lang="scss">
@@ -305,7 +306,7 @@ $end: #3f4b5e;
       border-top: 1px solid $calendar-border;
     }
     .day-wrapper {
-      width:calc(100% / 7);
+      width: calc(100% / 7);
       border-left: 1px solid $calendar-border;
       .title-wrapper {
         padding: 5px 0;
@@ -351,7 +352,7 @@ $end: #3f4b5e;
           color: #ffffff;
         }
         .company-name {
-          width:calc(100% - 28px);
+          width: calc(100% - 28px);
           margin: 0 3px;
           padding-top: 3px;
           line-height: 1rem;

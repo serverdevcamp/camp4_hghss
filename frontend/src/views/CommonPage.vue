@@ -11,10 +11,12 @@
     <div class="chat-section" :class="{'chat-open':$store.state.template.ChatState}">
       <Chat />
     </div>
+    <Detail /> 
   </v-row>
 </template>
 
 <script>
+import Detail from "@/components/recruit/Detail"
 import Calendar from "@/components/recruit/Calendar";
 import Resume from "@/components/resume/Resume";
 import Chat from "@/components/chat/Chat";
@@ -26,6 +28,7 @@ export default {
     Resume,
     Chat,
     ResumeWrite,
+    Detail,
   },
   data: () => ({})
 };
