@@ -311,7 +311,6 @@
           </c-col>
         </v-row>
       </v-col>
-
       <v-col class="resume-items-3">
         <v-row>
           <p class="title point-font">3차 전형</p>

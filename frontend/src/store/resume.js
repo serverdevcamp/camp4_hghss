@@ -20,6 +20,96 @@ export default {
     },
   },
   actions: {
+    // 추가
+    addAnswer(context, payload) {
+      var access_token = localStorage.getItem('accessToken')
+      return axios({
+        method: 'post',
+        url: config.RESUME_HOST + '/resumes/answer/add/' + payload.resume_id,
+        headers: {
+          "Content-Type": "application/json",
+          'Access-Control-Allow-Origin': '*',
+          'Authorization': 'Bearer ' + access_token,
+        },
+      }).then(async response => {
+        if (response.data.status == 200) {
+          return response.data.data
+        }
+        if (response.data.status == 402) {
+          let refresh = await context.dispatch('refreshToken')
+          if (refresh == true) {
+            return context.dispatch('addResume', payload)
+          }
+        }
+      })
+    },
+    // 삭제
+    deleteAnswer(context, payload) {
+      var access_token = localStorage.getItem('accessToken')
+      axios({
+        method: 'delete',
+        url: config.RESUME_HOST + '/resumes/answer/delete/' + payload.answer_id,
+        headers: {
+          "Content-Type": "application/json",
+          'Access-Control-Allow-Origin': '*',
+          'Authorization': 'Bearer ' + access_token,
+        },
+      }).then(async response => {
+        if (response.data.status == 200) {
+          console.log("삭제완료!")
+        }
+        if (response.data.status == 402) {
+          context.dispatch('refreshToken', { funcName: 'deleteAnswer', param: payload })
+        }
+      })
+    },
+    // 저장
+    saveResume(context, payload) {
+      var access_token = localStorage.getItem('accessToken')
+      axios({
+        method: 'put',
+        url: config.RESUME_HOST + '/resumes/save/' + payload.resume_id,
+        headers: {
+          "Content-Type": "application/json",
+          'Access-Control-Allow-Origin': '*',
+          'Authorization': 'Bearer ' + access_token,
+        },
+        data: payload.body
+      }).then(response => {
+        if (response.data.status == 200) {
+          console.log("저장완료!")
+        }
+        if (response.data.status == 402) {
+          context.dispatch('refreshToken', { funcName: 'saveResume', param: payload })
+        }
+      })
+    },
+    // 상세조회
+    detailResume(context, payload) {
+      var access_token = localStorage.getItem('accessToken')
+      return axios({
+        method: "get",
+        url: config.RESUME_HOST + "/resumes/" + payload.resume_id,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          'Authorization': 'Bearer ' + access_token,
+        }
+      }).then(async response => {
+        if (response.data.status == 200) {
+          return response.data.data
+        }
+        if (response.data.status == 402) {
+          let refresh = await context.dispatch('refreshToken')
+          if (refresh == true) {
+            // 리프레시 완료시 다시 호출
+            return context.dispatch('detailResume', payload)
+          }
+        }
+        // 이경우는 로그인이 안된거거나 해당하는 자소서 없음
+        return false
+      });
+    },
     // 만들기
     createResume(context, payload) {
       var access_token = localStorage.getItem('accessToken')
@@ -34,8 +124,6 @@ export default {
         data: payload.body
       }).then(response => {
         if (response.data.status == 200) {
-          // 새로 만든 리스트 다시 부르기 + 알파
-          alert('자기소개서를 새로 생성합니다.')
           context.dispatch('resumeListAPI')
         }
         if (response.data.status == 402) {

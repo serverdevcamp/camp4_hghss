@@ -28,7 +28,8 @@
           </v-row>
           <v-row class="recruit-date">
             <p>
-              {{ recruit.startTime }} ~ {{ recruit.endTime }}
+              {{ startTime}} 
+              ~ {{ endTime }}
               <!-- TODO : 날짜 계산 -->
             </p>
           </v-row>
@@ -82,7 +83,9 @@ export default {
       "신입/인턴"
     ],
     company: {},
-    recruit: {}
+    recruit: {},
+    startTime : '',
+    endTime: '',
   }),
   methods: {
     ...mapActions(["likeToggle", "addChat", "createResume"]),
@@ -109,7 +112,12 @@ export default {
       }).then(response => {
         if (response.data.status == 200) {
           this.recruit = response.data.data;
-          console.log(this.recruit)
+          var s_date = this.recruit.startTime.split("-")
+          var e_date = this.recruit.endTime.split("-")
+
+          this.startTime = s_date.slice(0,3).join("-") + " " + s_date.slice(3).join(":")
+          this.endTime = e_date.slice(0,3).join("-") + " " + e_date.slice(3).join(":")
+          
           return true;
         }
         console.log(response.data.message);
@@ -129,25 +137,28 @@ export default {
       this.$modal.hide("company-modal");
     },
     writeResume(recruit, employment) {
-      var answers = [];
-      employment.resumeQuestion.forEach(q => {
-        answers.push({
-          question_content: q.questionContent,
-          answer_content: "",
-          question_limit: q.questionLimit
+      if(confirm("자기소개서를 작성하시겠습니까?")){
+        var answers = [];
+        employment.resumeQuestion.forEach(q => {
+          answers.push({
+            question_content: q.question_content,
+            answer_content: "",
+            question_limit: q.question_limit
+          });
         });
-      });
-      var body = {
-        title: recruit.companyName + " " + employment.field,
-        endTime: recruit.endTime,
-        answers: answers
-      };
-      this.createResume({
-        position_id: employment.positionId,
-        body: body
-      });
+        var date_split = recruit.endTime.split("-")
+        var body = {
+          title: recruit.companyName + " " + employment.field,
+          endTime: date_split.slice(0,3).join("-") + " " + date_split.slice(3).join(":")+":00",
+          answers: answers,
+        };
+        this.createResume({
+          position_id: employment.positionId,
+          body: body,
+        });
+      }
     }
-  }
+  },
 };
 </script>
 <style lang="scss">

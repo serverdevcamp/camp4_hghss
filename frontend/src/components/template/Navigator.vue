@@ -4,8 +4,6 @@
       <div class="point-font nav-home" @click="$router.push('/')">합격하소서 🙏</div>
       <div class="nav-btn" @click="routerPush('RecruitPage')">채용 공고</div>
       <div class="nav-btn" @click="routerPush('ResumePage')">자기소개서</div>
-      <div class="nav-btn" @click="$router.push({ name: 'ResumeWrite', params: { id: 123 }})">더미</div>
-
     </div>
     <div class="nav-section">
       <div class="user-section">
