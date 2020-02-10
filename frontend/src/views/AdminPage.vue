@@ -62,7 +62,7 @@
 
       let response = await axios.get(this.auth_server + '/admin/users', {
         headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('accessToken')
+          Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
         }
       });
 
@@ -74,7 +74,7 @@
 
         response = await axios.get(this.auth_server + '/admin/users', {
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('accessToken')
+            Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
           }
         });
       }
@@ -100,7 +100,7 @@
 
         let response = await axios.put(this.auth_server + '/admin/users/update/role', payload, {
           headers: {
-            Authorization: 'Bearer ' + localStorage.getItem('accessToken')
+            Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
           }
         });
 
@@ -112,7 +112,7 @@
 
           response = await axios.put(this.auth_server + '/admin/users/update/role', payload, {
             headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('accessToken')
+              Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
             }
           });
         }
