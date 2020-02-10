@@ -24,9 +24,4 @@ public class RedisConfig {
         return redisTemplate;
     }
 
-//    @Bean
-//    public RedisUtil redisUtil() {
-//        return new RedisUtil();
-//    }
-
 }
