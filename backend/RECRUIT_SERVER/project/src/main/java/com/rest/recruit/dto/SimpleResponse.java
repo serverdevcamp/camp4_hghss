@@ -3,6 +3,9 @@ package com.rest.recruit.dto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 public class SimpleResponse {
 
     public static ResponseEntity ok() { return SimpleResponse.msg(HttpStatus.OK); }
