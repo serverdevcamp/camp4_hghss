@@ -1,0 +1,30 @@
+@import url("https://fonts.googleapis.com/css?family=Nanum+Gothic&display=swap");
+@font-face {
+  font-family: "BMEULJIRO";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.0/BMEULJIRO.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+.point-font {
+  font-family: "BMEULJIRO";
+}
+* {
+  font-family: "Nanum Gothic", sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #131417;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+input:focus,
+button:focus {
+  outline: none;
+}
+body{
+  height: 100vh;
+}
+.txt-center{
+  text-align: center;
+}
