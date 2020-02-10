@@ -17,13 +17,19 @@
           <v-row class="company-info">
             <p class="point-font company-name">
               {{ recruit.companyName }}
-              <font-awesome-icon icon="star" v-if="recruit.favorite" class="fav" @click="likeOrUnlike(1)"/>
-              <font-awesome-icon icon="star" v-else  @click="likeOrUnlike(0)"/>
+              <font-awesome-icon
+                icon="star"
+                v-if="recruit.favorite"
+                class="fav"
+                @click="likeOrUnlike(1)"
+              />
+              <font-awesome-icon icon="star" v-else @click="likeOrUnlike(0)" />
             </p>
           </v-row>
           <v-row class="recruit-date">
             <p>
-              {{ recruit.startTime }} ~ {{ recruit.endTime }}
+              {{ startTime}} 
+              ~ {{ endTime }}
               <!-- TODO : 날짜 계산 -->
             </p>
           </v-row>
@@ -46,7 +52,7 @@
           <!-- TODO 몇명 -->
           <v-col cols="2" class="d-cnt">1000명 작성</v-col>
           <v-col cols="3" class="d-btn">
-            <button class="resume-btn">자기소개서 쓰기</button>
+            <button class="resume-btn" @click="writeResume(recruit, employment)">자기소개서 쓰기</button>
             <!-- 자기소개서 질문 목록-->
             <div class="question-hover">
               <v-row v-for="(question, index) in employment.resumeQuestion" :key="index">
@@ -77,17 +83,19 @@ export default {
       "신입/인턴"
     ],
     company: {},
-    recruit: {}
+    recruit: {},
+    startTime : '',
+    endTime: '',
   }),
   methods: {
-    ...mapActions(["likeToggle","addChat"]),
-    async likeOrUnlike(action){
+    ...mapActions(["likeToggle", "addChat", "createResume"]),
+    async likeOrUnlike(action) {
       var favorite = await this.likeToggle({
-        recruit_id :this.company.recruitId,
-        action: action,
-      })
-      this.recruit.favorite = favorite 
-      this.company.favorite = favorite 
+        recruit_id: this.company.recruitId,
+        action: action
+      });
+      this.recruit.favorite = favorite;
+      this.company.favorite = favorite;
     },
     beforeOpen(event) {
       this.company = event.params.company;
@@ -104,6 +112,12 @@ export default {
       }).then(response => {
         if (response.data.status == 200) {
           this.recruit = response.data.data;
+          var s_date = this.recruit.startTime.split("-")
+          var e_date = this.recruit.endTime.split("-")
+
+          this.startTime = s_date.slice(0,3).join("-") + " " + s_date.slice(3).join(":")
+          this.endTime = e_date.slice(0,3).join("-") + " " + e_date.slice(3).join(":")
+          
           return true;
         }
         console.log(response.data.message);
@@ -113,15 +127,38 @@ export default {
     moveUrl(url) {
       window.open(url, "_blank");
     },
-    openChatRoom(){
+    openChatRoom() {
+      // 여기손좀
       this.addChat({
-        company_id: this.company.companyId,
-        company: this.company.companyName,
-        logo_url : this.company.imageFileName
-        })
-      this.$modal.hide("company-modal")
+        company_id: this.company.company_id,
+        company: this.recruit.companyName,
+        logo_url: this.recruit.imageFileName
+      });
+      this.$modal.hide("company-modal");
+    },
+    writeResume(recruit, employment) {
+      if(confirm("자기소개서를 작성하시겠습니까?")){
+        var answers = [];
+        employment.resumeQuestion.forEach(q => {
+          answers.push({
+            question_content: q.question_content,
+            answer_content: "",
+            question_limit: q.question_limit
+          });
+        });
+        var date_split = recruit.endTime.split("-")
+        var body = {
+          title: recruit.companyName + " " + employment.field,
+          endTime: date_split.slice(0,3).join("-") + " " + date_split.slice(3).join(":")+":00",
+          answers: answers,
+        };
+        this.createResume({
+          position_id: employment.positionId,
+          body: body,
+        });
+      }
     }
-  }
+  },
 };
 </script>
 <style lang="scss">
@@ -235,6 +272,7 @@ $end: #3f4b5e;
       border-radius: 3px;
       background: #ffffff;
       .position {
+        width: 100%;
         border-top: 1px solid #ddd;
         text-align: center;
         &:nth-child(1) {
@@ -246,6 +284,11 @@ $end: #3f4b5e;
           font-weight: 500;
           letter-spacing: 0.03rem;
           color: #707070;
+        }
+        .d-content{
+          padding-left: 15px;
+          padding-right: 15px;
+          text-align: left;
         }
         .d-btn {
           position: relative;
