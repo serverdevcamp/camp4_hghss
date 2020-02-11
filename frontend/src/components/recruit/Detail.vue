@@ -137,7 +137,7 @@ export default {
     openChatRoom() {
       // 여기손좀
       this.addChat({
-        company_id: this.company.company_id,
+        company_id: this.company.companyId,
         company: this.recruit.companyName,
         logo_url: this.recruit.imageFileName
       });

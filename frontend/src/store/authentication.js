@@ -5,7 +5,7 @@ import config from './config'
 export default {
   state: {
     user: {
-      id: "",
+      id: "-1",
       email: "",
       nickname: "",
       role: ""
