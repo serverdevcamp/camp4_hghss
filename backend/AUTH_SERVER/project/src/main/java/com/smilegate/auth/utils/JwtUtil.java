@@ -77,7 +77,6 @@ public class JwtUtil {
             claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         }catch (Exception e) {
-            System.out.println(e.getMessage());
             return false;
         }
     }
