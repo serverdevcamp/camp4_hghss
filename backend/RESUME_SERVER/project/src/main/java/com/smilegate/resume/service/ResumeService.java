@@ -4,6 +4,8 @@ import com.smilegate.resume.domain.Answer;
 import com.smilegate.resume.domain.Resume;
 import com.smilegate.resume.dto.request.ResumeRequestDto;
 import com.smilegate.resume.dto.response.ResumeDetailResponseDto;
+import com.smilegate.resume.exceptions.AnswerNotExistException;
+import com.smilegate.resume.exceptions.ResumeNotExistException;
 import com.smilegate.resume.exceptions.UnauthorizedException;
 import com.smilegate.resume.repository.ResumeRepository;
 import com.smilegate.resume.utils.DateUtil;
@@ -11,6 +13,7 @@ import com.smilegate.resume.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,11 +25,17 @@ public class ResumeService {
     private final JwtUtil jwtUtil;
     private final DateUtil dateUtil;
 
+    @Transactional
     public ResumeDetailResponseDto createResume(String token, int positionId, ResumeRequestDto resumeRequestDto) {
 
         int userId = getUserId(token);
+        int recruitId = resumeRepository.findRecruitIdByPositionId(positionId);
+        int companyId = resumeRepository.findCompanyIdByRecruitId(recruitId);
+
         Resume resume = Resume.builder()
                             .userId(userId)
+                            .recruitId(recruitId)
+                            .companyId(companyId)
                             .positionId(positionId)
                             .title(resumeRequestDto.getTitle())
                             .endTime(resumeRequestDto.getEndTime())
@@ -52,13 +61,12 @@ public class ResumeService {
     }
 
     public List<Resume> getResumes(String token) {
-
         int userId = getUserId(token);
         List<Resume> resumes = resumeRepository.findResumesByUserId(userId);
-
         return resumes;
     }
 
+    @Transactional
     public boolean saveResume(int resumeId, String token, String title, List<Answer> answers) {
 
         if(!checkAuth(token, resumeId)) return false;
@@ -67,13 +75,15 @@ public class ResumeService {
 
         for(int i=0; i<answers.size(); ++i) {
             Answer answer = answers.get(i);
-            answer.setOrderNum(i+1);
-            resumeRepository.updateAnswer(answer);
+            answer.setResumeId(resumeId);
+            int updateCnt = resumeRepository.updateAnswer(answer);
+            if(updateCnt < 1) throw new AnswerNotExistException(answer.getId());
         }
 
         return true;
     }
 
+    @Transactional
     public boolean deleteResume(int resumeId, String token) {
 
         if(!checkAuth(token, resumeId)) return false;
@@ -110,11 +120,11 @@ public class ResumeService {
 
         if(!checkAuth(token, resumeId)) return null;
 
-        int cnt = resumeRepository.countAnswer(resumeId);
+        int order = resumeRepository.findMaxOrderNumByResumeId(resumeId);
 
         Answer answer = Answer.builder()
                             .resumeId(resumeId)
-                            .orderNum(cnt+1)
+                            .orderNum(order+1)
                             .questionLimit(1000)
                             .build();
 
@@ -125,7 +135,8 @@ public class ResumeService {
 
     public boolean deleteAnswer(String token, int answerId) {
 
-        int resumeId = resumeRepository.findResumeIdByAnswerId(answerId);
+        Integer resumeId = resumeRepository.findResumeIdByAnswerId(answerId);
+        if(resumeId == null) throw new AnswerNotExistException(answerId);
 
         if(!checkAuth(token, resumeId)) return false;
 
@@ -134,9 +145,16 @@ public class ResumeService {
         return true;
     }
 
+    public int countResume(String token, int positionId) {
+        int userId = getUserId(token);
+        return resumeRepository.countResumeByPositionId(userId, positionId);
+    }
+
     private boolean checkAuth(String token, int resumeId) {
 
         Resume resume = resumeRepository.findResumeById(resumeId);
+        if(resume == null) throw new ResumeNotExistException(resumeId);
+
         int userId = getUserId(token);
         if(userId != resume.getUserId()) throw new UnauthorizedException();
 
