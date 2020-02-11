@@ -7,8 +7,6 @@ import com.rest.recruit.mapper.ChattingMapper;
 import com.rest.recruit.model.Chatting;
 import com.rest.recruit.model.tmpChatting;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

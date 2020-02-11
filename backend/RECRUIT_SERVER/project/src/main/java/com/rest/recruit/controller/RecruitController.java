@@ -41,6 +41,147 @@ public class RecruitController {
         this.recruitService = recruitService;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    //refactor
+    @ApiOperation(value = "채용공고 캘린더 리팩토링", httpMethod = "GET", notes = "채용공고 캘린더 조회" , response=GetCalendarResponse.class)
+    @GetMapping("/calendar/refactor")
+    public ResponseEntity calendarRefactor(@ApiParam(value = "startTime , endTime", required = true)
+                                   @RequestParam(value = "startTime")  String startTime,
+                                   @RequestParam(value = "endTime") String endTime) {
+
+        long start = System.currentTimeMillis();
+        logger.info("채용공고캘린더 api 실행 시작");
+        if (!DateValidation.validationDate(startTime) || !DateValidation.validationDate(endTime)) {
+            throw new UnValidatedDateTypeException();
+        }
+
+        ResponseEntity result = recruitService.GetRecruitCalendar
+                (GetRecruitCalendarRequestDTO.builder().startTime(startTime).endTime(endTime).build());
+
+        long end = System.currentTimeMillis();
+        logger.info("채용공고캘린더의 Cache 수행시간 : "+ Long.toString(end-start));
+        return result;
+    }
+
+    @ApiOperation(value = "유저가 좋아요한 채용공고 리스트 리팩토링", httpMethod = "GET", notes = "채용공고 캘린더 조회" , response=GetCalendarResponse.class)
+    @GetMapping("/likeList")
+    public ResponseEntity calendarLikeList(@ApiParam(value = "startTime , endTime", required = true)
+                                   @RequestHeader(value="Authorization") String token,
+                                   @RequestParam(value = "startTime")  String startTime,
+                                   @RequestParam(value = "endTime") String endTime) {
+
+        long start = System.currentTimeMillis();
+        logger.info("채용공고캘린더 api 실행 시작");
+        if (!DateValidation.validationDate(startTime) || !DateValidation.validationDate(endTime)) {
+
+            throw new UnValidatedDateTypeException();
+        }
+
+        long end = System.currentTimeMillis();
+        logger.info("채용공고캘린더의 Cache 수행시간 : "+ Long.toString(end-start));
+
+        String tokenString = token.substring("Bearer ".length());
+
+        return recruitService.GetUserLikeList(GetRecruitCalendarRequestDTO.builder()
+                .userIdx(Integer.toString(jwtUtil.getAuthentication(tokenString)))
+                .startTime(startTime)
+                .endTime(endTime).build());
+    }
+
+
+    @ApiOperation(value = "상세 채용공고 페이지(refactor ver) 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회",response= GetRecruitDetailResponseDTO.class)
+    @GetMapping("/detail/{recruitIdx}")
+    public ResponseEntity detailRecuitPage(@ApiParam(value = "recruitIdx", required = true)
+                                           @RequestHeader(value="Authorization", required=false) String token,
+                                           @PathVariable(value = "recruitIdx") int recruitIdx) {
+        logger.info("상세 채용공고 api 실행 시작");
+        long start = System.currentTimeMillis();
+        if (token == null || token.isEmpty()) {
+            logger.info("token empty\n");
+            ResponseEntity result = recruitService.GetDetailRecruit(
+                    DataWithToken.builder().recruitIdx(recruitIdx).build());
+
+            long end = System.currentTimeMillis();
+            logger.info("채용공고캘린더의 Cache 수행시간 : "+ Long.toString(end-start));
+            return result;
+        }
+
+        String tokenString = token.substring("Bearer ".length());
+
+        if(!jwtUtil.isValidToken(tokenString)){
+            logger.info("expire or no valid token\n");
+            //throw new ExpiredTokenException();
+            ResponseEntity result =
+                    recruitService.GetDetailRecruit(
+                            DataWithToken.builder()
+                                    .recruitIdx(recruitIdx)
+                                    .statusCode(402)
+                                    .build());
+
+            long end = System.currentTimeMillis();
+            logger.info("채용공고상세페이지의 Cache 수행시간 : "+ Long.toString(end-start));
+            return result;
+        }
+
+        if(!jwtUtil.isAccessToken(tokenString)) {
+            logger.info("no accessToken");
+            throw new UnauthorizedException();
+        }
+
+
+        ResponseEntity result = recruitService.GetDetailRecruit(DataWithToken.builder()
+                .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
+
+        long end = System.currentTimeMillis();
+        logger.info("채용공고상세페이지의 Cache 수행시간 : "+ Long.toString(end-start));
+        return result;
+    }
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @ApiOperation(value = "상세 채용공고 페이지 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회",response= GetRecruitDetailResponseDTO.class)
+    @GetMapping("/before/{recruitIdx}")
+    public ResponseEntity detailRecuit(@ApiParam(value = "recruitIdx", required = true)
+                                           @RequestHeader(value="Authorization", required=false) String token,
+                                           @PathVariable(value = "recruitIdx") int recruitIdx) {
+        logger.info("상세 채용공고(BEFORE) api 실행 시작");
+        long start = System.currentTimeMillis();
+        if (token== null || token.isEmpty()) {
+            ResponseEntity result = recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).build());
+
+            long end = System.currentTimeMillis();
+            logger.info("채용공고 상세 페이지(BEFORE)의 Cache 수행시간 : "+ Long.toString(end-start));
+            return result;
+        }
+
+        String tokenString = token.substring("Bearer ".length());
+
+        if(!jwtUtil.isValidToken(tokenString)){
+            logger.info("expire or no valid token\n");
+            //throw new ExpiredTokenException();
+            ResponseEntity result = recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).statusCode(402).build());
+            long end = System.currentTimeMillis();
+            logger.info("채용공고상세페이지의(BEFORE) Cache 수행시간 : "+ Long.toString(end-start));
+            return result;
+        }
+
+        if(!jwtUtil.isAccessToken(tokenString)) {
+            logger.info("no accessToken");
+            throw new UnauthorizedException();
+            //return recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).statusCode(401).build());
+        }
+
+
+
+
+        ResponseEntity result = recruitService.GetDetailRecruitPage(DataWithToken.builder()
+                .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
+
+        long end = System.currentTimeMillis();
+        logger.info("채용공고상세페이지 (BEFORE)의 Cache 수행시간 : "+ Long.toString(end-start));
+        return result;
+    }
     @ApiOperation(value = "채용공고 캘린더 조회", httpMethod = "GET", notes = "채용공고 캘린더 조회" , response=GetCalendarResponse.class)
     @GetMapping("/calendar")
     public ResponseEntity calendar(@ApiParam(value = "startTime , endTime", required = true)
@@ -66,11 +207,12 @@ public class RecruitController {
 
 
         String tokenString = token.substring("Bearer ".length());
-        if (!jwtUtil.isValidToken(tokenString)) {//expiration, 꺼내기
-
+        if (!jwtUtil.isValidToken(tokenString)) {
             ResponseEntity result = recruitService.GetRecruitCalendarByDate
-                    (GetRecruitCalendarRequestDTO.builder().startTime(startTime).endTime(endTime).statusCode(402).build());
-
+                    (GetRecruitCalendarRequestDTO.builder()
+                            .startTime(startTime)
+                            .endTime(endTime)
+                            .statusCode(402).build());
             long end = System.currentTimeMillis();
             logger.info("채용공고캘린더의 Cache 수행시간 : "+ Long.toString(end-start));
             return result;
@@ -91,50 +233,6 @@ public class RecruitController {
         long end = System.currentTimeMillis();
         logger.info("채용공고캘린더의 Cache 수행시간 : "+ Long.toString(end-start));
 
-        return result;
-    }
-
-
-    @ApiOperation(value = "상세 채용공고 페이지 조회", httpMethod = "GET", notes = "상세 채용공고 페이지 조회",response= GetRecruitDetailResponseDTO.class)
-    @GetMapping("/detail/{recruitIdx}")
-    public ResponseEntity detailRecuitPage(@ApiParam(value = "recruitIdx", required = true)
-                                           @RequestHeader(value="Authorization", required=false) String token,
-                                           @PathVariable(value = "recruitIdx") int recruitIdx) {
-        logger.info("상세 채용공고 api 실행 시작");
-        long start = System.currentTimeMillis();
-        if (token== null || token.isEmpty()) {
-            ResponseEntity result = recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).build());
-
-            long end = System.currentTimeMillis();
-            logger.info("채용공고캘린더의 Cache 수행시간 : "+ Long.toString(end-start));
-            return result;
-        }
-
-        String tokenString = token.substring("Bearer ".length());
-
-        if(!jwtUtil.isValidToken(tokenString)){
-            logger.info("expire or no valid token\n");
-            //throw new ExpiredTokenException();
-            ResponseEntity result = recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).statusCode(402).build());
-            long end = System.currentTimeMillis();
-            logger.info("채용공고상세페이지의 Cache 수행시간 : "+ Long.toString(end-start));
-            return result;
-        }
-
-        if(!jwtUtil.isAccessToken(tokenString)) {
-            logger.info("no accessToken");
-            throw new UnauthorizedException();
-            //return recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).statusCode(401).build());
-        }
-
-
-
-
-        ResponseEntity result = recruitService.GetDetailRecruitPage(DataWithToken.builder()
-                .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
-
-        long end = System.currentTimeMillis();
-        logger.info("채용공고상세페이지의 Cache 수행시간 : "+ Long.toString(end-start));
         return result;
     }
 

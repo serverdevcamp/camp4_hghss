@@ -3,10 +3,7 @@ package com.rest.recruit.mapper;
 import com.rest.recruit.dto.request.DataWithToken;
 import com.rest.recruit.dto.request.GetRecruitCalendarRequestDTO;
 import com.rest.recruit.dto.response.GetRecruitCalendarSimpleResponseDTO;
-import com.rest.recruit.model.Position;
-import com.rest.recruit.model.RecruitDetail;
-import com.rest.recruit.model.RecruitLike;
-import com.rest.recruit.model.SimpleRecruit;
+import com.rest.recruit.model.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -37,4 +34,14 @@ public interface RecruitMapper {
     public int PostLikeRecruitCount(int recruitIdx);
 
     public int PostUnlikeRecruitCount(int recruitIdx);
+
+    List<Calendars> getRecruitCalendar(GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO);
+
+    List<Integer> GetUserLikeList(GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO);
+
+    public Recruit GetRecruit(int recruitIdx);
+
+    public int GetViewCount(int recruitId);
+
+    public int GetFavoriteCount(int recruitIdx);
 }

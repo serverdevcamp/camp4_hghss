@@ -1,6 +1,9 @@
 package com.rest.recruit.util;
 
+import com.rest.recruit.controller.RecruitController;
 import io.jsonwebtoken.Jws;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
@@ -28,19 +31,16 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
     private Key key;
-
+    private static final Logger logger = LoggerFactory.getLogger(RecruitController.class);
     @PostConstruct
     public void init(){
         System.out.print("secret\n");
         System.out.print(secret);
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
 
     public Claims getClaims(String token) {
-
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
-
-
         return Jwts.parser()
                 .setSigningKey(key)
                 .parseClaimsJws(token)
@@ -64,7 +64,10 @@ public class JwtUtil {
 
     public boolean isValidToken(String token) {
         try {
+            logger.info("isValidToken 함수 실행\n");
             Jws<Claims> claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token);
+            logger.info(String.valueOf(claims.getBody().getExpiration()));
+
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;

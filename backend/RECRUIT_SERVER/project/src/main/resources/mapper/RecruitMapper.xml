@@ -60,6 +60,99 @@
     </select>
 
 
+
+
+
+
+
+
+
+
+
+
+    <select id = "getRecruitCalendar" parameterType="String" resultType="com.rest.recruit.model.Calendars">
+
+        SELECT
+        recruit.id AS recruitId,
+        company.id AS companyId,
+        company.name AS companyName,
+        recruit.recruit_type AS recruitType,
+        company.logo_url AS imageFileName,
+        GROUP_CONCAT(position.division) AS employType,
+        recruit.start_time AS startTime,
+        recruit.end_time AS endTime
+        FROM company
+        INNER JOIN recruit ON company.id= recruit.company_id
+        INNER JOIN position ON recruit.id = position.recruit_id
+        WHERE (DATE(recruit.start_time) <![CDATA[>=]]> DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i')
+        AND DATE(recruit.start_time) <![CDATA[<=]]>  DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
+        OR (DATE(recruit.end_time) <![CDATA[>=]]>  DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i')
+        AND DATE(recruit.end_time) <![CDATA[<=]]> DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
+        GROUP BY recruit.id
+        ORDER BY recruit.start_time ASC;
+    </select>
+
+    <select id = "GetUserLikeList" parameterType="String" resultType="Integer">
+        SELECT
+        recruit.id
+        FROM recruit_like
+        INNER JOIN recruit ON recruit.id= recruit_like.recruit_id
+        WHERE recruit_like.user_id = #{userIdx}
+        AND (DATE(recruit.start_time) <![CDATA[>=]]> DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i')
+        AND DATE(recruit.start_time) <![CDATA[<=]]>  DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
+        OR (DATE(recruit.end_time) <![CDATA[>=]]>  DATE_FORMAT(#{startTime},'%Y-%m-%d %h:%i')
+        AND DATE(recruit.end_time) <![CDATA[<=]]> DATE_FORMAT(#{endTime},'%Y-%m-%d %h:%i'))
+        GROUP BY recruit.id
+        ORDER BY recruit.start_time ASC;
+    </select>
+
+    <select id = "GetRecruit" resultType="com.rest.recruit.model.Recruit">
+        SELECT
+        recruit.id AS recruitId,
+        company.id AS companyId,
+        company.name AS companyName,
+        company.logo_url AS imageFileName,
+        recruit.employment_page_url AS employmentPageUrl,
+        DATE_FORMAT(recruit.start_time,'%Y-%m-%d-%h-%i') AS startTime,
+        DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS endTime,
+        recruit.recruit_type AS 'recruit_type',
+        recruit.content
+        FROM recruit
+        INNER JOIN company ON company.id = recruit.company_id
+        WHERE recruit.id = #{recruitIdx};
+    </select>
+
+    <select id = "GetViewCount" resultType="int">
+        SELECT view_count FROM recruit WHERE id = #{recruitIdx};
+    </select>
+
+    <select id = "GetFavoriteCount" resultType="int">
+        SELECT like_count FROM recruit WHERE id = #{recruitIdx};
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <select id = "GetDetailRecruitPage" resultType="com.rest.recruit.model.RecruitDetail">
         SELECT
         <include refid = "detail"/>
