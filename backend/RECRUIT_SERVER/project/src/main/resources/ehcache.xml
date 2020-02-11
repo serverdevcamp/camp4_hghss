@@ -6,13 +6,19 @@
          dynamicConfig="true">
     <diskStore path="java.io.tmpdir"/>
 
-    <cache name="calendarRecruitCache"
+    <cache name="calendar"
            maxElementsInMemory="1000"
            eternal="false"
            timeToIdleSeconds="300"
            timeToLiveSeconds="600"/>
 
-    <cache name="detailRecruitCache"
+    <cache name="detailRecruit"
+           maxElementsInMemory="1000"
+           eternal="false"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="600"/>
+
+    <cache name="detailPosition"
            maxElementsInMemory="1000"
            eternal="false"
            timeToIdleSeconds="300"

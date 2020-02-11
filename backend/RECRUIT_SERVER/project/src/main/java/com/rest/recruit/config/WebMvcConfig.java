@@ -25,7 +25,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
             "/ranking/visit",
             "/ranking/like",
             "/ranking/apply",
-            "/chats/hot"
+            "/chats/hot",
+            "/recruits/before/**"
     };
 
     @Autowired
