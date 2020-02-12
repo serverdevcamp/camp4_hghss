@@ -9,6 +9,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class ChattingController {
 
     private final ChattingService chattingService;
-
+    private static final Logger logger = LoggerFactory.getLogger(ChattingController.class);
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -64,6 +66,9 @@ public class ChattingController {
     public ResponseEntity postEnterChatting(@ApiParam(value = "companyIdx, token", required = true)
                                      @RequestHeader(value="Authorization") String token,
                                      @PathVariable(value = "companyIdx") int companyIdx) {
+
+        logger.info("채팅구독 api");
+        System.out.print(companyIdx);
 
         String tokenString = token.substring("Bearer ".length());
         return chattingService.postEnterChatting(jwtUtil.getAuthentication(tokenString),companyIdx);
