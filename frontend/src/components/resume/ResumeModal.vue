@@ -35,7 +35,7 @@ export default {
     openRecruitDetailModal(target){
       let company = {
         recruitId: target.recruitId,
-        company_id: target.companyId
+        companyId: target.companyId
       }
       this.$modal.show("company-modal", { company:company });
       this.$modal.hide("resume-modal");

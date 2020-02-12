@@ -85,7 +85,8 @@ export default {
   },
   actions: {
     openSocket(context, company_id) {
-      var socket = new WebSocket('ws://' + config.CHAT_HOST + '/chat/' + company_id + '/');
+      var user_id = context.getters.is_user_login ? context.getters.getUser.id : -1
+      var socket = new WebSocket('ws://' + config.CHAT_HOST + '/chat/' + company_id + '/' + user_id);
       // 소켓이 열린 뒤에 실행
       socket.onopen = function () {
         context.commit('setSocket', {
@@ -103,6 +104,15 @@ export default {
           company: payload.company,
           logo_url: payload.logo_url
         }
+        console.log({
+          method: 'post',
+          url: config.RECRUIT_HOST + '/chats/detail/'+payload.company_id+'/like',
+          headers: {
+            "Content-Type": "application/json",
+            'Access-Control-Allow-Origin': '*',
+            'Authorization': 'Bearer ' + config.access_token,
+          }
+        })
         axios({
           method: 'post',
           url: config.RECRUIT_HOST + '/chats/detail/'+payload.company_id+'/like',

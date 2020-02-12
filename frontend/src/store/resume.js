@@ -31,6 +31,7 @@ export default {
           'Authorization': 'Bearer ' + config.access_token,
         },
       }).then(async response => {
+        console.log(response.data)
         if (response.data.status == 200) {
           return response.data.data
         }
@@ -53,6 +54,7 @@ export default {
           'Authorization': 'Bearer ' + config.access_token,
         },
       }).then(async response => {
+        console.log(response.data)
         if (response.data.status == 200) {
           console.log("삭제완료!")
         }
@@ -73,10 +75,10 @@ export default {
         },
         data: payload.body
       }).then(response => {
-        if (response.data.status == 200) {
-          console.log(response.data)
-        }
-        else if(response.data.status == 500){
+        // if (response.data.status == 200) {
+        //   console.log(response.data)
+        // }
+        if(response.data.status == 500){
           alert("자기소개서가 존재하지 않습니다.")
           this.$router.push('/resume')
         }
@@ -110,18 +112,30 @@ export default {
         return false
       });
     },
-    // 만들기
-    createResume(context, payload) {
-      console.log({
-        method: 'post',
-        url: config.RESUME_HOST + '/resumes/create/' + payload.position_id,
+    // 중복조회
+    countResume(context, payload) {
+      return axios({
+        method: 'get',
+        url: config.RESUME_HOST + '/resumes/count/' + payload.position_id,
         headers: {
           "Content-Type": "application/json",
           'Access-Control-Allow-Origin': '*',
           'Authorization': 'Bearer ' + config.access_token,
         },
-        data: payload.body
+      }).then(async response => {
+        if (response.data.status == 200) {
+          return response.data.data.resumeCnt
+        }
+        else if (response.data.status == 402) {
+          let refresh = await context.dispatch('refreshToken')
+          if (refresh == true) {
+            return context.dispatch('countResume', payload)
+          }
+        }
       })
+    },
+    // 만들기
+    createResume(context, payload) {
       axios({
         method: 'post',
         url: config.RESUME_HOST + '/resumes/create/' + payload.position_id,

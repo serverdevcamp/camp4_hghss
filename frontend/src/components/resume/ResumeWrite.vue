@@ -50,18 +50,18 @@
               class="text-section"
               v-for="answer in answers"
               v-if="answer.orderNum == target"
-              :key="answer"
+              :key="answer.orderNum"
             >
               <textarea class="question" v-model="answer.questionContent"></textarea>
               <textarea class="answer" v-model="answer.answerContent"></textarea>
               <v-row class="check-letter">
                 <v-col cols="4">
-                  <p>{{answer.answerContent.length }}/{{ answer.questionLimit }} (글자수, 공백포함)</p>
+                  <p>{{ answer.answerContent.length }}/{{ answer.questionLimit }} (글자수, 공백포함)</p>
                 </v-col>
                 <v-col>
                   <p class="letter_max_bar">
                     <span
-                      :style="{ width: 'calc('+ answer.answerContent.length /  answer.questionLimit * 100 +'%)', background:answer.questionLimit < answer.answerContent.length ?'red' : '#ff6813'}"
+                      :style="{ width: 'calc('+ (answer.answerContent.length) / answer.questionLimit * 100 +'%)', background:answer.questionLimit < answer.answerContent.length ?'red' : '#ff6813'}"
                     ></span>
                   </p>
                 </v-col>
@@ -73,16 +73,15 @@
           <v-row class="title">
             <p class="point-font">저장 기록</p>
           </v-row>
-          <v-row class="content-wrap">
+          <v-row class="content-wrap" v-if="storage_item.hasOwnProperty(target)">
             <v-col
               class="content"
-              cols="12"
-              v-for="(item, index) in storage_item[target].reverse()"
+              cols="12"  
+              v-for="(item, index) in storage_item[target]"
               :key="index"
-              
             >
-            <!-- v-if="storage_item.hasOwnProperty(target)" -->
-              <div class="recode-order">저장 {{ storage_item[target].length - index}}</div>
+              <!-- <div class="recode-order">저장 {{ storage_item[target].length - index}}</div> -->
+              <div class="recode-order">저장 {{ index+1 }}</div>
               <div class="datetime">{{ item.datetime }}</div>
               <div class="item-content">
                 <p class="question">{{ item.question}}</p>
@@ -115,17 +114,12 @@ export default {
     ...mapActions(["detailResume", "saveResume", "addAnswer", "deleteAnswer"]),
     showRecord() {
       this.recode_mode = !this.recode_mode;
-      if (this.recode_mode) {
-        this.storage_item =
-          JSON.parse(localStorage.getItem(this.resume_id)) || {};
-      } else {
-        this.storage_item = {};
-      }
     },
     openTab(index) {
       this.target = index;
     },
     save() {
+      this.recode() 
       var today = new Date();
       this.saveResume({
         resume_id: this.resume_id,
@@ -145,13 +139,9 @@ export default {
       });
     },
     deleteA(index) {
-      if (
-        confirm(
-          this.answers[index].orderNum + "번 문항을 정말 삭제하시겠습니까?"
-        )
-      ) {
-        this.answers.splice(index, 1);
+      if (confirm(this.answers[index].orderNum + "번 문항을 정말 삭제하시겠습니까?")) {
         this.deleteAnswer({ answer_id: this.answers[index].id });
+        this.answers.splice(index, 1);
       }
     },
     delete_mode_toggle() {
@@ -164,6 +154,7 @@ export default {
       // 10분마다 로컬스토리지에 기록
       var datetime = new Date().toISOString().split("T");
       var storage_item = JSON.parse(localStorage.getItem(this.resume_id)) || {};
+
       this.answers.forEach(answer => {
         if (!storage_item.hasOwnProperty(answer.orderNum)) {
           storage_item[answer.orderNum] = [];
@@ -173,8 +164,14 @@ export default {
           answer: answer.answerContent,
           datetime: datetime[0] + " " + datetime[1].substring(0, 5)
         });
-        localStorage.setItem(this.resume_id, JSON.stringify(storage_item));
       });
+      localStorage.setItem(this.resume_id, JSON.stringify(storage_item));
+
+      // 잡기
+      this.storage_item = JSON.parse(localStorage.getItem(this.resume_id)) || {}
+    },
+    saveAndRecode(storage_item){
+      localStorage.setItem(this.resume_id, JSON.stringify(storage_item));
       // 서버에 최종본 저장
       this.save();
     }
@@ -186,10 +183,12 @@ export default {
     });
     this.resume = Object.assign({}, resume_detail.resume);
     this.answers = resume_detail.answers;
+    this.storage_item = JSON.parse(localStorage.getItem(this.resume_id)) || {}
     // 10분마다 로컬스토리지에 기록
-    // setInterval(() => {
-    //   this.recode();
-    // }, 100000);
+    setInterval(() => {
+      this.recode()
+      this.save()
+    }, 100000);
   }
 };
 </script>
@@ -431,7 +430,7 @@ $point-color: #ff6813;
               }
               .answer {
                 margin: 10px 0;
-                font-size: 0.8rem;
+                font-size: 0.75rem;
               }
             }
           }
