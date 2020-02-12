@@ -1,5 +1,6 @@
 package com.rest.recruit.service;
 
+import com.rest.recruit.controller.RecruitController;
 import com.rest.recruit.dto.ResultResponse;
 import com.rest.recruit.dto.ResultResponseWithoutData;
 import com.rest.recruit.dto.SimpleResponse;
@@ -7,6 +8,8 @@ import com.rest.recruit.mapper.ChattingMapper;
 import com.rest.recruit.model.Chatting;
 import com.rest.recruit.model.tmpChatting;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,8 @@ public class ChattingService {
 
     @Autowired
     ChattingMapper chattingMapper;
+
+    private static final Logger logger = LoggerFactory.getLogger(RecruitController.class);
 
     public ResponseEntity GetUserChattingList(int userIdx) {
 
@@ -74,6 +79,7 @@ public class ChattingService {
         Chatting tmp = chattingMapper.getChatting(userIdx,companyIdx);
 
         if(tmp != null){
+
             return SimpleResponse.ok(ResultResponseWithoutData.builder()
                     .message("이미 구독하셨습니다.")
                     .status("400")
