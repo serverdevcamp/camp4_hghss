@@ -24,7 +24,7 @@ public class ChattingService {
     @Autowired
     ChattingMapper chattingMapper;
 
-    private static final Logger logger = LoggerFactory.getLogger(RecruitController.class);
+
 
     public ResponseEntity GetUserChattingList(int userIdx) {
 

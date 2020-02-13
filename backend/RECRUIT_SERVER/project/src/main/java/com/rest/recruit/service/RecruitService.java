@@ -18,6 +18,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -34,6 +35,7 @@ public class RecruitService {
 
     /////////////////////////////////////////////////////////////////////////////////////
     ////refactor
+    @Transactional
     @Cacheable(cacheNames="calendar" , key = "#getRecruitCalendarRequestDTO.startTime+#getRecruitCalendarRequestDTO.endTime")
     public ResponseEntity GetRecruitCalendar(GetRecruitCalendarRequestDTO getRecruitCalendarRequestDTO) {
 
@@ -141,7 +143,7 @@ public class RecruitService {
 
     }
 
-    private int GetFavoriteCount(int recruitIdx) {
+    public int GetFavoriteCount(int recruitIdx) {
         return recruitMapper.GetFavoriteCount(recruitIdx);
     }
 

@@ -12,9 +12,11 @@ import com.rest.recruit.exception.UnauthorizedException;
 import com.rest.recruit.service.RecruitService;
 import com.rest.recruit.util.DateValidation;
 import com.rest.recruit.util.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +26,7 @@ import io.swagger.annotations.ApiParam;
 
 //또한, 특정 도메인만 접속을 허용할 수도 있습니다.
 //      - @CrossOrigin(origins = "허용주소:포트")
-
+@Slf4j
 @CrossOrigin("*")
 @Api(tags={"채용공고"})
 @RestController
@@ -32,7 +34,7 @@ import io.swagger.annotations.ApiParam;
 public class RecruitController {
 
     private final RecruitService recruitService;
-    private static final Logger logger = LoggerFactory.getLogger(RecruitController.class);
+
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -59,7 +61,7 @@ public class RecruitController {
                 (GetRecruitCalendarRequestDTO.builder().startTime(startTime).endTime(endTime).build());
 
         long end = System.currentTimeMillis();
-        logger.info("리팩토링 후 채용공고 캘린더 api 수행 시간 : "+ Long.toString(end-start));
+        log.info("리팩토링 후 채용공고 캘린더 api 수행 시간 : "+ Long.toString(end-start));
         return result;
     }
 
@@ -100,7 +102,7 @@ public class RecruitController {
                     DataWithToken.builder().recruitIdx(recruitIdx).build());
 
             long end = System.currentTimeMillis();
-            logger.info("리팩토링 후 상세 채용공고 api 수행 시간 : "+ Long.toString(end-start));
+            log.info("리팩토링 후 상세 채용공고 api 수행 시간 : "+ Long.toString(end-start));
             return result;
         }
 
@@ -117,7 +119,7 @@ public class RecruitController {
                                     .build());
 
             long end = System.currentTimeMillis();
-            logger.info("리팩토링 후 상세 채용공고 api 수행 시간 : "+ Long.toString(end-start));
+            log.info("리팩토링 후 상세 채용공고 api 수행 시간 : "+ Long.toString(end-start));
             return result;
         }
 
@@ -131,7 +133,7 @@ public class RecruitController {
                 .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
 
         long end = System.currentTimeMillis();
-        logger.info("리팩토링 후 상세 채용공고 api 수행 시간 : "+ Long.toString(end-start));
+        log.info("리팩토링 후 상세 채용공고 api 수행 시간 : "+ Long.toString(end-start));
         return result;
     }
 
@@ -149,7 +151,7 @@ public class RecruitController {
             ResponseEntity result = recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).build());
 
             long end = System.currentTimeMillis();
-            logger.info("리팩토링 전 상세 채용공고 api 수행 시간 : "+ Long.toString(end-start));
+            log.info("리팩토링 전 상세 채용공고 api 수행 시간 : "+ Long.toString(end-start));
             return result;
         }
 
@@ -160,7 +162,7 @@ public class RecruitController {
             //throw new ExpiredTokenException();
             ResponseEntity result = recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).statusCode(402).build());
             long end = System.currentTimeMillis();
-            logger.info("리팩토링 전 상세 채용공고 api 수행 시간 : "+ Long.toString(end-start));
+            log.info("리팩토링 전 상세 채용공고 api 수행 시간 : "+ Long.toString(end-start));
             return result;
         }
 
@@ -177,7 +179,7 @@ public class RecruitController {
                 .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
 
         long end = System.currentTimeMillis();
-        logger.info("리팩토링 전 상세 채용공고 api 수행 시간 : "+ Long.toString(end-start));
+        log.info("리팩토링 전 상세 채용공고 api 수행 시간 : "+ Long.toString(end-start));
         return result;
     }
     @ApiOperation(value = "채용공고 캘린더 조회", httpMethod = "GET", notes = "채용공고 캘린더 조회" , response=GetCalendarResponse.class)
@@ -198,7 +200,7 @@ public class RecruitController {
                     (GetRecruitCalendarRequestDTO.builder().startTime(startTime).endTime(endTime).build());
 
             long end = System.currentTimeMillis();
-            logger.info("리팩토링 전 채용공고 캘린더 api 수행 시간 : "+ Long.toString(end-start));
+            log.info("리팩토링 전 채용공고 캘린더 api 수행 시간 : "+ Long.toString(end-start));
             return result;
         }
 
@@ -211,7 +213,7 @@ public class RecruitController {
                             .endTime(endTime)
                             .statusCode(402).build());
             long end = System.currentTimeMillis();
-            logger.info("리팩토링 전 채용공고 캘린더 api 수행 시간 : "+ Long.toString(end-start));
+            log.info("리팩토링 전 채용공고 캘린더 api 수행 시간 : "+ Long.toString(end-start));
             return result;
         }
 
@@ -228,7 +230,7 @@ public class RecruitController {
                 .userIdx(userIdx).build());
 
         long end = System.currentTimeMillis();
-        logger.info("리팩토링 전 채용공고 캘린더 api 수행 시간 : "+ Long.toString(end-start));
+        log.info("리팩토링 전 채용공고 캘린더 api 수행 시간 : "+ Long.toString(end-start));
 
         return result;
     }
@@ -256,4 +258,28 @@ public class RecruitController {
         return recruitService.PostUnlikeRecruit(DataWithToken.builder()
                 .userIdx(jwtUtil.getAuthentication(tokenString)).recruitIdx(recruitIdx).build());
     }
+
+    /*
+    <select id = "GetViewCount" resultType="int">
+        SELECT view_count FROM recruit WHERE id = #{recruitIdx};
+    </select>
+    *
+    * */
+    @ApiOperation(value = "채용공고 즐겨찾기", httpMethod = "POST", notes = "채용공고 즐겨찾기",response= ResultResponseWithoutData.class)
+    @GetMapping("/likelist/{recruitIdx}")
+    public ResponseEntity getViewCount(@ApiParam(value = "recruitIdx", required = true)
+                                           @PathVariable(value = "recruitIdx") int recruitIdx) {
+
+        return recruitService.GetFavoriteCount(recruitIdx)> 0 ?  SimpleResponse.ok(ResultResponseWithoutData.builder()
+                .message("좋아요수 조회 성공")
+                .status("200")
+                .success("true")
+                .build()) : SimpleResponse.ok(ResultResponseWithoutData.builder()
+                .message("좋아요수 조회 실패")
+                .status("200")
+                .success("true")
+                .build());
+    }
+
+
 }

@@ -6,6 +6,7 @@ import com.rest.recruit.dto.ResultResponseWithoutData;
 import com.rest.recruit.dto.SimpleResponse;
 import com.rest.recruit.exception.*;
 import io.jsonwebtoken.ExpiredJwtException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.text.ParseException;
 
-
+@Slf4j
 @ControllerAdvice
 public class ExceptionAdvice {
 
@@ -38,6 +39,7 @@ public class ExceptionAdvice {
      */
     @ExceptionHandler(ClientAbortException.class)
     protected ResponseEntity clientAbortException(ClientAbortException e) {
+        log.info("client disconnected");
         return SimpleResponse.ok(ResultResponseWithoutData.builder()
                 .message(HttpStatus.INTERNAL_SERVER_ERROR.toString())
                 .status("500")
