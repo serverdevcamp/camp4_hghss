@@ -33,3 +33,5 @@ out/
 ### .env
 /.env
 
+### settings ###
+application.properties

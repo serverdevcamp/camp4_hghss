@@ -1,22 +1,48 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import HghssPage from '../views/HghssPage'
+import CommonPage from '../views/CommonPage'
+import ResetPasswd from '../components/template/ResetPasswd'
+import ChangePasswd from '../components/template/ChangePasswd'
+import AdminPage from '../views/AdminPage.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: Home
+    name: 'HghssPage',
+    component: HghssPage
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: '/recruit',
+    name: 'RecruitPage',
+    component: CommonPage
+  },
+  {
+    path: '/resume',
+    name: 'ResumePage',
+    component: CommonPage
+  },
+  {
+    path: '/resume/write/:id',
+    name: 'ResumeWrite',
+    component: CommonPage
+  },
+  {
+    path: '/password/reset',
+    name: 'ResetPasswd',
+    component: ResetPasswd
+  },
+  {
+    path: '/password/change',
+    name: 'ChangePasswd',
+    component: ChangePasswd
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: AdminPage
   }
 ]
 
