@@ -70,15 +70,13 @@ public class RecruitController {
                                    @RequestParam(value = "startTime")  String startTime,
                                    @RequestParam(value = "endTime") String endTime) {
 
-        long start = System.currentTimeMillis();
-        logger.info("채용공고캘린더 api 실행 시작");
+
         if (!DateValidation.validationDate(startTime) || !DateValidation.validationDate(endTime)) {
 
             throw new UnValidatedDateTypeException();
         }
 
-        long end = System.currentTimeMillis();
-        logger.info("채용공고캘린더의 Cache 수행시간 : "+ Long.toString(end-start));
+
 
         String tokenString = token.substring("Bearer ".length());
 

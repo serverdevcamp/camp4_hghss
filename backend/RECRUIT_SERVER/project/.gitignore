@@ -31,4 +31,4 @@ build/
 .vscode/
 
 ### db configuration
-/src/main/java/com/rest/recruit/config/AppConfig.java
+/src/main/resources/application.properties

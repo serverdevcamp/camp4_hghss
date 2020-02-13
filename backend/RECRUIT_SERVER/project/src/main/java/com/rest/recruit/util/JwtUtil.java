@@ -64,9 +64,7 @@ public class JwtUtil {
 
     public boolean isValidToken(String token) {
         try {
-            logger.info("isValidToken 함수 실행\n");
             Jws<Claims> claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token);
-            logger.info(String.valueOf(claims.getBody().getExpiration()));
 
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
