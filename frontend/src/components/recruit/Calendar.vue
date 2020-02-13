@@ -42,11 +42,11 @@
               <span class="star-btn">
                 <font-awesome-icon
                   icon="star"
-                  v-if="company.favorite"
+                  v-if="getCalendarLike.indexOf(company.recruitId) >= 0"
                   class="fav"
-                  @click="likeOrUnlike(1, company)"
+                  @click="likeOrUnlike(1, company.recruitId)"
                 />
-                <font-awesome-icon icon="star" v-else @click="likeOrUnlike(0, company)" />
+                <font-awesome-icon icon="star" v-else @click="likeOrUnlike(0, company.recruitId)" />
               </span>
             </v-row>
             <v-row
@@ -57,16 +57,16 @@
             >
               <div @click="showCompanyModal(company)" class="infos">
                 <span class="info-end-icon point-font">끝</span>
-                <span class="company-name">{{ company.companyName}}</span>
+                <span class="company-name">{{ company.companyName }}</span>
               </div>
               <span class="star-btn">
                 <font-awesome-icon
                   icon="star"
-                  v-if="company.favorite"
+                  v-if="getCalendarLike.indexOf(company.recruitId) >= 0"
                   class="fav"
-                  @click="likeOrUnlike(1, company)"
+                  @click="likeOrUnlike(1, company.recruitId)"
                 />
-                <font-awesome-icon icon="star" v-else @click="likeOrUnlike(0, company)" />
+                <font-awesome-icon icon="star" v-else @click="likeOrUnlike(0, company.recruitId)" />
               </span>
             </v-row>
           </div>
@@ -76,7 +76,7 @@
   </section>
 </template>
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapMutations } from "vuex";
 
 export default {
   data: () => ({
@@ -107,16 +107,27 @@ export default {
     time: "-00:00:00.000"
   }),
   computed: {
-    ...mapGetters(["getCalendar"])
+    ...mapGetters(["getCalendar", "getCalendarLike"])
   },
   methods: {
+    ...mapMutations(["setLikeOrUnlike"]),
     ...mapActions(["calendarAPI", "likeToggle"]),
-    async likeOrUnlike(action, company) {
-      var favorite = await this.likeToggle({
-        recruit_id: company.recruitId,
-        action: action
-      });
-      company.favorite = favorite;
+    async likeOrUnlike(action, recruit_id) {
+      if (sessionStorage.getItem("email")) {
+        var favorite = await this.likeToggle({
+          recruit_id: recruit_id,
+          action: action
+        });
+        if ((action == 0 && favorite) || (action == 1 && !favorite)) {
+          // 좋아요
+          this.setLikeOrUnlike({
+            action: action,
+            recruit_id: recruit_id
+          });
+        }
+      } else {
+        alert("로그인 후 사용해주세요.");
+      }
     },
     showCompanyModal(company) {
       this.$modal.show("company-modal", { company: company });
@@ -183,7 +194,7 @@ export default {
       } else {
         this.month -= 1;
       }
-      this.makeCalendarPage();
+      this.makeCalendar();
     },
     afterMonth() {
       if (this.month == 11) {
@@ -192,27 +203,28 @@ export default {
       } else {
         this.month += 1;
       }
-      this.makeCalendarPage();
+      this.makeCalendar();
+    },
+    makeCalendar() {
+      var startDate =
+        new Date(this.year, this.month - 2, 1).toISOString().substring(0, 10) +
+        this.time;
+      var endDate =
+        new Date(this.year, this.month + 2, 1).toISOString().substring(0, 10) +
+        this.time;
+
+      this.calendarAPI({
+        startTime: startDate,
+        endTime: endDate
+      }).then(e => {
+        console.log(e);
+        // TODO : 로딩
+        this.createCalendar(this.year, this.month);
+      });
     },
     makeCalendarPage() {
       if (this.getCalendar.length == 0) {
-        // 최소 2달 전 값부터 가져오기
-        var startDate =
-          new Date(this.year, this.month - 2, 1)
-            .toISOString()
-            .substring(0, 10) + this.time;
-        var endDate =
-          new Date(this.year, this.month + 2, 1)
-            .toISOString()
-            .substring(0, 10) + this.time;
-
-        this.calendarAPI({
-          startTime: startDate,
-          endTime: endDate
-        }).then(e => {
-          console.log(e);
-          this.createCalendar(this.year, this.month);
-        });
+        this.makeCalendar();
       } else {
         this.createCalendar(this.year, this.month);
       }
@@ -224,13 +236,7 @@ export default {
     this.date = this.today.getDate();
 
     this.makeCalendarPage();
-  },
-  // mounted() {
-  //   let company = {
-  //     recruitId: 35868,
-  //   };
-  //   this.$modal.show("company-modal", { company: company });
-  // }
+  }
 };
 </script>
 <style lang="scss">

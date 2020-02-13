@@ -97,7 +97,8 @@ export default {
       router.go()
     },
     async refreshToken({ commit, dispatch }, payload) {
-      let refreshToken = sessionStorage.getItem('refreshToken');
+      let refreshToken = config.refresh_token
+
       const response = await axios.get(config.AUTH_HOST + '/users/refresh', {
         headers: {
           Authorization: 'Bearer ' + refreshToken
@@ -115,7 +116,8 @@ export default {
 
         return true;
       } else {
-        alert('세션이 만료되었습니다.');
+        alert("로그인 후 사용해주세요.");
+        router.push('/')  // 세션만료시 홈으로 리다이렉트
 
         sessionStorage.removeItem('refreshToken');
         sessionStorage.removeItem('accessToken');

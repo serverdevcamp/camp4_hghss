@@ -44,6 +44,7 @@ export default {
   }
   .main-section {
     width: 100%;
+    height: calc(100vh - 50px);
     transition: width .5s;
     &.chat-open {
       width: calc(100% - 280px);

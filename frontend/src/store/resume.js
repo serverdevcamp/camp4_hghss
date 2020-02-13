@@ -22,16 +22,16 @@ export default {
   actions: {
     // 추가
     addAnswer(context, payload) {
-      var access_token = localStorage.getItem('accessToken')
       return axios({
         method: 'post',
         url: config.RESUME_HOST + '/resumes/answer/add/' + payload.resume_id,
         headers: {
           "Content-Type": "application/json",
           'Access-Control-Allow-Origin': '*',
-          'Authorization': 'Bearer ' + access_token,
+          'Authorization': 'Bearer ' + config.access_token,
         },
       }).then(async response => {
+        console.log(response.data)
         if (response.data.status == 200) {
           return response.data.data
         }
@@ -45,16 +45,16 @@ export default {
     },
     // 삭제
     deleteAnswer(context, payload) {
-      var access_token = localStorage.getItem('accessToken')
       axios({
         method: 'delete',
         url: config.RESUME_HOST + '/resumes/answer/delete/' + payload.answer_id,
         headers: {
           "Content-Type": "application/json",
           'Access-Control-Allow-Origin': '*',
-          'Authorization': 'Bearer ' + access_token,
+          'Authorization': 'Bearer ' + config.access_token,
         },
       }).then(async response => {
+        console.log(response.data)
         if (response.data.status == 200) {
           console.log("삭제완료!")
         }
@@ -65,35 +65,37 @@ export default {
     },
     // 저장
     saveResume(context, payload) {
-      var access_token = localStorage.getItem('accessToken')
       axios({
         method: 'put',
         url: config.RESUME_HOST + '/resumes/save/' + payload.resume_id,
         headers: {
           "Content-Type": "application/json",
           'Access-Control-Allow-Origin': '*',
-          'Authorization': 'Bearer ' + access_token,
+          'Authorization': 'Bearer ' + config.access_token,
         },
         data: payload.body
       }).then(response => {
-        if (response.data.status == 200) {
-          console.log("저장완료!")
+        // if (response.data.status == 200) {
+        //   console.log(response.data)
+        // }
+        if(response.data.status == 500){
+          alert("자기소개서가 존재하지 않습니다.")
+          this.$router.push('/resume')
         }
-        if (response.data.status == 402) {
+        else if (response.data.status == 402) {
           context.dispatch('refreshToken', { funcName: 'saveResume', param: payload })
         }
       })
     },
     // 상세조회
     detailResume(context, payload) {
-      var access_token = localStorage.getItem('accessToken')
       return axios({
         method: "get",
         url: config.RESUME_HOST + "/resumes/" + payload.resume_id,
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
-          'Authorization': 'Bearer ' + access_token,
+          'Authorization': 'Bearer ' + config.access_token,
         }
       }).then(async response => {
         if (response.data.status == 200) {
@@ -110,16 +112,37 @@ export default {
         return false
       });
     },
+    // 중복조회
+    countResume(context, payload) {
+      return axios({
+        method: 'get',
+        url: config.RESUME_HOST + '/resumes/count/' + payload.position_id,
+        headers: {
+          "Content-Type": "application/json",
+          'Access-Control-Allow-Origin': '*',
+          'Authorization': 'Bearer ' + config.access_token,
+        },
+      }).then(async response => {
+        if (response.data.status == 200) {
+          return response.data.data.resumeCnt
+        }
+        else if (response.data.status == 402) {
+          let refresh = await context.dispatch('refreshToken')
+          if (refresh == true) {
+            return context.dispatch('countResume', payload)
+          }
+        }
+      })
+    },
     // 만들기
     createResume(context, payload) {
-      var access_token = localStorage.getItem('accessToken')
       axios({
         method: 'post',
         url: config.RESUME_HOST + '/resumes/create/' + payload.position_id,
         headers: {
           "Content-Type": "application/json",
           'Access-Control-Allow-Origin': '*',
-          'Authorization': 'Bearer ' + access_token,
+          'Authorization': 'Bearer ' + config.access_token,
         },
         data: payload.body
       }).then(response => {
@@ -133,14 +156,13 @@ export default {
     },
     // 삭제
     deleteResume(context, payload) {
-      var access_token = localStorage.getItem('accessToken')
       axios({
         method: 'delete',
         url: config.RESUME_HOST + '/resumes/delete/' + payload.resume_id,
         headers: {
           "Content-Type": "application/json",
           'Access-Control-Allow-Origin': '*',
-          'Authorization': 'Bearer ' + access_token,
+          'Authorization': 'Bearer ' + config.access_token,
         },
       }).then(response => {
         if (response.data.status == 200) {
@@ -154,24 +176,19 @@ export default {
     },
     // 위치 변경
     moveResume(context, payload) {
-      var access_token = localStorage.getItem('accessToken')
       axios({
         method: 'put',
         url: config.RESUME_HOST + '/resumes/' + payload.resume_id,
         headers: {
           "Content-Type": "application/json",
           'Access-Control-Allow-Origin': '*',
-          'Authorization': 'Bearer ' + access_token,
+          'Authorization': 'Bearer ' + config.access_token,
         },
         params: {
           col: payload.col,
           row: payload.row
         }
       }).then(response => {
-        if (response.data.status == 200) {
-          // 변경된 리스트 다시 부르기
-          // context.dispatch('resumeListAPI')
-        }
         if (response.data.status == 402) {
           context.dispatch('refreshToken', { funcName: 'moveResume', param: payload })
         }
@@ -179,14 +196,13 @@ export default {
     },
     // 목록
     resumeListAPI(context) {
-      var access_token = localStorage.getItem('accessToken')
       axios({
         method: 'get',
         url: config.RESUME_HOST + '/resumes/list',
         headers: {
           "Content-Type": "application/json",
           'Access-Control-Allow-Origin': '*',
-          'Authorization': 'Bearer ' + access_token,
+          'Authorization': 'Bearer ' + config.access_token,
         }
       }).then(response => {
         if (response.data.status == 200) {

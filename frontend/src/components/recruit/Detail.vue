@@ -28,7 +28,7 @@
           </v-row>
           <v-row class="recruit-date">
             <p>
-              {{ startTime}} 
+              {{ startTime}}
               ~ {{ endTime }}
               <!-- TODO : 날짜 계산 -->
             </p>
@@ -70,7 +70,7 @@
 <script>
 import config from "../../store/config";
 import axios from "axios";
-import { mapActions } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 export default {
   data: () => ({
     division: [
@@ -84,18 +84,30 @@ export default {
     ],
     company: {},
     recruit: {},
-    startTime : '',
-    endTime: '',
+    startTime: "",
+    endTime: ""
   }),
   methods: {
-    ...mapActions(["likeToggle", "addChat", "createResume"]),
+    ...mapActions(["likeToggle", "addChat", "createResume", "countResume"]),
+    ...mapMutations(["setLikeOrUnlike"]),
     async likeOrUnlike(action) {
-      var favorite = await this.likeToggle({
-        recruit_id: this.company.recruitId,
-        action: action
-      });
-      this.recruit.favorite = favorite;
-      this.company.favorite = favorite;
+      if (sessionStorage.getItem("email")) {
+        // 로그인된 사용자만 좋아요 가능
+        var favorite = await this.likeToggle({
+          recruit_id: this.company.recruitId,
+          action: action
+        });
+        this.recruit.favorite = favorite;
+        this.company.favorite = favorite;
+        if ((action == 0 && favorite) || (action == 1 && !favorite)) {
+          this.setLikeOrUnlike({
+            action: action,
+            recruit_id: this.company.recruitId
+          });
+        }
+      } else {
+        alert("로그인 후 사용해주세요.");
+      }
     },
     beforeOpen(event) {
       this.company = event.params.company;
@@ -107,17 +119,20 @@ export default {
         url: config.RECRUIT_HOST + "/recruits/detail/" + this.company.recruitId,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*"
+          "Access-Control-Allow-Origin": "*",
+          Authorization: "Bearer " + config.access_token
         }
       }).then(response => {
         if (response.data.status == 200) {
           this.recruit = response.data.data;
-          var s_date = this.recruit.startTime.split("-")
-          var e_date = this.recruit.endTime.split("-")
+          var s_date = this.recruit.startTime.split("-");
+          var e_date = this.recruit.endTime.split("-");
 
-          this.startTime = s_date.slice(0,3).join("-") + " " + s_date.slice(3).join(":")
-          this.endTime = e_date.slice(0,3).join("-") + " " + e_date.slice(3).join(":")
-          
+          this.startTime =
+            s_date.slice(0, 3).join("-") + " " + s_date.slice(3).join(":");
+          this.endTime =
+            e_date.slice(0, 3).join("-") + " " + e_date.slice(3).join(":");
+
           return true;
         }
         console.log(response.data.message);
@@ -130,35 +145,56 @@ export default {
     openChatRoom() {
       // 여기손좀
       this.addChat({
-        company_id: this.company.company_id,
+        company_id: this.company.companyId,
         company: this.recruit.companyName,
         logo_url: this.recruit.imageFileName
       });
       this.$modal.hide("company-modal");
     },
-    writeResume(recruit, employment) {
-      if(confirm("자기소개서를 작성하시겠습니까?")){
-        var answers = [];
-        employment.resumeQuestion.forEach(q => {
-          answers.push({
-            question_content: q.question_content,
-            answer_content: "",
-            question_limit: q.question_limit
-          });
+    makeNewResume(recruit, employment, cnt) {
+      var answers = [];
+      employment.resumeQuestion.forEach(q => {
+        answers.push({
+          questionContent: q.questionContent,
+          answerContent: "",
+          questionLimit: q.questionLimit
         });
-        var date_split = recruit.endTime.split("-")
-        var body = {
-          title: recruit.companyName + " " + employment.field,
-          endTime: date_split.slice(0,3).join("-") + " " + date_split.slice(3).join(":")+":00",
-          answers: answers,
-        };
-        this.createResume({
-          position_id: employment.positionId,
-          body: body,
-        });
+      });
+      var date_split = recruit.endTime.split("-");
+
+      var body = {
+        title: recruit.companyName + " " + employment.field + (cnt==0? '' : "(" + cnt + ")"),
+        endTime:
+          date_split.slice(0, 3).join("-") +
+          " " +
+          date_split.slice(3).join(":") +
+          ":00",
+        answers: answers
+      };
+      this.createResume({
+        position_id: employment.positionId,
+        body: body
+      });
+    },
+    async writeResume(recruit, employment) {
+      var is_create = false;
+      var cnt = 0;
+      if (confirm("자기소개서를 작성하시겠습니까?")) {
+        // 중복 체크
+        cnt = await this.countResume({ position_id: employment.positionId });
+        if (cnt >= 1) {
+          if (confirm("중복된 자기소개서가 있습니다. 새로 생성하시겠습니까?")) {
+            is_create = true;
+          }
+        } else {
+          is_create = true;
+        }
+      }
+      if (is_create) {
+        this.makeNewResume(recruit, employment, cnt);
       }
     }
-  },
+  }
 };
 </script>
 <style lang="scss">
@@ -285,7 +321,7 @@ $end: #3f4b5e;
           letter-spacing: 0.03rem;
           color: #707070;
         }
-        .d-content{
+        .d-content {
           padding-left: 15px;
           padding-right: 15px;
           text-align: left;
