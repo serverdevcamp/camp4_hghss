@@ -125,6 +125,8 @@ public class ResumeService {
         Answer answer = Answer.builder()
                             .resumeId(resumeId)
                             .orderNum(order+1)
+                            .questionContent("")
+                            .answerContent("")
                             .questionLimit(1000)
                             .build();
 
