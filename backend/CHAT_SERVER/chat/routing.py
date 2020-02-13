@@ -6,7 +6,7 @@ websocket_urlpatterns = [
 ]
 
 """
-var socket = new WebSocket('ws://' + 'localhost:8081' + '/chat/0/1');
+var socket = new WebSocket('ws://' + '13.124.252.238:8000' + '/chat/0/1');
 var chat = []
 
 // 데이터 전송
