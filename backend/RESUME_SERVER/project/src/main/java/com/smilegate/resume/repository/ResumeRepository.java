@@ -28,9 +28,15 @@ public interface ResumeRepository {
 
     List<Answer> findAnswersByResumeId(int resumeId);
 
-    int countAnswer(int resumeId);
-
-    int findResumeIdByAnswerId(int answerId);
+    Integer findResumeIdByAnswerId(int answerId);
 
     int deleteAnswer(int answerId);
+
+    Integer findRecruitIdByPositionId(int positionId);
+
+    Integer findCompanyIdByRecruitId(int recruitId);
+
+    Integer findMaxOrderNumByResumeId(int resumeId);
+
+    int countResumeByPositionId(int userId, int positionId);
 }

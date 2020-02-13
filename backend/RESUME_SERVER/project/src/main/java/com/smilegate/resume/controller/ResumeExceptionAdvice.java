@@ -1,9 +1,7 @@
 package com.smilegate.resume.controller;
 
 import com.smilegate.resume.dto.ResultResponse;
-import com.smilegate.resume.exceptions.InvalidTokenException;
-import com.smilegate.resume.exceptions.TokenNotExistException;
-import com.smilegate.resume.exceptions.UnauthorizedException;
+import com.smilegate.resume.exceptions.*;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,6 +39,26 @@ public class ResumeExceptionAdvice {
                 .status(400)
                 .message(e.getMessage())
                 .data(new LinkedList<>())
+                .build();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(ResumeNotExistException.class)
+    public ResultResponse handleResumeNotExist(Exception e) {
+        return ResultResponse.builder()
+                .success(false)
+                .status(500)
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(AnswerNotExistException.class)
+    public ResultResponse handleAnswerNotExist(Exception e) {
+        return ResultResponse.builder()
+                .success(false)
+                .status(501)
+                .message(e.getMessage())
                 .build();
     }
 

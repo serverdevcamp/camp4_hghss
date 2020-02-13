@@ -119,9 +119,6 @@ public class UserService {
 
         String nickname = userRepository.getNickname(userId);
 
-        System.out.println(userId);
-        System.out.println(nickname);
-
         userRepository.updateNickname(userId, nickname, now);
     }
 
