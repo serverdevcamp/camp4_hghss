@@ -85,7 +85,8 @@ export default {
   },
   actions: {
     openSocket(context, company_id) {
-      var socket = new WebSocket('ws://' + config.CHAT_HOST + '/chat/' + company_id + '/');
+      var user_id = context.getters.is_user_login ? context.getters.getUser.id : -1
+      var socket = new WebSocket('ws://' + config.CHAT_HOST + '/chat/' + company_id + '/' + user_id);
       // 소켓이 열린 뒤에 실행
       socket.onopen = function () {
         context.commit('setSocket', {
@@ -97,21 +98,28 @@ export default {
     // 채팅 구독
     addChat(context, payload){
       // 구독체크
-      console.log("시작이 두번나와야겎ㅆ지?")
-      var access_token = localStorage.getItem('accessToken')
       if(!context.state.myChat.hasOwnProperty(payload.company_id)){
         // 구독!
         context.state.myChat[payload.company_id] = {
           company: payload.company,
           logo_url: payload.logo_url
         }
+        console.log({
+          method: 'post',
+          url: config.RECRUIT_HOST + '/chats/detail/'+payload.company_id+'/like',
+          headers: {
+            "Content-Type": "application/json",
+            'Access-Control-Allow-Origin': '*',
+            'Authorization': 'Bearer ' + config.access_token,
+          }
+        })
         axios({
           method: 'post',
           url: config.RECRUIT_HOST + '/chats/detail/'+payload.company_id+'/like',
           headers: {
             "Content-Type": "application/json",
             'Access-Control-Allow-Origin': '*',
-            'Authorization': 'Bearer ' + access_token,
+            'Authorization': 'Bearer ' + config.access_token,
           }
         }).then(response => {
           if(response.data.status == 402){
@@ -136,7 +144,6 @@ export default {
       return true
     },
     async userChatAPI(context) {
-      var access_token = localStorage.getItem('accessToken')
       var chatURL = ['/my', '/favorite', '/hot']
       for (let i = 0; i < 3; i++) {
         await axios({
@@ -145,7 +152,7 @@ export default {
           headers: {
             "Content-Type": "application/json",
             'Access-Control-Allow-Origin': '*',
-            'Authorization': 'Bearer ' + access_token,
+            'Authorization': 'Bearer ' + config.access_token,
           }
         }).then(response => {
           if (response.data.status == 200) {

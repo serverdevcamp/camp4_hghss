@@ -17,13 +17,19 @@
           <v-row class="company-info">
             <p class="point-font company-name">
               {{ recruit.companyName }}
-              <font-awesome-icon icon="star" v-if="recruit.favorite" class="fav" @click="likeOrUnlike(1)"/>
-              <font-awesome-icon icon="star" v-else  @click="likeOrUnlike(0)"/>
+              <font-awesome-icon
+                icon="star"
+                v-if="recruit.favorite"
+                class="fav"
+                @click="likeOrUnlike(1)"
+              />
+              <font-awesome-icon icon="star" v-else @click="likeOrUnlike(0)" />
             </p>
           </v-row>
           <v-row class="recruit-date">
             <p>
-              {{ recruit.startTime }} ~ {{ recruit.endTime }}
+              {{ startTime}}
+              ~ {{ endTime }}
               <!-- TODO : 날짜 계산 -->
             </p>
           </v-row>
@@ -46,7 +52,7 @@
           <!-- TODO 몇명 -->
           <v-col cols="2" class="d-cnt">1000명 작성</v-col>
           <v-col cols="3" class="d-btn">
-            <button class="resume-btn">자기소개서 쓰기</button>
+            <button class="resume-btn" @click="writeResume(recruit, employment)">자기소개서 쓰기</button>
             <!-- 자기소개서 질문 목록-->
             <div class="question-hover">
               <v-row v-for="(question, index) in employment.resumeQuestion" :key="index">
@@ -64,7 +70,7 @@
 <script>
 import config from "../../store/config";
 import axios from "axios";
-import { mapActions } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 export default {
   data: () => ({
     division: [
@@ -77,17 +83,31 @@ export default {
       "신입/인턴"
     ],
     company: {},
-    recruit: {}
+    recruit: {},
+    startTime: "",
+    endTime: ""
   }),
   methods: {
-    ...mapActions(["likeToggle","addChat"]),
-    async likeOrUnlike(action){
-      var favorite = await this.likeToggle({
-        recruit_id :this.company.recruitId,
-        action: action,
-      })
-      this.recruit.favorite = favorite 
-      this.company.favorite = favorite 
+    ...mapActions(["likeToggle", "addChat", "createResume", "countResume"]),
+    ...mapMutations(["setLikeOrUnlike"]),
+    async likeOrUnlike(action) {
+      if (sessionStorage.getItem("email")) {
+        // 로그인된 사용자만 좋아요 가능
+        var favorite = await this.likeToggle({
+          recruit_id: this.company.recruitId,
+          action: action
+        });
+        this.recruit.favorite = favorite;
+        this.company.favorite = favorite;
+        if ((action == 0 && favorite) || (action == 1 && !favorite)) {
+          this.setLikeOrUnlike({
+            action: action,
+            recruit_id: this.company.recruitId
+          });
+        }
+      } else {
+        alert("로그인 후 사용해주세요.");
+      }
     },
     beforeOpen(event) {
       this.company = event.params.company;
@@ -99,11 +119,20 @@ export default {
         url: config.RECRUIT_HOST + "/recruits/detail/" + this.company.recruitId,
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*"
+          "Access-Control-Allow-Origin": "*",
+          Authorization: "Bearer " + config.access_token
         }
       }).then(response => {
         if (response.data.status == 200) {
           this.recruit = response.data.data;
+          var s_date = this.recruit.startTime.split("-");
+          var e_date = this.recruit.endTime.split("-");
+
+          this.startTime =
+            s_date.slice(0, 3).join("-") + " " + s_date.slice(3).join(":");
+          this.endTime =
+            e_date.slice(0, 3).join("-") + " " + e_date.slice(3).join(":");
+
           return true;
         }
         console.log(response.data.message);
@@ -113,13 +142,57 @@ export default {
     moveUrl(url) {
       window.open(url, "_blank");
     },
-    openChatRoom(){
+    openChatRoom() {
+      // 여기손좀
       this.addChat({
         company_id: this.company.companyId,
-        company: this.company.companyName,
-        logo_url : this.company.imageFileName
-        })
-      this.$modal.hide("company-modal")
+        company: this.recruit.companyName,
+        logo_url: this.recruit.imageFileName
+      });
+      this.$modal.hide("company-modal");
+    },
+    makeNewResume(recruit, employment, cnt) {
+      var answers = [];
+      employment.resumeQuestion.forEach(q => {
+        answers.push({
+          questionContent: q.questionContent,
+          answerContent: "",
+          questionLimit: q.questionLimit
+        });
+      });
+      var date_split = recruit.endTime.split("-");
+
+      var body = {
+        title: recruit.companyName + " " + employment.field + (cnt==0? '' : "(" + cnt + ")"),
+        endTime:
+          date_split.slice(0, 3).join("-") +
+          " " +
+          date_split.slice(3).join(":") +
+          ":00",
+        answers: answers
+      };
+      this.createResume({
+        position_id: employment.positionId,
+        body: body
+      });
+    },
+    async writeResume(recruit, employment) {
+      var is_create = false;
+      var cnt = 0;
+      if (confirm("자기소개서를 작성하시겠습니까?")) {
+        // 중복 체크
+        cnt = await this.countResume({ position_id: employment.positionId });
+        if (cnt >= 1) {
+          if (confirm("중복된 자기소개서가 있습니다. 새로 생성하시겠습니까?")) {
+            is_create = true;
+          }
+        } else {
+          is_create = true;
+        }
+      }
+      if (is_create) {
+        this.makeNewResume(recruit, employment, cnt);
+      }
     }
   }
 };
@@ -235,6 +308,7 @@ $end: #3f4b5e;
       border-radius: 3px;
       background: #ffffff;
       .position {
+        width: 100%;
         border-top: 1px solid #ddd;
         text-align: center;
         &:nth-child(1) {
@@ -246,6 +320,11 @@ $end: #3f4b5e;
           font-weight: 500;
           letter-spacing: 0.03rem;
           color: #707070;
+        }
+        .d-content {
+          padding-left: 15px;
+          padding-right: 15px;
+          text-align: left;
         }
         .d-btn {
           position: relative;
