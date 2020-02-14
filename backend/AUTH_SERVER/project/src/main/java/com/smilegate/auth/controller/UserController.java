@@ -10,6 +10,7 @@ import com.smilegate.auth.exceptions.UnauthorizedException;
 import com.smilegate.auth.service.UserService;
 import com.smilegate.auth.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping("/users")
 public class UserController {
 
@@ -28,6 +30,8 @@ public class UserController {
 
     @PostMapping("/signin")
     public ResponseEntity<ResultResponse> signin(@RequestBody SigninRequestDto signinRequestDto) {
+
+        log.info("SIGN IN");
 
         TokenResponseDto tokenResponseDto = userService.signin(signinRequestDto);
 
@@ -47,7 +51,9 @@ public class UserController {
         String refreshToken = token.substring("Bearer ".length());
         if(!jwtUtil.isRefreshToken(refreshToken)) throw new UnauthorizedException();
 
+        log.info("SIGN OUT ");
         userService.signout(refreshToken);
+        log.info("SUCCESS");
 
         return ResponseEntity.ok().body(
                 ResultResponse.builder()

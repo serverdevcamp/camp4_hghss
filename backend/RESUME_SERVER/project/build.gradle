@@ -24,7 +24,6 @@ dependencies {
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.1'
     implementation 'io.jsonwebtoken:jjwt-api:0.10.7'
 
-//    compile 'org.springframework.session:2.1.4.RELEASE'
     compileOnly 'org.projectlombok:lombok'
     
     runtime 'io.jsonwebtoken:jjwt-impl:0.10.7'
