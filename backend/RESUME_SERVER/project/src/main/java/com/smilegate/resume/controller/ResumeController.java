@@ -4,15 +4,18 @@ import com.smilegate.resume.domain.Answer;
 import com.smilegate.resume.domain.Resume;
 import com.smilegate.resume.dto.ResultResponse;
 import com.smilegate.resume.dto.request.ResumeRequestDto;
+import com.smilegate.resume.dto.response.ResumeCountResponseDto;
 import com.smilegate.resume.dto.response.ResumeDetailResponseDto;
 import com.smilegate.resume.service.ResumeService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RestController
@@ -32,7 +35,7 @@ public class ResumeController {
         return ResponseEntity.ok().body(
                 ResultResponse.builder()
                         .success(true)
-                        .status(HttpStatus.CREATED.value())
+                        .status(HttpStatus.OK.value())
                         .message("자기소개서를 생성했습니다.")
                         .data(resumeDetailResponseDto)
                         .build()
@@ -41,6 +44,7 @@ public class ResumeController {
 
     @GetMapping("/list")
     public ResponseEntity<ResultResponse> list(@RequestHeader("Authorization") String token) {
+        log.info("RESUME LIST");
 
         List<Resume> resumes = resumeService.getResumes(token);
 
@@ -157,6 +161,24 @@ public class ResumeController {
                         .success(true)
                         .status(HttpStatus.OK.value())
                         .message("문항을 삭제했습니다.")
+                        .build()
+        );
+    }
+
+    @GetMapping("/count/{positionId}")
+    public ResponseEntity<ResultResponse> countResume(
+            @RequestHeader("Authorization") String token,
+            @PathVariable int positionId
+    ) {
+
+        int resumeCnt = resumeService.countResume(token, positionId);
+
+        return ResponseEntity.ok().body(
+                ResultResponse.builder()
+                        .success(true)
+                        .status(HttpStatus.OK.value())
+                        .message("해당 직무에 작성한 자기소개서 개수입니다.")
+                        .data(ResumeCountResponseDto.builder().resumeCnt(resumeCnt).build())
                         .build()
         );
     }

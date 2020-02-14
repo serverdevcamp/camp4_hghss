@@ -42,11 +42,11 @@
               <span class="star-btn">
                 <font-awesome-icon
                   icon="star"
-                  v-if="company.favorite"
+                  v-if="getCalendarLike.indexOf(company.recruitId) >= 0"
                   class="fav"
-                  @click="likeOrUnlike(1, company)"
+                  @click="likeOrUnlike(1, company.recruitId)"
                 />
-                <font-awesome-icon icon="star" v-else @click="likeOrUnlike(0, company)" />
+                <font-awesome-icon icon="star" v-else @click="likeOrUnlike(0, company.recruitId)" />
               </span>
             </v-row>
             <v-row
@@ -57,33 +57,28 @@
             >
               <div @click="showCompanyModal(company)" class="infos">
                 <span class="info-end-icon point-font">끝</span>
-                <span class="company-name">{{ company.companyName}}</span>
+                <span class="company-name">{{ company.companyName }}</span>
               </div>
               <span class="star-btn">
                 <font-awesome-icon
                   icon="star"
-                  v-if="company.favorite"
+                  v-if="getCalendarLike.indexOf(company.recruitId) >= 0"
                   class="fav"
-                  @click="likeOrUnlike(1, company)"
+                  @click="likeOrUnlike(1, company.recruitId)"
                 />
-                <font-awesome-icon icon="star" v-else @click="likeOrUnlike(0, company)" />
+                <font-awesome-icon icon="star" v-else @click="likeOrUnlike(0, company.recruitId)" />
               </span>
             </v-row>
           </div>
         </v-col>
       </v-row>
     </div>
-    <Detail />
   </section>
 </template>
 <script>
-import Detail from "./Detail";
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapMutations } from "vuex";
 
 export default {
-  components: {
-    Detail
-  },
   data: () => ({
     months: [
       "January",
@@ -112,16 +107,27 @@ export default {
     time: "-00:00:00.000"
   }),
   computed: {
-    ...mapGetters(["getCalendar"])
+    ...mapGetters(["getCalendar", "getCalendarLike"])
   },
   methods: {
+    ...mapMutations(["setLikeOrUnlike"]),
     ...mapActions(["calendarAPI", "likeToggle"]),
-    async likeOrUnlike(action, company) {
-      var favorite = await this.likeToggle({
-        recruit_id: company.recruitId,
-        action: action
-      });
-      company.favorite = favorite;
+    async likeOrUnlike(action, recruit_id) {
+      if (sessionStorage.getItem("email")) {
+        var favorite = await this.likeToggle({
+          recruit_id: recruit_id,
+          action: action
+        });
+        if ((action == 0 && favorite) || (action == 1 && !favorite)) {
+          // 좋아요
+          this.setLikeOrUnlike({
+            action: action,
+            recruit_id: recruit_id
+          });
+        }
+      } else {
+        alert("로그인 후 사용해주세요.");
+      }
     },
     showCompanyModal(company) {
       this.$modal.show("company-modal", { company: company });
@@ -188,7 +194,7 @@ export default {
       } else {
         this.month -= 1;
       }
-      this.makeCalendarPage();
+      this.makeCalendar();
     },
     afterMonth() {
       if (this.month == 11) {
@@ -197,27 +203,28 @@ export default {
       } else {
         this.month += 1;
       }
-      this.makeCalendarPage();
+      this.makeCalendar();
+    },
+    makeCalendar() {
+      var startDate =
+        new Date(this.year, this.month - 2, 1).toISOString().substring(0, 10) +
+        this.time;
+      var endDate =
+        new Date(this.year, this.month + 2, 1).toISOString().substring(0, 10) +
+        this.time;
+
+      this.calendarAPI({
+        startTime: startDate,
+        endTime: endDate
+      }).then(e => {
+        console.log(e);
+        // TODO : 로딩
+        this.createCalendar(this.year, this.month);
+      });
     },
     makeCalendarPage() {
       if (this.getCalendar.length == 0) {
-        // 최소 2달 전 값부터 가져오기
-        var startDate =
-          new Date(this.year, this.month - 2, 1)
-            .toISOString()
-            .substring(0, 10) + this.time;
-        var endDate =
-          new Date(this.year, this.month + 2, 1)
-            .toISOString()
-            .substring(0, 10) + this.time;
-
-        this.calendarAPI({
-          startTime: startDate,
-          endTime: endDate
-        }).then(e => {
-          console.log(e);
-          this.createCalendar(this.year, this.month);
-        });
+        this.makeCalendar();
       } else {
         this.createCalendar(this.year, this.month);
       }
@@ -305,7 +312,7 @@ $end: #3f4b5e;
       border-top: 1px solid $calendar-border;
     }
     .day-wrapper {
-      width:calc(100% / 7);
+      width: calc(100% / 7);
       border-left: 1px solid $calendar-border;
       .title-wrapper {
         padding: 5px 0;
@@ -351,7 +358,7 @@ $end: #3f4b5e;
           color: #ffffff;
         }
         .company-name {
-          width:calc(100% - 28px);
+          width: calc(100% - 28px);
           margin: 0 3px;
           padding-top: 3px;
           line-height: 1rem;

@@ -76,18 +76,36 @@ public class ResumeRepositoryImpl implements ResumeRepository {
     }
 
     @Override
-    public int countAnswer(int resumeId) {
-        return session.selectOne("resume.selectCntAnswerByResumeId", resumeId);
-    }
-
-    @Override
-    public int findResumeIdByAnswerId(int answerId) {
+    public Integer findResumeIdByAnswerId(int answerId) {
         return session.selectOne("resume.selectResumeIdByAnswerId", answerId);
     }
 
     @Override
     public int deleteAnswer(int answerId) {
         return session.delete("resume.deleteAnswer", answerId);
+    }
+
+    @Override
+    public Integer findRecruitIdByPositionId(int positionId) {
+        return session.selectOne("resume.selectRecruitIdByPositionId", positionId);
+    }
+
+    @Override
+    public Integer findCompanyIdByRecruitId(int recruitId) {
+        return session.selectOne("resume.selectCompanyIdByRecruitId", recruitId);
+    }
+
+    @Override
+    public Integer findMaxOrderNumByResumeId(int resumeId) {
+        return session.selectOne("resume.selectMaxOrderNumByResumeId", resumeId);
+    }
+
+    @Override
+    public int countResumeByPositionId(int userId, int positionId) {
+        HashMap<String, Integer> map = new HashMap<>();
+        map.put("userId", userId);
+        map.put("positionId", positionId);
+        return session.selectOne("resume.selectCountResumeByPositionId", map);
     }
 
 }

@@ -49,7 +49,7 @@ public class MailUtil {
 
             message.setContent(
                     "<h1>[이메일 인증]</h1> <p>아래 링크를 클릭하시면 이메일 인증이 완료됩니다.</p> " +
-                    "<a href='http://10.99.13.27:8000/users/signup/confirm?key=" + key + "' target='_blenk'>이메일 인증 확인</a>"
+                    "<a href='http://15.165.146.7:7000/users/signup/confirm?key=" + key + "' target='_blenk'>이메일 인증 확인</a>"
                     , "text/html;charset=euc-kr"
             );
 
