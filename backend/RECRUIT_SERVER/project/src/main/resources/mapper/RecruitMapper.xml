@@ -131,28 +131,6 @@
     </select>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     <select id = "GetDetailRecruitPage" resultType="com.rest.recruit.model.RecruitDetail">
         SELECT
         <include refid = "detail"/>
@@ -177,9 +155,9 @@
 
     <select id = "getPosition" resultType="com.rest.recruit.model.Position">
         SELECT
-        position.id AS 'position_id', position.title AS 'field' , position.division,
-        question.id AS 'question_id',question.question_content,
-        question.question_limit
+        position.id AS positionId, position.title AS field, position.division,
+        question.id AS questionId,question.question_content AS questionContent,
+        question.question_limit AS questionLimit
         FROM recruit
         INNER JOIN position ON position.recruit_id = recruit.id
         INNER JOIN question ON question.position_id = position.id

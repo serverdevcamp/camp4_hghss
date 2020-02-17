@@ -13,16 +13,9 @@ public class Position {
     private String field;
     private int division;
     private int questionId;
-
-
     private String questionContent;
+    private int questionLimit;
     private List<Question> quesitons;
 
-    private int questionLimit;
-
-    public void setEmployments(List<Question> tmpQuestion) {
-        this.quesitons = tmpQuestion;
-
-    }
 
 }

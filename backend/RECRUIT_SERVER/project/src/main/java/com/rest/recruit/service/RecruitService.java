@@ -65,10 +65,14 @@ public class RecruitService {
     }
 
 
-    @Cacheable(cacheNames="detailRecruit", key = "recruitIdx")
+   @Cacheable(cacheNames="detailRecruit", key = "#recruitIdx")
     public Recruit GetRecruit(int recruitIdx){
 
         Recruit recruit = recruitMapper.GetRecruit(recruitIdx);
+
+        System.out.print("recruit-companyName");
+        System.out.print(recruit.getCompanyName());
+
 
         return recruit;
 
@@ -76,10 +80,15 @@ public class RecruitService {
 
 
 
-    @Cacheable(cacheNames ="detailPosition", key="recruitIdx")
+    @Cacheable(cacheNames ="detailPosition", key="#recruitIdx")
     public List<GetRecruitPositionResponseDTO> GetPositionList(int recruitIdx) {
 
         List<Position> tmpPosition = recruitMapper.getPosition(recruitIdx);
+
+        System.out.print("recruit-questionContent");
+        System.out.print(tmpPosition.get(0).getQuestionContent());
+
+
         List<Question> tmpQuestionList = new ArrayList<>();
         List<GetRecruitPositionResponseDTO> tmpEmployments = new ArrayList<>();
         int j = 0;
@@ -106,6 +115,8 @@ public class RecruitService {
             tmpQuestionList.add(new Question(tmpPosition.get(k).getQuestionId(),
                     tmpPosition.get(k).getQuestionContent(),tmpPosition.get(k).getQuestionLimit()));
         }
+
+
         tmpEmployments.add(new GetRecruitPositionResponseDTO(tmpPosition.get(j).getPositionId(),
                 tmpPosition.get(j).getField(),
                 tmpPosition.get(j).getDivision(),
@@ -252,8 +263,22 @@ public class RecruitService {
                 return SimpleResponse.ok();
             }
         }
+        log.info("getRecruitIdx ");
+        System.out.println(dataWithToken.getRecruitIdx());//ok
 
         List<Position> tmpPosition = recruitMapper.getPosition(dataWithToken.getRecruitIdx());
+        log.info("getPosition- content ");
+        log.info(tmpPosition.get(0).getQuestionContent());//null
+        log.info("getPosition1 - positionid");
+        System.out.println(tmpPosition.get(0).getPositionId());//0
+        log.info("getPosition2- field ");
+        log.info(tmpPosition.get(0).getField());//ok
+        log.info("getPosition3- questionLimit");
+        System.out.println(tmpPosition.get(0).getQuestionLimit());//ok
+        log.info("getPosition4- division");
+        System.out.println(tmpPosition.get(0).getDivision());//ok 4
+
+
         List<Question> tmpQuestionList = new ArrayList<>();
         List<GetRecruitPositionResponseDTO> tmpEmployments = new ArrayList<>();
 

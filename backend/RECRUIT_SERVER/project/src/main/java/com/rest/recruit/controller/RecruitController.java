@@ -1,6 +1,5 @@
 package com.rest.recruit.controller;
 
-import com.rest.recruit.dto.ResultResponse;
 import com.rest.recruit.dto.ResultResponseWithoutData;
 import com.rest.recruit.dto.SimpleResponse;
 import com.rest.recruit.dto.request.DataWithToken;
@@ -9,20 +8,22 @@ import com.rest.recruit.dto.response.GetCalendarResponse;
 import com.rest.recruit.dto.response.GetRecruitDetailResponseDTO;
 import com.rest.recruit.exception.UnValidatedDateTypeException;
 import com.rest.recruit.exception.UnauthorizedException;
+import com.rest.recruit.service.BasicService;
 import com.rest.recruit.service.RecruitService;
 import com.rest.recruit.util.DateValidation;
 import com.rest.recruit.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+
+import java.io.IOException;
 
 //또한, 특정 도메인만 접속을 허용할 수도 있습니다.
 //      - @CrossOrigin(origins = "허용주소:포트")
@@ -34,13 +35,33 @@ import io.swagger.annotations.ApiParam;
 public class RecruitController {
 
     private final RecruitService recruitService;
-
+    private final BasicService basicService;
 
     @Autowired
     private JwtUtil jwtUtil;
 
-    public RecruitController(RecruitService recruitService) {
+    public RecruitController(RecruitService recruitService, BasicService basicService) {
         this.recruitService = recruitService;
+        this.basicService = basicService;
+    }
+
+    @ExceptionHandler(ClientAbortException.class)
+    protected ResponseEntity clientAbortException(ClientAbortException e) {
+        log.info("client disconnected");
+        return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                .message(HttpStatus.INTERNAL_SERVER_ERROR.toString())
+                .status("500")
+                .success("false").build());
+    }
+
+
+    @ExceptionHandler(IOException.class)
+    protected ResponseEntity IOExceptionHandler(IOException e) {
+        log.info("ioexception");
+        return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                .message(HttpStatus.INTERNAL_SERVER_ERROR.toString())
+                .status("500")
+                .success("false").build());
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,6 +72,7 @@ public class RecruitController {
                                    @RequestParam(value = "startTime")  String startTime,
                                    @RequestParam(value = "endTime") String endTime) {
 
+        basicService.onAsync();
         long start = System.currentTimeMillis();
         //logger.info("채용공고캘린더 api 실행 시작");
         if (!DateValidation.validationDate(startTime) || !DateValidation.validationDate(endTime)) {
@@ -72,7 +94,7 @@ public class RecruitController {
                                    @RequestParam(value = "startTime")  String startTime,
                                    @RequestParam(value = "endTime") String endTime) {
 
-
+        basicService.onAsync();
         if (!DateValidation.validationDate(startTime) || !DateValidation.validationDate(endTime)) {
 
             throw new UnValidatedDateTypeException();
@@ -95,6 +117,7 @@ public class RecruitController {
                                            @RequestHeader(value="Authorization", required=false) String token,
                                            @PathVariable(value = "recruitIdx") int recruitIdx) {
         //logger.info("상세 채용공고 api 실행 시작");
+        basicService.onAsync();
         long start = System.currentTimeMillis();
         if (token == null || token.isEmpty()) {
             //logger.info("token empty\n");
@@ -145,7 +168,7 @@ public class RecruitController {
     public ResponseEntity detailRecuit(@ApiParam(value = "recruitIdx", required = true)
                                            @RequestHeader(value="Authorization", required=false) String token,
                                            @PathVariable(value = "recruitIdx") int recruitIdx) {
-
+        basicService.onAsync();
         long start = System.currentTimeMillis();
         if (token== null || token.isEmpty()) {
             ResponseEntity result = recruitService.GetDetailRecruitPage(DataWithToken.builder().recruitIdx(recruitIdx).build());
@@ -188,7 +211,7 @@ public class RecruitController {
                                    @RequestHeader(value="Authorization", required=false) String token,
                                    @RequestParam(value = "startTime")  String startTime,
                                    @RequestParam(value = "endTime") String endTime) {
-
+        basicService.onAsync();
         long start = System.currentTimeMillis();
         if (!DateValidation.validationDate(startTime) || !DateValidation.validationDate(endTime)) {
 
