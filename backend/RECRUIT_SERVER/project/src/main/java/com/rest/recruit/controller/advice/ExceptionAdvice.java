@@ -15,7 +15,9 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
+import org.terracotta.modules.ehcache.async.exceptions.AsyncException;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 @Slf4j
@@ -46,6 +48,15 @@ public class ExceptionAdvice {
                 .success("false").build());
     }
 
+    @ExceptionHandler(IOException.class)
+    protected ResponseEntity IOExceptionHandler(IOException e) {
+        log.info("ioexception");
+        return SimpleResponse.ok(ResultResponseWithoutData.builder()
+                .message(HttpStatus.INTERNAL_SERVER_ERROR.toString())
+                .status("500")
+                .success("false").build());
+    }
+
     /**
      *  handleException
      *  그 밖에 발생하는 모든 예외 처리, Null Point Exception, 등등
@@ -59,6 +70,9 @@ public class ExceptionAdvice {
                 .status("500")
                 .success("false").build());
     }
+
+
+
     /**
      *  MissingServletRequestParameterException
      *  parameter가 없을 때
