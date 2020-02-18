@@ -34,6 +34,8 @@ export default {
       sessionStorage.setItem('nickname', payload.nickname);
       sessionStorage.setItem('role', payload.role);
 
+      config.access_token = sessionStorage.getItem('accessToken');
+      config.refresh_token = sessionStorage.getItem('refreshToken');
     },
     signout(state) {
       state.user.id = "";
@@ -48,6 +50,9 @@ export default {
       sessionStorage.removeItem('email');
       sessionStorage.removeItem('role');
       sessionStorage.removeItem('id');
+
+      config.access_token = null;
+      config.refresh_token = null;
     }
   },
   actions: {

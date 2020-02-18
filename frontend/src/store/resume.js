@@ -196,6 +196,7 @@ export default {
     },
     // 목록
     resumeListAPI(context) {
+      console.log(config.access_token)
       axios({
         method: 'get',
         url: config.RESUME_HOST + '/resumes/list',
