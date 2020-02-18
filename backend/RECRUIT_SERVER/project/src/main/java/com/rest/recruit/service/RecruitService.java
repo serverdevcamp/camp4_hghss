@@ -65,7 +65,7 @@ public class RecruitService {
     }
 
 
-   @Cacheable(cacheNames="detailRecruit", key = "#recruitIdx")
+   @Cacheable(cacheNames="detailRecruit", key = "recruitIdx")
     public Recruit GetRecruit(int recruitIdx){
 
         Recruit recruit = recruitMapper.GetRecruit(recruitIdx);
@@ -80,7 +80,7 @@ public class RecruitService {
 
 
 
-    @Cacheable(cacheNames ="detailPosition", key="#recruitIdx")
+    @Cacheable(cacheNames ="detailPosition", key="recruitIdx")
     public List<GetRecruitPositionResponseDTO> GetPositionList(int recruitIdx) {
 
         List<Position> tmpPosition = recruitMapper.getPosition(recruitIdx);
@@ -150,6 +150,11 @@ public class RecruitService {
     }
 
     private boolean GetFavorite(int userIdx, int recruitIdx) {
+        System.out.print("\ngetfavorite - userIdx\n");
+        System.out.print(userIdx);
+        System.out.print("\ngetfavorite - recruitIdx\n");
+        System.out.print(recruitIdx);
+
         return recruitMapper.GetFavorite(userIdx,recruitIdx) != null ? true : false;
 
     }
@@ -162,6 +167,9 @@ public class RecruitService {
     public ResponseEntity GetDetailRecruit(DataWithToken dataWithToken) {
 
         Recruit updateDetail = updateViewCount(GetRecruit(dataWithToken.getRecruitIdx()));
+
+        System.out.print("\nfavorite return\n");
+        System.out.print(GetFavorite(dataWithToken.getUserIdx(),dataWithToken.getRecruitIdx()));
 
         updateDetail.setFavorite(GetFavorite(dataWithToken.getUserIdx(),dataWithToken.getRecruitIdx()));
         updateDetail.setFavoriteCount(GetFavoriteCount(dataWithToken.getRecruitIdx()));

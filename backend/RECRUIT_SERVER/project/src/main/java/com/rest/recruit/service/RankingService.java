@@ -44,6 +44,10 @@ public class RankingService {
 
             if (visitRank != null || likeRank != null || applyRank != null) { continue; }
 
+            System.out.print("\nredisTmp\n");
+            System.out.print(tmpString);
+            System.out.print("\n");
+
             redisZsetUtil.add("ranking-apply", tmpString, tmp.getApplyCount());
             redisZsetUtil.add("ranking-visit", tmpString, tmp.getViewCount());
             redisZsetUtil.add("ranking-like", tmpString, tmp.getFavoriteCount());
@@ -204,6 +208,14 @@ public class RankingService {
 
             //이미 마감 or 오 늘+ 7일 이전에 끝나지않을때
             if(time.compareTo(endDate) <= 0 && endDate.compareTo(cal.getTime()) <= 0){
+                /*this.recruitId = Integer.parseInt(array[1]);
+        this.companyId = Integer.parseInt(array[2]);
+        this.companyName = array[3];
+        this.count = count;
+        this.rank  = rank;
+        this.endTime = array[0];*/
+                System.out.print("companyNmae\n");
+                System.out.print(array[3]);
                 getRankingResponseDTOList
                         .add(new GetRankingResponseDTO(array,rank.getScore(),i++));
             }
