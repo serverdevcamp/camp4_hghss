@@ -150,7 +150,7 @@
 
 
     <select id = "GetFavorite" resultType="com.rest.recruit.model.RecruitLike" >
-        SELECT * FROM recruit_like WHERE user_id = #{userIdx} AND recruit_id = #{recruitIdx};
+        SELECT user_id AS userId, recruit_id AS recruitId FROM recruit_like WHERE user_id = #{userIdx} AND recruit_id = #{recruitIdx};
     </select>
 
     <select id = "getPosition" resultType="com.rest.recruit.model.Position">
@@ -171,8 +171,8 @@
         DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS endTime,
         company.name AS companyName,
         recruit.view_count AS viewCount,
-        recruit.like_count AS 'favoriteCount',
-        recruit.resume_count AS 'applyCount'
+        recruit.like_count AS favoriteCount,
+        recruit.resume_count AS applyCount
         FROM recruit
         INNER JOIN company ON company.id = recruit.company_id
         WHERE recruit.id IN (SELECT recruit.id FROM recruit)
