@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface UserRepository {
 
-    User findByEmail(String email);
+    User findByEmail(String email, int status);
 
     int countUser(String email);
 

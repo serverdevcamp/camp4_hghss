@@ -5,6 +5,7 @@ import CommonPage from '../views/CommonPage'
 import ResetPasswd from '../components/template/ResetPasswd'
 import ChangePasswd from '../components/template/ChangePasswd'
 import AdminPage from '../views/AdminPage.vue'
+import OAuth2Page from '../views/OAuth2Page.vue'
 
 Vue.use(VueRouter)
 
@@ -43,6 +44,11 @@ const routes = [
     path: '/admin',
     name: 'Admin',
     component: AdminPage
+  },
+  {
+    path: '/oauth2',
+    name: 'OAuth2',
+    component: OAuth2Page
   }
 ]
 

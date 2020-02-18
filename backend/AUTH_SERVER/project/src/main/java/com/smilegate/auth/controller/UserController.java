@@ -7,6 +7,7 @@ import com.smilegate.auth.dto.request.SignupRequestDto;
 import com.smilegate.auth.dto.request.UpdatePasswordRequestDto;
 import com.smilegate.auth.dto.response.TokenResponseDto;
 import com.smilegate.auth.exceptions.UnauthorizedException;
+import com.smilegate.auth.service.OAuth2Service;
 import com.smilegate.auth.service.UserService;
 import com.smilegate.auth.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import java.io.IOException;
 public class UserController {
 
     private final UserService userService;
+    private final OAuth2Service oAuth2Service;
     private final JwtUtil jwtUtil;
 
     @PostMapping("/signin")
@@ -130,6 +132,22 @@ public class UserController {
                         .success(true)
                         .status(HttpStatus.OK.value())
                         .message("새로운 Access Token이 발급되었습니다.")
+                        .data(tokenResponseDto)
+                        .build()
+        );
+    }
+
+    @GetMapping("/oauth2/naver")
+    public ResponseEntity<ResultResponse> naverCallback(@RequestParam("code") String code) {
+        log.info("oauth2 naver");
+
+        TokenResponseDto tokenResponseDto = oAuth2Service.createToken(code);
+
+        return ResponseEntity.ok().body(
+                ResultResponse.builder()
+                        .success(true)
+                        .status(HttpStatus.OK.value())
+                        .message("")
                         .data(tokenResponseDto)
                         .build()
         );

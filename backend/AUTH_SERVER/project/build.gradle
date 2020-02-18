@@ -30,7 +30,7 @@ dependencies {
 
     compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.4.0.RELEASE'
     compile group: 'javax.mail', name: 'mail', version: '1.4.7'
-//    compile 'org.springframework.session:2.1.4.RELEASE'
+    compile group: 'org.json', name: 'json', version: '20160810'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'mysql:mysql-connector-java'

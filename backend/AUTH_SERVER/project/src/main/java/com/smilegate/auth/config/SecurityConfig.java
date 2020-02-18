@@ -33,6 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                             "/users/signin",
                             "/users/signup/**",
                             "/users/password/**",
+                            "/users/oauth2/**",
                             "/exception/**"
                     ).permitAll()
                     .antMatchers("/admin/**").hasAuthority("ADMIN")
@@ -50,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(6);
+        return new BCryptPasswordEncoder(4);
     }
 
 }
