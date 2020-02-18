@@ -15,6 +15,8 @@ import com.rest.recruit.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -118,6 +120,7 @@ public class RecruitController {
                                            @PathVariable(value = "recruitIdx") int recruitIdx) {
         //logger.info("상세 채용공고 api 실행 시작");
         basicService.onAsync();
+
         long start = System.currentTimeMillis();
         if (token == null || token.isEmpty()) {
             //logger.info("token empty\n");
@@ -130,7 +133,8 @@ public class RecruitController {
         }
 
         String tokenString = token.substring("Bearer ".length());
-
+        System.out.print("toekn\n");
+        System.out.print(jwtUtil.getAuthentication(tokenString));
         if(!jwtUtil.isValidToken(tokenString)){
             //logger.info("expire or no valid token\n");
             //throw new ExpiredTokenException();
@@ -288,6 +292,7 @@ public class RecruitController {
     </select>
     *
     * */
+
     @ApiOperation(value = "채용공고 즐겨찾기", httpMethod = "POST", notes = "채용공고 즐겨찾기",response= ResultResponseWithoutData.class)
     @GetMapping("/likelist/{recruitIdx}")
     public ResponseEntity getViewCount(@ApiParam(value = "recruitIdx", required = true)
@@ -302,6 +307,23 @@ public class RecruitController {
                 .status("200")
                 .success("true")
                 .build());
+    }
+
+    @CacheEvict(cacheNames="detailRecruit", key = "#recruitIdx")
+    @DeleteMapping("/cache/{recruitIdx}")
+    public ResponseEntity cacheDelete(@ApiParam(value = "recruitIdx", required = true)
+                                       @PathVariable(value = "recruitIdx") int recruitIdx) {
+
+        return   SimpleResponse.ok(ResultResponseWithoutData.builder()
+                .message("좋아요수 조회 성공")
+                .status("200")
+                .success("true")
+                .build());
+    }
+
+    @CacheEvict(cacheNames ="detailPosition", key="#recruitIdx")
+    public void test(){
+        System.out.print("cacheEvict");
     }
 
 

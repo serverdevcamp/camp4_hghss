@@ -65,22 +65,17 @@ public class RecruitService {
     }
 
 
-   @Cacheable(cacheNames="detailRecruit", key = "recruitIdx")
+   @Cacheable(cacheNames="detailRecruit", key = "#recruitIdx")
     public Recruit GetRecruit(int recruitIdx){
 
         Recruit recruit = recruitMapper.GetRecruit(recruitIdx);
-
-        System.out.print("recruit-companyName");
-        System.out.print(recruit.getCompanyName());
-
-
         return recruit;
 
     }
 
 
 
-    @Cacheable(cacheNames ="detailPosition", key="recruitIdx")
+    @Cacheable(cacheNames ="detailPosition", key="#recruitIdx")
     public List<GetRecruitPositionResponseDTO> GetPositionList(int recruitIdx) {
 
         List<Position> tmpPosition = recruitMapper.getPosition(recruitIdx);
@@ -137,6 +132,9 @@ public class RecruitService {
             double score = zsetOperations.incrementScore("ranking-visit",key,1);
             tmpdetail.setViewCount( Integer.parseInt(String.valueOf(Math.round(score))));
 
+            System.out.print("updateViewCount - test\n");//ok
+            System.out.print(score);
+
         } else {
             int updateCheck = recruitMapper.updateViewCountWithDB(tmpdetail.getRecruitId());
             int getVisitCount = recruitMapper.GetViewCount(tmpdetail.getRecruitId());
@@ -144,18 +142,25 @@ public class RecruitService {
             //레디스에없다면 update +1
             tmpdetail.setViewCount(getVisitCount);
 
+            System.out.print("test\n");
+            System.out.print(getVisitCount);
         }
+
 
         return tmpdetail;
     }
 
     private boolean GetFavorite(int userIdx, int recruitIdx) {
-        System.out.print("\ngetfavorite - userIdx\n");
-        System.out.print(userIdx);
-        System.out.print("\ngetfavorite - recruitIdx\n");
-        System.out.print(recruitIdx);
 
-        return recruitMapper.GetFavorite(userIdx,recruitIdx) != null ? true : false;
+
+        RecruitLike recruitLike = recruitMapper.GetFavorite(userIdx,recruitIdx);
+        System.out.print("\ngetfavorite - userIdx\n");
+        System.out.print(recruitLike.getUserId());
+        System.out.print("\ngetfavorite - recruitIdx\n");
+        System.out.print(recruitLike.getRecruitId());//ok
+
+
+        return recruitLike != null ? true : false;
 
     }
 
@@ -168,13 +173,26 @@ public class RecruitService {
 
         Recruit updateDetail = updateViewCount(GetRecruit(dataWithToken.getRecruitIdx()));
 
-        System.out.print("\nfavorite return\n");
-        System.out.print(GetFavorite(dataWithToken.getUserIdx(),dataWithToken.getRecruitIdx()));
+        System.out.print("\ngetCompanyName\n");//ok
+        System.out.print(updateDetail.getCompanyName());
 
+//문제
         updateDetail.setFavorite(GetFavorite(dataWithToken.getUserIdx(),dataWithToken.getRecruitIdx()));
+
+
+
+        System.out.print("\nisFavorite\n");
+        System.out.print(updateDetail.isFavorite());
+
         updateDetail.setFavoriteCount(GetFavoriteCount(dataWithToken.getRecruitIdx()));
 
+        System.out.print("\nfavoriteCount\n");
+        System.out.print(updateDetail.getFavoriteCount());
+
         List<GetRecruitPositionResponseDTO> tmpEmployments = GetPositionList(dataWithToken.getRecruitIdx());
+
+        System.out.print("\nGETDivision\n");
+        System.out.print(tmpEmployments.get(0).getDivision());
 
         GetRecruitPageResponseDTO getRecruitPageResponseDTO
                 = new GetRecruitPageResponseDTO(updateDetail,tmpEmployments);

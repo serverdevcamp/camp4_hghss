@@ -107,7 +107,7 @@
     </select>
 
     <select id = "GetRecruit" resultType="com.rest.recruit.model.Recruit">
-        SELECT
+         SELECT
         recruit.id AS recruitId,
         company.id AS companyId,
         company.name AS companyName,
@@ -115,8 +115,8 @@
         recruit.employment_page_url AS employmentPageUrl,
         DATE_FORMAT(recruit.start_time,'%Y-%m-%d-%h-%i') AS startTime,
         DATE_FORMAT(recruit.end_time,'%Y-%m-%d-%h-%i') AS endTime,
-        recruit.recruit_type AS 'recruit_type',
-        recruit.content
+        recruit.recruit_type AS recruitType,
+        recruit.content AS content
         FROM recruit
         INNER JOIN company ON company.id = recruit.company_id
         WHERE recruit.id = #{recruitIdx};
