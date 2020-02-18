@@ -67,10 +67,8 @@ public class RecruitService {
 
    @Cacheable(cacheNames="detailRecruit", key = "#recruitIdx")
     public Recruit GetRecruit(int recruitIdx){
-
         Recruit recruit = recruitMapper.GetRecruit(recruitIdx);
         return recruit;
-
     }
 
 

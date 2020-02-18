@@ -120,10 +120,13 @@ public class RecruitController {
                                            @PathVariable(value = "recruitIdx") int recruitIdx) {
         //logger.info("상세 채용공고 api 실행 시작");
         basicService.onAsync();
+        System.out.print("\ntoeknresult\n");
+        System.out.print(token);
+        System.out.print("\nBearer length 1\n\n");
 
         long start = System.currentTimeMillis();
-        if (token == null || token.isEmpty()) {
-            //logger.info("token empty\n");
+        if ( token.substring("Bearer".length()).equals("null") || token.substring("Bearer ".length()).equals("null") || token == null || token.isEmpty()) {
+            log.info("token empty\n");
             ResponseEntity result = recruitService.GetDetailRecruit(
                     DataWithToken.builder().recruitIdx(recruitIdx).build());
 
