@@ -3,7 +3,7 @@
     <v-row class="chat-header">
       <v-col cols="3" class="title point-font">채팅</v-col>
       <v-col cols="3">
-        <input type="text" class="chat-search" placeholder="기업명을 입력하세요." />
+        <input type="text" class="chat-search" placeholder="기업명을 입력하세요." v-model="search" />
       </v-col>
     </v-row>
     <v-row class="my-chat">
@@ -16,6 +16,7 @@
             class="chat-item"
             v-for="(chat, company_id) in getMyChat"
             v-bind:key="company_id"
+            v-if="chat.company.indexOf(search) >= 0"
             @click="openRoom(company_id, chat.company)"
           >
             <div class="company-logo">
@@ -31,6 +32,9 @@
                 v-if="getChatList(company_id).chat && getChatList(company_id).chat.length >= 1"
               >{{ getChatList(company_id).chat[getChatList(company_id).chat.length-1].message }}</p>
               <p class="last-chat" v-else>이전 채팅이 없습니다.</p>
+            </div>
+            <div v-if="company_id != 0" class="remove-btn">
+              <font-awesome-icon icon="times" @click.stop="closeChat(company_id)"/>
             </div>
           </div>
         </v-row>
@@ -110,6 +114,7 @@ export default {
   },
   data: () => ({
     company_id : 0,
+    search: '',
   }),
   computed: {
     ...mapGetters([
@@ -122,11 +127,14 @@ export default {
     ])
   },
   methods: {
-    ...mapActions(["openSocket","userChatAPI"]),
+    ...mapActions(["openSocket","userChatAPI","removeChat"]),
     ...mapMutations(["setRoomState"]),
     openRoom(company_id, company){
       this.company_id = company_id
       this.setRoomState({is_open : true, company_id : company_id, company: company})
+    },
+    closeChat(company_id){
+      this.removeChat({ company_id : company_id})
     }
   },
   created() {
@@ -184,6 +192,19 @@ $calendar-title: #fafafa;
       overflow: hidden;
       &:hover {
         background: #f4f4f4;
+        .remove-btn{
+          width: 30px;
+          height: 40px;
+          padding-top: 20px;
+          // padding-right: 3px;
+          display: inline-block;
+          path{
+            color: #999999;
+          }
+          &:hover path{
+            color: #131417;
+          }
+        }
       }
       .company-logo,
       .company-info {
@@ -213,7 +234,7 @@ $calendar-title: #fafafa;
         }
       }
       .company-info {
-        width: calc(100% - 60px);
+        width: calc(100% - 90px);
         height: 40px;
         margin: 10px 0;
         padding-right: 10px;
@@ -241,6 +262,9 @@ $calendar-title: #fafafa;
           display: block;
           clear: both;
         }
+      }
+      .remove-btn{
+        display: none;
       }
     }
   }

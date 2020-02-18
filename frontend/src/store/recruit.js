@@ -68,7 +68,6 @@ export default {
     likeToggle(context, payload) {
       var method = ['post', 'delete']
       var path = ['like', 'unlike']
-
       return axios({
         method: method[payload.action],
         url: config.RECRUIT_HOST + '/recruits/' + path[payload.action] + '/' + payload.recruit_id,
