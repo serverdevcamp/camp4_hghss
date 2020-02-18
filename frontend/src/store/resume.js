@@ -205,6 +205,7 @@ export default {
           'Authorization': 'Bearer ' + config.access_token,
         }
       }).then(response => {
+        console.log(response.data)
         if (response.data.status == 200) {
           context.commit('setResume', response.data.data)
         }

@@ -72,7 +72,8 @@ export default {
     async signout({ commit }) {
       const response = await axios.get(config.AUTH_HOST + '/users/signout', {
         headers: {
-          Authorization: 'Bearer ' + sessionStorage.getItem('refreshToken')
+          Authorization: 'Bearer ' + sessionStorage.getItem('refreshToken'),
+          'Access-Control-Allow-Origin': '*',
         }
       });
 
@@ -87,10 +88,11 @@ export default {
 
       const response = await axios.get(config.AUTH_HOST + '/users/refresh', {
         headers: {
-          Authorization: 'Bearer ' + refreshToken
+          Authorization: 'Bearer ' + refreshToken,
+          'Access-Control-Allow-Origin': '*',
         }
       });
-
+      console.log(response)
       if (response.data.success) {
         sessionStorage.setItem('accessToken', response.data.data.accessToken);
         sessionStorage.setItem('refreshToken', response.data.data.refreshToken);
