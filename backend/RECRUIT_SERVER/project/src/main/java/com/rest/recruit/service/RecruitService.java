@@ -151,16 +151,8 @@ public class RecruitService {
     }
 
     private boolean GetFavorite(int userIdx, int recruitIdx) {
-
-
-        RecruitLike recruitLike = recruitMapper.GetFavorite(userIdx,recruitIdx);
-        System.out.print("\ngetfavorite - userIdx\n");
-        System.out.print(recruitLike.getUserId());
-        System.out.print("\ngetfavorite - recruitIdx\n");
-        System.out.print(recruitLike.getRecruitId());//ok
-
-
-        return recruitLike != null ? true : false;
+//문제
+        return recruitMapper.GetFavorite(userIdx,recruitIdx) != null ? true : false;
 
     }
 
