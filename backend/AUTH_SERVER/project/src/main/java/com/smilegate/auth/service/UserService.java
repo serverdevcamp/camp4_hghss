@@ -34,17 +34,17 @@ public class UserService {
         String email = signinRequestDto.getEmail();
         String password = signinRequestDto.getPassword();
 
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email, 1);
+
         if(user==null) throw new EmailNotExistException(email);
-
-        userRepository.updateAccessedAt(user.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-
         if(!passwordEncoder.matches(password, user.getPasswd())) throw new PasswordWrongException();
 
         String accessToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "ACCESS_TOKEN", 30);
         String refreshToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "REFRESH_TOKEN", 60*24*14);
 
         redisUtil.set(refreshToken, user.getRole(), 60*24*14);
+
+        userRepository.updateAccessedAt(user.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 
         return TokenResponseDto.builder()
                 .id(user.getId())
@@ -62,7 +62,6 @@ public class UserService {
 
     public TokenResponseDto refreshToken(String refreshToken) throws ExpiredJwtException {
 
-        // 로그아웃 상태에서 refresh 요청
         if(!redisUtil.hasKey(refreshToken)) throw new UnauthorizedException();
 
         Claims claims = jwtUtil.getClaims(refreshToken);
@@ -97,6 +96,7 @@ public class UserService {
                         .nickname("temp")
                         .passwd(passwd)
                         .role(1)
+                        .status(1)
                         .build();
 
         if(mailUtil.sendSignupMail(key, user)) redisUtil.set(key, user, 10);
@@ -135,7 +135,6 @@ public class UserService {
 
         String email = (String) redisUtil.get(key);
 
-        // key가 잘못된 경우
         if(email == null) throw new UnauthorizedException();
 
         if(userRepository.countUser(email) == 0) throw new EmailNotExistException(email);

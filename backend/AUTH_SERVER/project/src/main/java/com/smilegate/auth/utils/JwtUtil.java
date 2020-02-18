@@ -18,7 +18,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 
 @Component
 public class JwtUtil {
@@ -26,14 +25,10 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
     private Key key;
-    private HashMap<Integer, String> roles;
 
     @PostConstruct
     protected void JwtUtil() {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
-        this.roles = new HashMap<>();
-        this.roles.put(1, "USER");
-        this.roles.put(99, "ADMIN");
     }
 
     public String createToken(Integer userId, String email, String nickname, int role, String tokenType, int minutes) {
@@ -56,7 +51,7 @@ public class JwtUtil {
         String email = claims.getSubject();
         int role = (int) claims.get("role");
 
-        return new UsernamePasswordAuthenticationToken(email, null, Collections.singletonList(new SimpleGrantedAuthority(this.roles.get(role))));
+        return new UsernamePasswordAuthenticationToken(email, null, Collections.singletonList(new SimpleGrantedAuthority((role<50)? "USER" : "ADMIN")));
     }
 
     public Claims getClaims(String token) {

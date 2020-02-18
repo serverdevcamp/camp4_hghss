@@ -26,16 +26,28 @@ export default {
       state.user.nickname = payload.nickname;
       state.user.role = payload.role;
 
+      sessionStorage.setItem('accessToken', payload.accessToken);
+      sessionStorage.setItem('refreshToken', payload.refreshToken);
+
       sessionStorage.setItem('id', payload.id);
       sessionStorage.setItem('email', payload.email);
       sessionStorage.setItem('nickname', payload.nickname);
       sessionStorage.setItem('role', payload.role);
+
     },
     signout(state) {
       state.user.id = "";
       state.user.email = "";
       state.user.nickname = "";
       state.user.role = "";
+
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
+
+      sessionStorage.removeItem('nickname');
+      sessionStorage.removeItem('email');
+      sessionStorage.removeItem('role');
+      sessionStorage.removeItem('id');
     }
   },
   actions: {
@@ -47,26 +59,10 @@ export default {
         }
       });
 
-      if (!response.data.success) {
-        alert(response.data.message);
-        return false;
-      }
-
-      if (typeof (Storage) !== 'undefined') {
-        sessionStorage.setItem('accessToken', response.data.data.accessToken);
-        sessionStorage.setItem('refreshToken', response.data.data.refreshToken);
-      } else {
-        console.error('로컬스토리지를 사용 할 수 없습니다.');
-        return;
-      }
-
-      commit('setUserInfo', response.data.data);
-      //  로그인 후, 리다이렉트
-      router.go()
-
+      if(response.data.success) commit('setUserInfo', response.data.data);
       alert(response.data.message);
 
-      return true;
+      return response.data.success;
     },
     async signup(context, payload) {
       const response = await axios.post(config.AUTH_HOST + '/users/signup', payload);
@@ -80,19 +76,9 @@ export default {
         }
       });
 
-      if (response.data.success) alert(response.data.message);
-
-      commit('signout');
-
-      sessionStorage.removeItem('accessToken');
-      sessionStorage.removeItem('refreshToken');
-
-      sessionStorage.removeItem('nickname');
-      sessionStorage.removeItem('email');
-      sessionStorage.removeItem('role');
-      sessionStorage.removeItem('id');
-
+      if (response.data.success) commit('signout');
       alert(response.data.message);
+
       // 현재페이지 리다이렉트, 유저 맞춤 정보 삭제
       router.go()
     },

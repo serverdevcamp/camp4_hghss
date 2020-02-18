@@ -8,12 +8,14 @@ import com.smilegate.resume.dto.response.ResumeCountResponseDto;
 import com.smilegate.resume.dto.response.ResumeDetailResponseDto;
 import com.smilegate.resume.service.ResumeService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RestController
@@ -42,6 +44,7 @@ public class ResumeController {
 
     @GetMapping("/list")
     public ResponseEntity<ResultResponse> list(@RequestHeader("Authorization") String token) {
+        log.info("RESUME LIST");
 
         List<Resume> resumes = resumeService.getResumes(token);
 
