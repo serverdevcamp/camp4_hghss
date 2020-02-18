@@ -133,8 +133,10 @@ public class RecruitController {
         }
 
         String tokenString = token.substring("Bearer ".length());
-        System.out.print("toekn\n");
-        System.out.print(jwtUtil.getAuthentication(tokenString));
+        System.out.print("\ntoekn\n");
+        System.out.print(tokenString);
+
+
         if(!jwtUtil.isValidToken(tokenString)){
             //logger.info("expire or no valid token\n");
             //throw new ExpiredTokenException();
