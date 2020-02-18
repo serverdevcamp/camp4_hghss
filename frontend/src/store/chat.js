@@ -5,8 +5,8 @@ import axios from "axios"
 export default {
   state: {
     chat_room: {
-      is_open : false,
-      company_id : 0,
+      is_open: false,
+      company_id: 0,
       company: '전체'
     },
     // 채팅 목록 => 로그인할때 가져온다.
@@ -19,7 +19,7 @@ export default {
     favChat: {},
     hotChat: {},
     // 채팅 내용
-    chat_id:[],
+    chat_id: [],
     chatList: {
       // 이런 구조
       // 0: {
@@ -32,6 +32,17 @@ export default {
 
   },
   mutations: {
+    setCloseChat(state, payload) {
+      // myChat 목록에서 제거
+      let company_id = parseInt(payload.company_id)
+      Vue.delete(state.myChat,company_id)
+
+      // favChat, hotChat 둘 다 없으면, 소켓 닫고 chat_id도 삭제
+      if (!state.favChat.hasOwnProperty(company_id) && !state.hotChat.hasOwnProperty(company_id)) {
+        state.chat_id.splice(state.chat_id.indexOf(company_id))
+        Vue.delete(state.chatList,company_id)
+      }
+    },
     setUserChat(state, payload) {
       var userChat = ['myChat', 'favChat', 'hotChat']
       if (payload.target == 0) {
@@ -41,15 +52,15 @@ export default {
       }
       state[userChat[payload.target]] = payload.data
       // 전체 채팅방 중복 제거
-      for(let company_id in state[userChat[payload.target]]){
-        if(!state.chat_id.includes(company_id)){
+      for (let company_id in state[userChat[payload.target]]) {
+        if (!state.chat_id.includes(company_id)) {
           state.chat_id.push(company_id)
         }
       }
     },
     setRoomState(state, payload) {
-      state.chat_room.is_open= payload.is_open
-      if(payload.company_id){
+      state.chat_room.is_open = payload.is_open
+      if (payload.company_id) {
         state.chat_room.company_id = payload.company_id
         state.chat_room.company = payload.company
       }
@@ -95,49 +106,61 @@ export default {
         })
       }
     },
+    // 채팅 구독 취소
+    removeChat(context, payload) {
+      axios({
+        method: 'delete',
+        url: config.RECRUIT_HOST + '/chats/detail/' + payload.company_id + '/unlike',
+        headers: {
+          "Content-Type": "application/json",
+          'Access-Control-Allow-Origin': '*',
+          'Authorization': 'Bearer ' + config.access_token,
+        }
+      }).then(response => {
+        if (response.data.status == 200) {
+          // 열린 소켓 닫고 리스트에서 제거
+          context.commit('setCloseChat',payload)
+        }
+        if (response.data.status == 402) {
+          // 토큰만료시 다시 발급
+          context.dispatch('refreshToken', { funcName: 'removeChat', param: payload })
+        }
+      })
+    },
     // 채팅 구독
-    addChat(context, payload){
+    addChat(context, payload) {
       // 구독체크
-      if(!context.state.myChat.hasOwnProperty(payload.company_id)){
+      if (!context.state.myChat.hasOwnProperty(payload.company_id)) {
         // 구독!
         context.state.myChat[payload.company_id] = {
           company: payload.company,
           logo_url: payload.logo_url
         }
-        console.log({
-          method: 'post',
-          url: config.RECRUIT_HOST + '/chats/detail/'+payload.company_id+'/like',
-          headers: {
-            "Content-Type": "application/json",
-            'Access-Control-Allow-Origin': '*',
-            'Authorization': 'Bearer ' + config.access_token,
-          }
-        })
         axios({
           method: 'post',
-          url: config.RECRUIT_HOST + '/chats/detail/'+payload.company_id+'/like',
+          url: config.RECRUIT_HOST + '/chats/detail/' + payload.company_id + '/like',
           headers: {
             "Content-Type": "application/json",
             'Access-Control-Allow-Origin': '*',
             'Authorization': 'Bearer ' + config.access_token,
           }
         }).then(response => {
-          if(response.data.status == 402){
+          if (response.data.status == 402) {
             // 토큰만료시 다시 발급
-            context.dispatch('refreshToken',{funcName: 'addChat', param: payload})
+            context.dispatch('refreshToken', { funcName: 'addChat', param: payload })
           }
         })
       }
       // 소켓이 열려있는지 확인
-      if(!context.state.chat_id.includes(''+payload.company_id)){
+      if (!context.state.chat_id.includes('' + payload.company_id)) {
         // 소켓 열기
-        context.dispatch('openSocket',payload.company_id)
+        context.dispatch('openSocket', payload.company_id)
       }
       // 채팅 열기
-      context.commit('setRoomState',{
-        is_open : true,
-        company_id : payload.company_id,
-        company : payload.company,
+      context.commit('setRoomState', {
+        is_open: true,
+        company_id: payload.company_id,
+        company: payload.company,
       })
       // 채팅방 열기
       context.commit('setChatState', true)
@@ -160,26 +183,26 @@ export default {
               target: i,
               data: response.data.data
             })
-          }else{
+          } else {
             context.commit('setUserChat', {
               target: i,
               data: {}
             })
           }
         })
-        .then(()=>{
-          if(i == 2){
-            this.state.chat.chat_id.forEach(company_id=>{
-              // 소켓 생성
-              context.dispatch('openSocket',company_id)
-            })
-          }
-        })     
+          .then(() => {
+            if (i == 2) {
+              this.state.chat.chat_id.forEach(company_id => {
+                // 소켓 생성
+                context.dispatch('openSocket', company_id)
+              })
+            }
+          })
       }
     }
   },
   getters: {
-    getRoomCompanyInfo(state){
+    getRoomCompanyInfo(state) {
       return state.chat_room
     },
     getMyChat(state) {
