@@ -10,7 +10,7 @@
       <div class="title point-font">{{ action[target] }} 🙏</div>
       <div class="form-group">
         <form autocomplete="false">
-          <input id="n-email" type="text" placeholder="Email" v-model="user.email" />
+          <input id="n-email" type="text" placeholder="Email" v-model="user.email" @blur="checkEmail" />
           <input id="n-password" type="password" placeholder="Password" v-model="user.password" />
           <input
             v-if="target == 1"
@@ -30,7 +30,7 @@
           @click="moveToPath('password/reset')"
         >비밀번호 찾기</button>
         <!-- social -->
-        <button class="large-btn naver-btn">
+        <button class="large-btn naver-btn" @click="naverLogin" >
           connect with
           <span class="point-font">naver</span>
         </button>
@@ -55,11 +55,22 @@ export default {
         email: "",
         password: ""
       },
-      password2: ""
+      password2: "",
+      naverLoginUrl: "https://nid.naver.com/oauth2.0/authorize",
+      responseType: "code",
+      clientId: "YS36qtMJTpVLzoYAK_up",
+      redirectUri: "http://localhost:8080/oauth2",
+      state: "123"
     };
   },
+  created() {
+    this.naverLoginUrl += "?response_type=" + this.responseType;
+    this.naverLoginUrl += "&client_id=" + this.clientId;
+    this.naverLoginUrl += "&redirect_uri=" + this.redirectUri;
+    this.naverLoginUrl += "&state=" + this.state;
+  },
   computed: {
-    ...mapGetters(["getUser"])
+    ...mapGetters(['getUser','is_user_login'])
   },
   methods: {
     async signin() {
@@ -67,11 +78,17 @@ export default {
       if(signinSuccess) this.$modal.hide('account-modal');
     },
     async signup() {
-      if (this.user.password == this.password2 && this.password != '') {
+      if (this.user.password === this.password2 && this.password !== '') {
         let signupSuccess = await this.$store.dispatch("signup", this.user);
         if(signupSuccess) this.$modal.hide('account-modal');
       }else {
         alert('비밀번호가 일치하지 않습니다.');
+      }
+    },
+    checkEmail() {
+      let emailRule = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+      if(this.user.email !== '' && !emailRule.test(this.user.email)){
+        alert('이메일 형식에 맞지 않습니다.');
       }
     },
     beforeOpen(event) {
@@ -84,6 +101,10 @@ export default {
     },
     moveToPath(path) {
       this.$router.push(path);
+      this.$modal.hide("account-modal");
+    },
+    naverLogin() {
+      window.open(this.naverLoginUrl);
       this.$modal.hide("account-modal");
     }
   }

@@ -13,6 +13,8 @@ public class Resume {
 
     private Integer id;
     private Integer userId;
+    private Integer recruitId;
+    private Integer companyId;
     private Integer positionId;
     private String createdAt;
     private String updatedAt;

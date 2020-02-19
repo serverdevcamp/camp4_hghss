@@ -38,7 +38,7 @@ public class UserExceptionAdvice {
     public ResultResponse handleEmailNotExist(Exception e) {
         return ResultResponse.builder()
                 .success(false)
-                .status(HttpStatus.NOT_FOUND.value())
+                .status(401)
                 .message(e.getMessage())
                 .build();
     }

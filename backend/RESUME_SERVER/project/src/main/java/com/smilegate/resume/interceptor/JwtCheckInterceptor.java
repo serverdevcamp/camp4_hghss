@@ -19,11 +19,15 @@ public class JwtCheckInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = jwtUtil.getToken(request);
+
         if(token == null) return true;
+
         if(token.equals("Bearer")) throw new TokenNotExistException();
+
         if(!(jwtUtil.isValidToken(token) && jwtUtil.isAccessToken(token))) {
             throw new InvalidTokenException();
         }
+
         return true;
     }
 

@@ -33,3 +33,7 @@ out/
 ### .env
 /.env
 
+### settings ###
+application.properties
+/AUTH_SERVER/project/src/main/resources/application.properties
+/RESUME_SERVER/project/src/main/resources/application.properties
