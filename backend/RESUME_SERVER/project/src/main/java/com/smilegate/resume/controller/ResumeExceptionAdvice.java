@@ -36,7 +36,7 @@ public class ResumeExceptionAdvice {
     public ResultResponse handleTokenNotExist(Exception e) {
         return ResultResponse.builder()
                 .success(false)
-                .status(400)
+                .status(200)
                 .message(e.getMessage())
                 .data(new LinkedList<>())
                 .build();
