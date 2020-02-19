@@ -1,5 +1,5 @@
 """
-월별 총 자기소개서 작성 수/ 공고 수 출력
+월별 총 자기소개서 작성 수 / 공고 수 출력
 """
 import requests
 import datetime
@@ -90,3 +90,15 @@ def get_recruits() :
 
 
 # get_recruits()
+
+year = [y for y in range(2014, 2021)]
+month = [m for m in range(1, 13)]
+for y in year :
+    for m in month :
+
+    
+# date = [m for m in range(2014, 2021)]
+
+user_avg = {}
+
+# 2014-01
