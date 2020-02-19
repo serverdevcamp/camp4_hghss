@@ -97,7 +97,7 @@ export default {
           'Access-Control-Allow-Origin': '*',
         }
       });
-      console.log(response)
+      
       if (response.data.success) {
         sessionStorage.setItem('accessToken', response.data.data.accessToken);
         sessionStorage.setItem('refreshToken', response.data.data.refreshToken);
@@ -114,6 +114,8 @@ export default {
 
         sessionStorage.removeItem('refreshToken');
         sessionStorage.removeItem('accessToken');
+        config.access_token = null
+        config.refresh_token = null
 
         sessionStorage.removeItem('nickname');
         sessionStorage.removeItem('email');

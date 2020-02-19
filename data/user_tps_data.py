@@ -1,43 +1,10 @@
-import config
-import csv
+"""
+월별 총 자기소개서 작성 수/ 공고 수 출력
+"""
 import requests
-import pymysql
 import datetime
-import random
 
 headers = { 'Content-Type': 'application/json'}
-
-# 닉네임
-def pushNickName() :
-    noun, adjective = [], []
-
-    with open('./seed/noun.csv',  'rt', encoding='UTF8', newline='') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-        for row in spamreader:
-            noun = ', '.join(row).split(',')
-
-    with open('./seed/adjective.csv', 'rt', encoding='UTF8', newline='') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-        for row in spamreader:
-            adjective = ', '.join(row).split(',')
-
-    nickname_pull = []
-    for n in noun :
-        for a in adjective :
-            # 닉네임 만들기
-            nickname_pull.append(a+" "+n)
-
-    random.shuffle(nickname_pull)
-    print("닉네임을 삽입합니다.")
-    for nickname in nickname_pull :
-        # 닉네임 삽입
-        curs = conn.cursor()
-        sql = """INSERT INTO nickname_bible(nickname)
-            VALUES (%s)"""
-        curs.execute(sql, nickname)
-        conn.commit()
-    print("닉네임 삽입이 완료되었습니다.")
-
 
 # 직무, 질문
 def get_questions(employment_id) :
@@ -71,36 +38,10 @@ def get_recruits() :
     response = requests.request("POST", url, headers=headers, data = payload)
     recuit = response.json()
 
-    print("채용공고 크롤링을 시작합니다.")
-    global_id = 0
+    print("채용공고 크롤링 시작합니다.")
     for data in recuit["employment"] :
         recruit_id = data["id"]
-        name = data["name"]
-        logo_url = data["image_file_name"]
 
-        # company id 중복 조회
-        curs = conn.cursor()
-        sql = """select id from company where name = %s"""
-        curs.execute(sql,(name.replace(" ", "") ))
-        rows = curs.fetchall()
-        if len(rows) :
-            if len(rows) > 1 :
-                print("미친듯")
-
-            for row in rows :
-              company_id = int(rows[0]['id'])
-              print(name, company_id)
-        else :
-            # 존재하지 않으면 삽입
-            """ company table """
-            curs = conn.cursor()
-            sql = """INSERT INTO company(name, logo_url)
-                VALUES (%s, %s)"""
-            curs.execute(sql, (name, logo_url))
-            conn.commit()
-
-            global_id +=1
-            company_id = global_id
 
 
         _start_time = data["start_time"].split('T')
@@ -119,12 +60,6 @@ def get_recruits() :
         recruit_type = detail["recruit_type"]
         view_count = detail["view_count"]
 
-        """ company table """
-        curs = conn.cursor()
-        sql = """INSERT INTO recruit(id,company_id,start_time,end_time,content,view_count,employment_page_url,recruit_type)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)"""
-        curs.execute(sql, (recruit_id, company_id, start_time, end_time, content, view_count, employment_page_url, recruit_type))
-        conn.commit()
 
         for employment in detail["employments"] :
             position_id = employment["id"]
@@ -152,10 +87,6 @@ def get_recruits() :
 
     print("완료!")
 
-conn = pymysql.connect(host=config.HOST, port=config.PORT, user=config.USER, passwd=config.PASSWORD,
-                        db=config.DATABASE, charset='utf8')
 
 
-# pushNickName() 
-get_recruits()
-conn.close()
+# get_recruits()
