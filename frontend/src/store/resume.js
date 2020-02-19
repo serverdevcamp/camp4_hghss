@@ -196,7 +196,6 @@ export default {
     },
     // 목록
     resumeListAPI(context) {
-      console.log(config.access_token)
       axios({
         method: 'get',
         url: config.RESUME_HOST + '/resumes/list',
@@ -206,7 +205,6 @@ export default {
           'Authorization': 'Bearer ' + config.access_token,
         }
       }).then(response => {
-        console.log(response.data)
         if (response.data.status == 200) {
           context.commit('setResume', response.data.data)
         }
