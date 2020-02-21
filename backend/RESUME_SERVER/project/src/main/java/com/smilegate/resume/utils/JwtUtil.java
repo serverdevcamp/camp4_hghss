@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
@@ -33,8 +35,8 @@ public class JwtUtil {
 
     public String getToken(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
-        if(token != null && token.length()>"Bearer".length()) return token.substring("Bearer ".length());
-        return token;
+        if(token == null) return null;
+        return token.substring("Bearer ".length());
     }
 
     public boolean isValidToken(String token) {
