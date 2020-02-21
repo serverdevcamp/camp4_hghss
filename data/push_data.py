@@ -60,7 +60,8 @@ def get_recruit_detail(recruit_id) :
     return { "content": data["content"],
                 "employment_page_url" : data["employment_page_url"],
                 "employments" : data["employments"],
-                "recruit_type" : data["recruit_type"]
+                "recruit_type" : data["recruit_type"],
+                "view_count" : data["view_count"]
             }
 
 # 채용공고 
@@ -88,8 +89,8 @@ def get_recruits(start,end) :
                 print("이거 나옴 당장 중지해라!")
 
             for row in rows :
-              company_id = int(rows[0]['id'])
-              print("이전에 들어간적 있는 회사임 : ",name, company_id)
+                company_id = row[0]
+                print("이전에 들어간적 있는 회사임 : ",name, company_id)
         else :
             # 존재하지 않으면 삽입
             """ company table """
@@ -127,14 +128,14 @@ def get_recruits(start,end) :
             """ company table """
             curs = conn.cursor()
             sql = """INSERT INTO recruit(id,company_id,start_time,end_time,content,view_count,employment_page_url,recruit_type)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"""
             curs.execute(sql, (recruit_id, company_id, start_time, end_time, content, view_count, employment_page_url, recruit_type))
             conn.commit()
 
             for employment in detail["employments"] :
                 position_id = employment["id"]
                 field = employment["field"]
-                division= employment["division"]
+                division= employment["division"] or ''
 
                 """ position table """
                 curs = conn.cursor()
@@ -160,9 +161,9 @@ def get_recruits(start,end) :
 conn = pymysql.connect(host=config.HOST, port=config.PORT, user=config.USER, passwd=config.PASSWORD, db=config.DATABASE, charset='utf8')
 
 
-pushNickName() 
+#pushNickName() 
 
-year = ["2014","2015","2016","2017","2018","2019","2020"]
+year = ["2017","2018","2019","2020"]
 month = ["01","02","03","04","05","06","07","08","09","10","11","12"]
 for y in year :
     for i in range(len(month)) : 
