@@ -5,12 +5,13 @@ import com.smilegate.resume.domain.Position;
 import com.smilegate.resume.domain.Resume;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 public interface ResumeRepository {
 
     int createResume(Resume resume);
 
-    int createAnswer(Answer answer);
+    Future<Integer> createAnswer(Answer answer);
 
     int updateAnswer(Answer answer);
 

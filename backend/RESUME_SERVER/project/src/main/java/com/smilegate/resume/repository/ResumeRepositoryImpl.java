@@ -4,10 +4,13 @@ import com.smilegate.resume.domain.Answer;
 import com.smilegate.resume.domain.Resume;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSession;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Future;
 
 @RequiredArgsConstructor
 @Repository
@@ -22,9 +25,9 @@ public class ResumeRepositoryImpl implements ResumeRepository {
     }
 
     @Override
-    public int createAnswer(Answer answer) {
+    public Future<Integer> createAnswer(Answer answer) {
         session.insert("resume.insertAnswer", answer);
-        return answer.getId();
+        return new AsyncResult<>(answer.getId());
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.smilegate.resume.config;
+package com.smilegate.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,10 +14,10 @@ public class AsyncThreadConfig {
     @Bean
     public Executor asyncThreadTaskExecutor() {
         ThreadPoolTaskExecutor threadPoolExecutor = new ThreadPoolTaskExecutor();
-        threadPoolExecutor.setCorePoolSize(15);
-        threadPoolExecutor.setMaxPoolSize(15);
-        threadPoolExecutor.setQueueCapacity(1000);
-        threadPoolExecutor.setThreadNamePrefix("resume-thread-pool-");
+        threadPoolExecutor.setCorePoolSize(20);
+        threadPoolExecutor.setMaxPoolSize(20);
+        threadPoolExecutor.setQueueCapacity(2000);
+        threadPoolExecutor.setThreadNamePrefix("resume-threadpool-");
         return threadPoolExecutor;
     }
 

@@ -12,13 +12,16 @@ import com.smilegate.auth.utils.RedisUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.Future;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -39,21 +42,23 @@ public class UserService {
         if(user==null) throw new EmailNotExistException(email);
         if(!passwordEncoder.matches(password, user.getPasswd())) throw new PasswordWrongException();
 
+        Future<Integer> updateAccessedAt = userRepository.updateAccessedAt(user.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+
         String accessToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "ACCESS_TOKEN", 30);
         String refreshToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "REFRESH_TOKEN", 60*24*14);
 
         redisUtil.set(refreshToken, user.getRole(), 60*24*14);
 
-        userRepository.updateAccessedAt(user.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        while(!updateAccessedAt.isDone());
 
         return TokenResponseDto.builder()
-                .id(user.getId())
-                .email(email)
-                .nickname(user.getNickname())
-                .role(user.getRole())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+                    .id(user.getId())
+                    .email(email)
+                    .nickname(user.getNickname())
+                    .role(user.getRole())
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .build();
     }
 
     public void signout(String refreshToken) {
