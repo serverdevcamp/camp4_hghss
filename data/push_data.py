@@ -73,7 +73,6 @@ def get_recruits(start,end) :
     recruit = response.json()
 
     print("채용공고 크롤링을 시작합니다.")
-    global_id = 0
     for data in recruit["employment"] :
         recruit_id = data["id"]
         name = data["name"]
@@ -85,9 +84,6 @@ def get_recruits(start,end) :
         curs.execute(sql,(name.replace(" ", "") ))
         rows = curs.fetchall()
         if len(rows) :
-            if len(rows) > 1 :
-                print("이거 나옴 당장 중지해라!")
-
             for row in rows :
                 company_id = row[0]
                 print("이전에 들어간적 있는 회사임 : ",name, company_id)
@@ -100,8 +96,13 @@ def get_recruits(start,end) :
             curs.execute(sql, (name, logo_url))
             conn.commit()
 
-            global_id +=1
-            company_id = global_id
+            # 삽입했으면 company id 가져오기
+            curs = conn.cursor()
+            sql = """select id from company where name = %s"""
+            curs.execute(sql,(name.replace(" ", "") ))
+            rows = curs.fetchall()
+            for row in rows :
+                company_id = row[0]
 
         # [2] 해당 recruit가 존재하지 않을 때만 넣기
         curs = conn.cursor()

@@ -202,6 +202,9 @@ export default {
       }
       if (is_create) {
         this.makeNewResume(recruit, employment, cnt);
+        // resume 페이지로 이동
+        this.$router.push({name:'ResumePage'})
+        this.$modal.hide("company-modal");
       }
     }
   }
