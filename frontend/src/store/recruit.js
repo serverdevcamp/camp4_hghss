@@ -57,6 +57,7 @@ export default {
         }
       }).then(response => {
         let status = response.data.status
+        console.log(response.data)
         if (status == 200 || status == 401 || status == 402) {
           // TODO : 402 코드 발생시 로그아웃
           context.commit('setCalendar', response.data.data);
