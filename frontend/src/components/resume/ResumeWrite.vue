@@ -401,12 +401,14 @@ $point-color: #ff6813;
           }
         }
         .content-wrap {
+          display: inline-block;
+          width: calc(100% - 30px);
           height: calc(100% - 35px);
           overflow: scroll;
           margin: 0 15px;
           .content {
             cursor: pointer;
-
+            display: inline-block;
             padding: 15px 5px 15px;
             border-bottom: 1px solid #ddd;
             .recode-order,
