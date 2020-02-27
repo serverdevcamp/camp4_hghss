@@ -53,21 +53,23 @@ public class OAuth2Service {
             int userId = userRepository.registerUser(user);
             nickname = userRepository.getNickname(userId);
             userRepository.updateNickname(userId, nickname, now);
+            user.setNickname(nickname);
         }
 
-        String accessToken = jwtUtil.createToken(user.getId(), user.getEmail(), nickname, user.getRole(), "ACCESS_TOKEN", 30);
-        String refreshToken = jwtUtil.createToken(user.getId(), user.getEmail(), nickname, user.getRole(), "REFRESH_TOKEN", 60*24*14);
+        String accessToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "ACCESS_TOKEN", 30);
+        String refreshToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "REFRESH_TOKEN", 60*24*14);
 
         redisUtil.set(refreshToken, user.getRole(), 60*24*14);
 
         return TokenResponseDto.builder()
-                .id(user.getId())
-                .email(email)
-                .nickname(user.getNickname())
-                .role(user.getRole())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+                    .id(user.getId())
+                    .email(email)
+                    .nickname(user.getNickname())
+                    .role(user.getRole())
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .build();
+
     }
 
     private String getAccessToken(String code) {

@@ -1,6 +1,7 @@
 package com.smilegate.resume.service;
 
 import com.smilegate.resume.domain.Answer;
+import com.smilegate.resume.domain.Company;
 import com.smilegate.resume.domain.Resume;
 import com.smilegate.resume.dto.request.ResumeRequestDto;
 import com.smilegate.resume.dto.response.ResumeDetailResponseDto;
@@ -10,6 +11,7 @@ import com.smilegate.resume.exceptions.UnauthorizedException;
 import com.smilegate.resume.repository.ResumeRepository;
 import com.smilegate.resume.utils.DateUtil;
 import com.smilegate.resume.utils.JwtUtil;
+import com.smilegate.resume.utils.RedisUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,18 +28,19 @@ public class ResumeService {
     private final ResumeRepository resumeRepository;
     private final JwtUtil jwtUtil;
     private final DateUtil dateUtil;
+    private final RedisUtil redisUtil;
 
     @Transactional
     public ResumeDetailResponseDto createResume(String token, int positionId, ResumeRequestDto resumeRequestDto) {
 
         int userId = getUserId(token);
         int recruitId = resumeRepository.findRecruitIdByPositionId(positionId);
-        int companyId = resumeRepository.findCompanyIdByRecruitId(recruitId);
+        Company company = resumeRepository.findCompanyByRecruitId(recruitId);
 
         Resume resume = Resume.builder()
                             .userId(userId)
                             .recruitId(recruitId)
-                            .companyId(companyId)
+                            .companyId(company.getId())
                             .positionId(positionId)
                             .title(resumeRequestDto.getTitle())
                             .endTime(resumeRequestDto.getEndTime())
@@ -47,13 +50,27 @@ public class ResumeService {
         resume = resumeRepository.findResumeById(resumeId);
 
         List<Answer> answers = resumeRequestDto.getAnswers();
-
         for(int i=0; i<answers.size(); ++i) {
             Answer answer = answers.get(i);
             answer.setResumeId(resumeId);
             answer.setOrderNum(i+1);
 
             resumeRepository.createAnswer(answer);
+        }
+
+        resumeRepository.updateResumeCount(recruitId);
+
+        String endtime = dateUtil.changeFormat(resume.getEndTime());
+        StringBuilder key = new StringBuilder();
+        key.append(endtime).append(":");
+        key.append(recruitId).append(":");
+        key.append(company.getId()).append(":");
+        key.append(company.getName());
+
+        if(redisUtil.reverseRank("ranking-apply", key.toString()) != null) {
+            redisUtil.increaseScore("ranking-apply", key.toString(), 1);
+        } else {
+            redisUtil.add("ranking-apply", key.toString(), 1);
         }
 
         return ResumeDetailResponseDto.builder()

@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
@@ -27,7 +29,7 @@ public class JwtUtil {
     private Key key;
 
     @PostConstruct
-    protected void JwtUtil() {
+    protected void initKey() {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
@@ -40,10 +42,10 @@ public class JwtUtil {
         claims.put("tokenType", tokenType);
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(Date.from(Instant.now().plus(minutes, ChronoUnit.MINUTES)))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+                    .setClaims(claims)
+                    .setExpiration(Date.from(Instant.now().plus(minutes, ChronoUnit.MINUTES)))
+                    .signWith(key, SignatureAlgorithm.HS256)
+                    .compact();
     }
 
     public Authentication getAuthentication(String token) {
