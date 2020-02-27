@@ -1,10 +1,10 @@
 package com.smilegate.resume.repository;
 
 import com.smilegate.resume.domain.Answer;
+import com.smilegate.resume.domain.Company;
 import com.smilegate.resume.domain.Resume;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSession;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Repository;
 
@@ -94,11 +94,6 @@ public class ResumeRepositoryImpl implements ResumeRepository {
     }
 
     @Override
-    public Integer findCompanyIdByRecruitId(int recruitId) {
-        return session.selectOne("resume.selectCompanyIdByRecruitId", recruitId);
-    }
-
-    @Override
     public Integer findMaxOrderNumByResumeId(int resumeId) {
         return session.selectOne("resume.selectMaxOrderNumByResumeId", resumeId);
     }
@@ -109,6 +104,16 @@ public class ResumeRepositoryImpl implements ResumeRepository {
         map.put("userId", userId);
         map.put("positionId", positionId);
         return session.selectOne("resume.selectCountResumeByPositionId", map);
+    }
+
+    @Override
+    public Company findCompanyByRecruitId(int recruitId) {
+        return session.selectOne("resume.selectCompanyByRecruitId", recruitId);
+    }
+
+    @Override
+    public int updateResumeCount(int recruitId) {
+        return session.update("resume.updateResumeCount", recruitId);
     }
 
 }
