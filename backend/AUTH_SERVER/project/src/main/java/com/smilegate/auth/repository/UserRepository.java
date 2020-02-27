@@ -3,10 +3,11 @@ package com.smilegate.auth.repository;
 import com.smilegate.auth.domain.User;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 public interface UserRepository {
 
-    User findByEmail(String email);
+    User findByEmail(String email, int status);
 
     int countUser(String email);
 
@@ -22,5 +23,5 @@ public interface UserRepository {
 
     int updateRole(int id, int role, String updatedAt);
 
-    int updateAccessedAt(Integer id, String accessedAt);
+    Future<Integer> updateAccessedAt(Integer id, String accessedAt);
 }

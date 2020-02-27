@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,22 +19,18 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
     @Value("${jwt.secret}")
     private String secret;
     private Key key;
-    private HashMap<Integer, String> roles;
 
     @PostConstruct
-    protected void JwtUtil() {
+    protected void initKey() {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
-        this.roles = new HashMap<>();
-        this.roles.put(1, "USER");
-        this.roles.put(99, "ADMIN");
     }
 
     public String createToken(Integer userId, String email, String nickname, int role, String tokenType, int minutes) {
@@ -45,10 +42,10 @@ public class JwtUtil {
         claims.put("tokenType", tokenType);
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(Date.from(Instant.now().plus(minutes, ChronoUnit.MINUTES)))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+                    .setClaims(claims)
+                    .setExpiration(Date.from(Instant.now().plus(minutes, ChronoUnit.MINUTES)))
+                    .signWith(key, SignatureAlgorithm.HS256)
+                    .compact();
     }
 
     public Authentication getAuthentication(String token) {
@@ -56,7 +53,7 @@ public class JwtUtil {
         String email = claims.getSubject();
         int role = (int) claims.get("role");
 
-        return new UsernamePasswordAuthenticationToken(email, null, Collections.singletonList(new SimpleGrantedAuthority(this.roles.get(role))));
+        return new UsernamePasswordAuthenticationToken(email, null, Collections.singletonList(new SimpleGrantedAuthority((role<50)? "USER" : "ADMIN")));
     }
 
     public Claims getClaims(String token) {

@@ -114,6 +114,16 @@ export default {
       this.getRecruit();
     },
     getRecruit() {
+      console.log(config.access_token)
+      console.log({
+        method: "get",
+        url: config.RECRUIT_HOST + "/recruits/detail/" + this.company.recruitId,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          Authorization: "Bearer " + config.access_token
+        }
+      })
       axios({
         method: "get",
         url: config.RECRUIT_HOST + "/recruits/detail/" + this.company.recruitId,
@@ -192,6 +202,9 @@ export default {
       }
       if (is_create) {
         this.makeNewResume(recruit, employment, cnt);
+        // resume 페이지로 이동
+        this.$router.push({name:'ResumePage'})
+        this.$modal.hide("company-modal");
       }
     }
   }

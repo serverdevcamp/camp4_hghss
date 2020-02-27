@@ -1,12 +1,17 @@
 package com.smilegate.auth.repository;
 
 import com.smilegate.auth.domain.User;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Future;
 
+@Slf4j
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
@@ -17,8 +22,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User findByEmail(String email) {
-        return session.selectOne("user.findByEmail", email);
+    public User findByEmail(String email, int status) {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("email", email);
+        map.put("status", String.valueOf(status));
+        return session.selectOne("user.findByEmail", map);
     }
 
     @Override
@@ -70,11 +78,13 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public int updateAccessedAt(Integer id, String accessedAt) {
+    @Async
+    public Future<Integer> updateAccessedAt(Integer id, String accessedAt) {
+        log.info("=== repo");
         HashMap<String, String> map = new HashMap<>();
         map.put("id", String.valueOf(id));
         map.put("accessedAt", accessedAt);
-        return session.update("user.updateAccessedAt", map);
+        return new AsyncResult<>(session.update("user.updateAccessedAt", map));
     }
 
 }

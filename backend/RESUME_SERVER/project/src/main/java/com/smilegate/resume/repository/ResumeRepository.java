@@ -1,16 +1,18 @@
 package com.smilegate.resume.repository;
 
 import com.smilegate.resume.domain.Answer;
+import com.smilegate.resume.domain.Company;
 import com.smilegate.resume.domain.Position;
 import com.smilegate.resume.domain.Resume;
 
 import java.util.List;
+import java.util.concurrent.Future;
 
 public interface ResumeRepository {
 
     int createResume(Resume resume);
 
-    int createAnswer(Answer answer);
+    Future<Integer> createAnswer(Answer answer);
 
     int updateAnswer(Answer answer);
 
@@ -34,9 +36,11 @@ public interface ResumeRepository {
 
     Integer findRecruitIdByPositionId(int positionId);
 
-    Integer findCompanyIdByRecruitId(int recruitId);
-
     Integer findMaxOrderNumByResumeId(int resumeId);
 
     int countResumeByPositionId(int userId, int positionId);
+
+    Company findCompanyByRecruitId(int id);
+
+    int updateResumeCount(int recruitId);
 }

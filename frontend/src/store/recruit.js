@@ -57,6 +57,7 @@ export default {
         }
       }).then(response => {
         let status = response.data.status
+        console.log(response.data)
         if (status == 200 || status == 401 || status == 402) {
           // TODO : 402 코드 발생시 로그아웃
           context.commit('setCalendar', response.data.data);
@@ -68,7 +69,6 @@ export default {
     likeToggle(context, payload) {
       var method = ['post', 'delete']
       var path = ['like', 'unlike']
-
       return axios({
         method: method[payload.action],
         url: config.RECRUIT_HOST + '/recruits/' + path[payload.action] + '/' + payload.recruit_id,

@@ -12,13 +12,16 @@ import com.smilegate.auth.utils.RedisUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.Future;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -34,26 +37,28 @@ public class UserService {
         String email = signinRequestDto.getEmail();
         String password = signinRequestDto.getPassword();
 
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email, 1);
+
         if(user==null) throw new EmailNotExistException(email);
-
-        userRepository.updateAccessedAt(user.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-
         if(!passwordEncoder.matches(password, user.getPasswd())) throw new PasswordWrongException();
+
+        Future<Integer> updateAccessedAt = userRepository.updateAccessedAt(user.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 
         String accessToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "ACCESS_TOKEN", 30);
         String refreshToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "REFRESH_TOKEN", 60*24*14);
 
         redisUtil.set(refreshToken, user.getRole(), 60*24*14);
 
+        while(!updateAccessedAt.isDone());
+
         return TokenResponseDto.builder()
-                .id(user.getId())
-                .email(email)
-                .nickname(user.getNickname())
-                .role(user.getRole())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+                    .id(user.getId())
+                    .email(email)
+                    .nickname(user.getNickname())
+                    .role(user.getRole())
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .build();
     }
 
     public void signout(String refreshToken) {
@@ -62,7 +67,6 @@ public class UserService {
 
     public TokenResponseDto refreshToken(String refreshToken) throws ExpiredJwtException {
 
-        // 로그아웃 상태에서 refresh 요청
         if(!redisUtil.hasKey(refreshToken)) throw new UnauthorizedException();
 
         Claims claims = jwtUtil.getClaims(refreshToken);
@@ -97,6 +101,7 @@ public class UserService {
                         .nickname("temp")
                         .passwd(passwd)
                         .role(1)
+                        .status(1)
                         .build();
 
         if(mailUtil.sendSignupMail(key, user)) redisUtil.set(key, user, 10);
@@ -135,7 +140,6 @@ public class UserService {
 
         String email = (String) redisUtil.get(key);
 
-        // key가 잘못된 경우
         if(email == null) throw new UnauthorizedException();
 
         if(userRepository.countUser(email) == 0) throw new EmailNotExistException(email);

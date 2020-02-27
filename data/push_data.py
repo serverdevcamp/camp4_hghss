@@ -3,6 +3,7 @@ import csv
 import requests
 import pymysql
 import datetime
+import random
 
 headers = { 'Content-Type': 'application/json'}
 
@@ -20,15 +21,21 @@ def pushNickName() :
         for row in spamreader:
             adjective = ', '.join(row).split(',')
 
-    print("닉네임을 삽입합니다.")
+    nickname_pull = []
     for n in noun :
         for a in adjective :
-            # 닉네임 삽입
-            curs = conn.cursor()
-            sql = """INSERT INTO nickname_bible(nickname)
-                VALUES (%s)"""
-            curs.execute(sql, a+" "+n)
-            conn.commit()
+            # 닉네임 만들기
+            nickname_pull.append(a+" "+n)
+
+    random.shuffle(nickname_pull)
+    print("닉네임을 삽입합니다.")
+    for nickname in nickname_pull :
+        # 닉네임 삽입
+        curs = conn.cursor()
+        sql = """INSERT INTO nickname_bible(nickname)
+            VALUES (%s)"""
+        curs.execute(sql, nickname)
+        conn.commit()
     print("닉네임 삽입이 완료되었습니다.")
 
 
@@ -53,85 +60,115 @@ def get_recruit_detail(recruit_id) :
     return { "content": data["content"],
                 "employment_page_url" : data["employment_page_url"],
                 "employments" : data["employments"],
-                "recruit_type" : data["recruit_type"]
+                "recruit_type" : data["recruit_type"],
+                "view_count" : data["view_count"]
             }
 
 # 채용공고 
-def get_recruits() :
+def get_recruits(start,end) :
     url = "https://jasoseol.com/employment/calendar_list.json"
-    payload = "{\n\t\"start_time\": \"2019-11-27T15:00:00.000Z\",\n\t\"end_time\": \"2020-02-01T15:00:00.000Z\"\n}"
+    payload = "{\n\t\"start_time\": \""+start+"T15:00:00.000Z\",\n\t\"end_time\": \""+end+"T15:00:00.000Z\"\n}"
 
     response = requests.request("POST", url, headers=headers, data = payload)
-    recuit = response.json()
+    recruit = response.json()
 
     print("채용공고 크롤링을 시작합니다.")
-    company_id = 0
-    for data in recuit["employment"] :
+    for data in recruit["employment"] :
         recruit_id = data["id"]
         name = data["name"]
         logo_url = data["image_file_name"]
 
-           
-        """ company table """
+        # [1] company id 중복 조회
         curs = conn.cursor()
-        sql = """INSERT INTO company(name, logo_url)
-            VALUES (%s, %s)"""
-        curs.execute(sql, (name, logo_url))
-        conn.commit()
-
-        company_id += 1
-        _start_time = data["start_time"].split('T')
-        _date = list(map(int, _start_time[0].split("-")))
-        _time = list(map(int, _start_time[1].split(".")[0].split(":")))
-        start_time = datetime.datetime(_date[0], _date[1], _date[2], _time[0], _time[1], _time[2])
-
-        _end_time = data["end_time"].split('T')
-        _date = list(map(int, _end_time[0].split("-")))
-        _time = list(map(int, _end_time[1].split(".")[0].split(":")))
-        end_time = datetime.datetime(_date[0], _date[1], _date[2], _time[0], _time[1], _time[2])
-        
-
-        detail = get_recruit_detail(recruit_id)
-        employment_page_url = detail["employment_page_url" ]
-        content = detail["content"]
-        recruit_type = detail["recruit_type"]
-
-        """ company table """
-        curs = conn.cursor()
-        sql = """INSERT INTO recruit(id,company_id,start_time,end_time,content,employment_page_url,recruit_type)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)"""
-        curs.execute(sql, (recruit_id, company_id, start_time, end_time, content, employment_page_url, recruit_type))
-        conn.commit()
-
-        for employment in detail["employments"] :
-            position_id = employment["id"]
-            field = employment["field"]
-            division= employment["division"]
-
-            """ position table """
+        sql = """select id from company where name = %s"""
+        curs.execute(sql,(name.replace(" ", "") ))
+        rows = curs.fetchall()
+        if len(rows) :
+            for row in rows :
+                company_id = row[0]
+                print("이전에 들어간적 있는 회사임 : ",name, company_id)
+        else :
+            # 존재하지 않으면 삽입
+            """ company table """
             curs = conn.cursor()
-            sql = """INSERT INTO position VALUES (%s, %s, %s, %s)"""
-            curs.execute(sql,(position_id, recruit_id, field, division))
+            sql = """INSERT INTO company(name, logo_url)
+                VALUES (%s, %s)"""
+            curs.execute(sql, (name, logo_url))
             conn.commit()
 
-        
-            questions = get_questions(position_id)
-            for question in questions :
-                question_id = question["id"]
-                question_content = question["question"] or '자유양식'
-                question_limit = question["total_count"] or 0
+            # 삽입했으면 company id 가져오기
+            curs = conn.cursor()
+            sql = """select id from company where name = %s"""
+            curs.execute(sql,(name.replace(" ", "") ))
+            rows = curs.fetchall()
+            for row in rows :
+                company_id = row[0]
 
-                """ question table """
+        # [2] 해당 recruit가 존재하지 않을 때만 넣기
+        curs = conn.cursor()
+        sql = """select id from recruit where id = %s"""
+        curs.execute(sql,(recruit_id))
+        rows = curs.fetchall()
+        if len(rows) == 0 :
+            _start_time = data["start_time"].split('T')
+            _date = list(map(int, _start_time[0].split("-")))
+            _time = list(map(int, _start_time[1].split(".")[0].split(":")))
+            start_time = datetime.datetime(_date[0], _date[1], _date[2], _time[0], _time[1], _time[2])
+
+            _end_time = data["end_time"].split('T')
+            _date = list(map(int, _end_time[0].split("-")))
+            _time = list(map(int, _end_time[1].split(".")[0].split(":")))
+            end_time = datetime.datetime(_date[0], _date[1], _date[2], _time[0], _time[1], _time[2])
+            
+            detail = get_recruit_detail(recruit_id)
+            employment_page_url = detail["employment_page_url" ]
+            content = detail["content"]
+            recruit_type = detail["recruit_type"]
+            view_count = detail["view_count"]
+
+            """ company table """
+            curs = conn.cursor()
+            sql = """INSERT INTO recruit(id,company_id,start_time,end_time,content,view_count,employment_page_url,recruit_type)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"""
+            curs.execute(sql, (recruit_id, company_id, start_time, end_time, content, view_count, employment_page_url, recruit_type))
+            conn.commit()
+
+            for employment in detail["employments"] :
+                position_id = employment["id"]
+                field = employment["field"]
+                division= employment["division"] or ''
+
+                """ position table """
                 curs = conn.cursor()
-                sql = """INSERT INTO question VALUES (%s, %s, %s, %s)"""
-                curs.execute(sql, (question_id, position_id, question_content, question_limit))
+                sql = """INSERT INTO position VALUES (%s, %s, %s, %s)"""
+                curs.execute(sql,(position_id, recruit_id, field, division))
                 conn.commit()
+
+            
+                questions = get_questions(position_id)
+                for question in questions :
+                    question_id = question["id"]
+                    question_content = question["question"] or '자유양식'
+                    question_limit = question["total_count"] or 0
+
+                    """ question table """
+                    curs = conn.cursor()
+                    sql = """INSERT INTO question VALUES (%s, %s, %s, %s)"""
+                    curs.execute(sql, (question_id, position_id, question_content, question_limit))
+                    conn.commit()
 
     print("완료!")
 
-conn = pymysql.connect(host=config.HOST, port=config.PORT, user=config.USER, passwd=config.PASSWORD,
-                        db=config.DATABASE, charset='utf8')
+conn = pymysql.connect(host=config.HOST, port=config.PORT, user=config.USER, passwd=config.PASSWORD, db=config.DATABASE, charset='utf8')
 
-pushNickName() 
-#get_recruits()
+
+#pushNickName() 
+
+year = ["2017","2018","2019","2020"]
+month = ["01","02","03","04","05","06","07","08","09","10","11","12"]
+for y in year :
+    for i in range(len(month)) : 
+        print(y+"-"+month[i]+"-01", y+"-"+month[i]+"-31", "시작")
+        get_recruits(y+"-"+month[i]+"-01", y+"-"+month[i]+"-31")
+
 conn.close()
