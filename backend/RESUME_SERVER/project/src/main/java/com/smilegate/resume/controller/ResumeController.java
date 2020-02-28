@@ -30,6 +30,7 @@ public class ResumeController {
             @PathVariable("positionId") int positionId,
             @RequestBody ResumeRequestDto resumeRequestDto
     ) {
+        log.info("RESUME CREATE positionId : "+positionId);
         ResumeDetailResponseDto resumeDetailResponseDto = resumeService.createResume(token, positionId, resumeRequestDto);
 
         return ResponseEntity.ok().body(
@@ -45,7 +46,6 @@ public class ResumeController {
     @GetMapping("/list")
     public ResponseEntity<ResultResponse> list(@RequestHeader("Authorization") String token) {
         log.info("RESUME LIST");
-
         List<Resume> resumes = resumeService.getResumes(token);
 
         return ResponseEntity.ok().body(
@@ -64,7 +64,7 @@ public class ResumeController {
             @PathVariable("resumeId") int resumeId,
             @RequestBody ResumeRequestDto resumeRequestDto
     ) {
-
+        log.info("RESUME SAVE resumeId : " + resumeId);
         resumeService.saveResume(resumeId, token, resumeRequestDto.getTitle(), resumeRequestDto.getAnswers());
 
         return ResponseEntity.ok().body(
@@ -81,7 +81,7 @@ public class ResumeController {
             @RequestHeader("Authorization") String token,
             @PathVariable("resumeId") int resumeId
     ) {
-
+        log.info("RESUME DELETE resumeId : " + resumeId);
         resumeService.deleteResume(resumeId, token);
 
         return ResponseEntity.ok().body(
@@ -100,7 +100,7 @@ public class ResumeController {
             @RequestParam("col") int col,
             @RequestParam("row") int row
     ) {
-
+        log.info("MOVE REUSME resumeId : " + resumeId);
         resumeService.moveResume(resumeId, token, col, row);
 
         return ResponseEntity.ok().body(
@@ -117,7 +117,7 @@ public class ResumeController {
             @RequestHeader("Authorization") String token,
             @PathVariable("resumeId") int resumeId
     ) {
-
+        log.info("RESUME DETAIL resumeId : " + resumeId);
         ResumeDetailResponseDto resumeDetailResponseDto = resumeService.getResume(token, resumeId);
 
         return ResponseEntity.ok().body(
@@ -135,7 +135,7 @@ public class ResumeController {
             @RequestHeader("Authorization") String token,
             @PathVariable int resumeId
     ) {
-
+        log.info("ANSWER CREATE resumeId : " + resumeId);
         Answer answer = resumeService.createAnswer(token, resumeId);
 
         return ResponseEntity.ok().body(
@@ -153,7 +153,7 @@ public class ResumeController {
             @RequestHeader("Authorization") String token,
             @PathVariable int answerId
     ) {
-
+        log.info("ANSWER DELETE answerId : " + answerId);
         resumeService.deleteAnswer(token, answerId);
 
         return ResponseEntity.ok().body(
@@ -170,7 +170,7 @@ public class ResumeController {
             @RequestHeader("Authorization") String token,
             @PathVariable int positionId
     ) {
-
+        log.info("COUNT RESUME positionId : " + positionId);
         int resumeCnt = resumeService.countResume(token, positionId);
 
         return ResponseEntity.ok().body(
