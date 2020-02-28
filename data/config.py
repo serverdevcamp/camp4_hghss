@@ -1,5 +1,5 @@
-HOST = 'hghssdb.cxzs7p8tyazt.ap-northeast-2.rds.amazonaws.com'
+HOST = ''
 PORT = 3306
-USER = 'hghss'
-PASSWORD = 'smilegate123!'
-DATABASE = 'hghssdb'
+USER = ''
+PASSWORD = ''
+DATABASE = ''
