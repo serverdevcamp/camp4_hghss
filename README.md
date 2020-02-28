@@ -4,7 +4,7 @@
 
 [![demo](http://img.youtube.com/vi/2VK6UbJtVYc/0.jpg)](https://youtu.be/2VK6UbJtVYc?t=0s)
 
-
+<br />
 
 
 ## I. 프로젝트 기능
@@ -36,7 +36,7 @@
 - 실시간 랭킹
 - 자기소개서 CRUD
 
-
+<br />
 
 ## II. 팀원 및 역할
 
@@ -64,7 +64,7 @@
 - Spring boot를 이용한 `자기소개서 서버`
 - OAuth를 활용한 `소셜 로그인` 
 
-
+<br />
 
 ## III. 구성
 
