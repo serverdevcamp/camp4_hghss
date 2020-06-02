@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
-import java.util.concurrent.Future;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,14 +42,12 @@ public class UserServiceImpl implements UserService {
         if(user==null) throw new EmailNotExistException(email);
         if(!passwordEncoder.matches(password, user.getPasswd())) throw new PasswordWrongException();
 
-        Future<Integer> updateAccessedAt = userRepository.updateAccessedAt(user.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        userRepository.updateAccessedAt(user.getId(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 
         String accessToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "ACCESS_TOKEN", 30);
         String refreshToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getRole(), "REFRESH_TOKEN", 60*24*14);
 
         redisUtil.set(refreshToken, user.getRole(), 60*24*14);
-
-        while(!updateAccessedAt.isDone());
 
         return TokenResponseDto.builder()
                     .id(user.getId())
