@@ -1,12 +1,14 @@
 package com.smilegate.auth.repository;
 
 import com.smilegate.auth.domain.User;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.List;
 
+@Slf4j
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
@@ -74,6 +76,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public int updateAccessedAt(Integer id, String accessedAt) {
+        log.info("=== repo");
         HashMap<String, String> map = new HashMap<>();
         map.put("id", String.valueOf(id));
         map.put("accessedAt", accessedAt);

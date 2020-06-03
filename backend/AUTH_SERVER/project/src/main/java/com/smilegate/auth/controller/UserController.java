@@ -32,7 +32,6 @@ public class UserController {
 
     @PostMapping("/signin")
     public ResponseEntity<ResultResponse> signin(@RequestBody SigninRequestDto signinRequestDto) {
-
         log.info("SIGN IN");
 
         TokenResponseDto tokenResponseDto = userService.signin(signinRequestDto);

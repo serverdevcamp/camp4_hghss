@@ -31,12 +31,6 @@
         WHERE id = #{positionId};
     </select>
 
-    <select id="selectCompanyIdByRecruitId" parameterType="int" resultType="int">
-        SELECT company_id
-        FROM recruit
-        WHERE id = #{recruitId};
-    </select>
-
     <select id="selectMaxOrderNumByResumeId" parameterType="int" resultType="int">
         SELECT MAX(order_num)
         FROM answer
@@ -48,6 +42,11 @@
         FROM resume
         WHERE user_id = #{userId}
         AND position_id = #{positionId};
+    </select>
+
+    <select id="selectCompanyByRecruitId" parameterType="int" resultType="Company">
+        SELECT * FROM company
+        where id = (SELECT company_id FROM recruit WHERE id = #{recruitId});
     </select>
 
     <insert id="insertResume" useGeneratedKeys="true" keyProperty="id" parameterType="Resume">
@@ -77,6 +76,12 @@
         UPDATE resume
         SET resume_col = #{col}, resume_row = #{row}
         WHERE id = #{resumeId};
+    </update>
+
+    <update id="updateResumeCount" parameterType="int">
+        UPDATE recruit
+        SET resume_count = resume_count+1
+        WHERE id = #{recruitId};
     </update>
 
     <delete id="deleteAnswers" parameterType="int">
