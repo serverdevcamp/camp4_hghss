@@ -3,7 +3,7 @@ appnope==0.1.0
 asgiref==3.2.3
 async-timeout==3.0.1
 attrs==19.3.0
-autobahn==20.1.2
+autobahn==20.12.3
 Automat==0.8.0
 backcall==0.1.0
 cffi==1.13.2
